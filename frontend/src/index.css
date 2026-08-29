@@ -1,0 +1,132 @@
+@import "leaflet/dist/leaflet.css";
+
+:root {
+  --void: #0B0E11;
+  --panel: #141920;
+  --panel-elevated: #1C232D;
+  --grid-line: #232B33;
+  --grid-line-bright: #323E4A;
+  
+  --signal-cyan: #4FD8C4;
+  --signal-cyan-glow: rgba(79, 216, 196, 0.15);
+  
+  --dispute-amber: #E8A33D;
+  --dispute-amber-glow: rgba(232, 163, 61, 0.15);
+  
+  --critical-ember: #D6553C;
+  --critical-ember-glow: rgba(214, 85, 60, 0.2);
+  
+  --dark-zone-grey: #5A6472;
+  --dark-zone-dark: #1E232B;
+  
+  --ink: #E4E8EC;
+  --ink-dim: #8A93A0;
+  --ink-muted: #535C68;
+  
+  --font-mono: "JetBrains Mono", "SF Mono", "Fira Code", monospace;
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: var(--void);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-size: 13px;
+  line-height: 1.4;
+  overflow: hidden;
+  height: 100vh;
+  width: 100vw;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Scrollbars */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+::-webkit-scrollbar-track {
+  background: var(--void);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--grid-line);
+  border-radius: 2px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--ink-muted);
+}
+
+/* Monospace Utilities */
+.mono {
+  font-family: var(--font-mono);
+  font-feature-settings: "tnum" 1, "zero" 1;
+}
+
+/* Hatched patterns */
+.hatched-amber {
+  background: repeating-linear-gradient(
+    45deg,
+    rgba(232, 163, 61, 0.1),
+    rgba(232, 163, 61, 0.1) 6px,
+    rgba(232, 163, 61, 0.2) 6px,
+    rgba(232, 163, 61, 0.2) 12px
+  );
+  border: 1px solid var(--dispute-amber);
+}
+
+.hatched-dark-zone {
+  background: repeating-linear-gradient(
+    -45deg,
+    rgba(90, 100, 114, 0.15),
+    rgba(90, 100, 114, 0.15) 8px,
+    rgba(30, 35, 43, 0.8) 8px,
+    rgba(30, 35, 43, 0.8) 16px
+  );
+  border: 1px dashed var(--dark-zone-grey);
+}
+
+/* Leaflet Dark Tactical Map Customization */
+.leaflet-container {
+  background-color: #0b0e11 !important;
+}
+.leaflet-tile-pane {
+  filter: brightness(0.65) contrast(1.35) saturate(0.3) !important;
+}
+.leaflet-control-zoom {
+  border: 1px solid var(--grid-line) !important;
+  background: var(--panel) !important;
+}
+
+
+
+.leaflet-control-zoom a {
+  background: var(--panel) !important;
+  color: var(--ink) !important;
+  border-bottom: 1px solid var(--grid-line) !important;
+}
+
+/* Keyframes */
+@keyframes pulse-critical {
+  0% { box-shadow: 0 0 0 0 rgba(214, 85, 60, 0.6); }
+  70% { box-shadow: 0 0 0 8px rgba(214, 85, 60, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(214, 85, 60, 0); }
+}
+
+@keyframes pulse-amber {
+  0% { box-shadow: 0 0 0 0 rgba(232, 163, 61, 0.6); }
+  70% { box-shadow: 0 0 0 8px rgba(232, 163, 61, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(232, 163, 61, 0); }
+}
+
+.pulsing-critical {
+  animation: pulse-critical 2s infinite;
+}
+
+.pulsing-amber {
+  animation: pulse-amber 2.5s infinite;
+}
