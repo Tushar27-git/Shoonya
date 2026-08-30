@@ -34,12 +34,12 @@ export const Header: React.FC<HeaderProps> = ({
       }}
     >
       {/* Brand & Sector */}
-      <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
+      <div style={{ display: "flex", alignItems: "center", gap: "12px", flexShrink: 0 }}>
         <div style={{ display: "flex", alignItems: "baseline", gap: "6px" }}>
-          <span style={{ fontSize: "16px", fontWeight: 800, letterSpacing: "1px", color: "var(--signal-cyan)" }}>
+          <span style={{ fontSize: "15px", fontWeight: 800, letterSpacing: "1px", color: "var(--signal-cyan)", whiteSpace: "nowrap" }}>
             SHOONYA
           </span>
-          <span style={{ fontSize: "13px", fontWeight: 600, color: "var(--ink-dim)" }}>
+          <span style={{ fontSize: "12px", fontWeight: 600, color: "var(--ink-dim)", whiteSpace: "nowrap" }}>
             // शून्य
           </span>
         </div>
@@ -47,7 +47,7 @@ export const Header: React.FC<HeaderProps> = ({
       </div>
 
       {/* Real-time Telemetry Readouts */}
-      <div style={{ display: "flex", alignItems: "center", gap: "20px" }} className="mono">
+      <div style={{ display: "flex", alignItems: "center", gap: "12px", overflowX: "auto", whiteSpace: "nowrap" }} className="mono">
         <div style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "11px" }}>
           <Radio size={13} color="var(--signal-cyan)" />
           <span style={{ color: "var(--ink-dim)" }}>PENDING REPORTS:</span>
@@ -93,15 +93,16 @@ export const Header: React.FC<HeaderProps> = ({
           style={{
             display: "flex",
             alignItems: "center",
-            gap: "6px",
-            padding: "4px 10px",
+            gap: "4px",
+            padding: "4px 8px",
             backgroundColor: "rgba(79, 216, 196, 0.15)",
             border: "1px solid var(--signal-cyan)",
             color: "var(--signal-cyan)",
             borderRadius: "2px",
             cursor: "pointer",
-            fontSize: "11px",
+            fontSize: "10px",
             fontWeight: 700,
+            whiteSpace: "nowrap"
           }}
         >
           <span
@@ -113,7 +114,7 @@ export const Header: React.FC<HeaderProps> = ({
               boxShadow: "0 0 6px var(--signal-cyan)",
             }}
           />
-          AI ADVISORY / HUMAN CONTROL
+          AI ADVISORY
         </button>
 
         <button
@@ -122,15 +123,16 @@ export const Header: React.FC<HeaderProps> = ({
           style={{
             display: "flex",
             alignItems: "center",
-            gap: "6px",
-            padding: "4px 10px",
+            gap: "4px",
+            padding: "4px 8px",
             backgroundColor: isLive ? "rgba(79, 216, 196, 0.1)" : "rgba(214, 85, 60, 0.1)",
             border: `1px solid ${isLive ? "var(--signal-cyan)" : "var(--critical-ember)"}`,
             color: isLive ? "var(--signal-cyan)" : "var(--critical-ember)",
             borderRadius: "2px",
             cursor: "pointer",
-            fontSize: "11px",
+            fontSize: "10px",
             fontWeight: 600,
+            whiteSpace: "nowrap"
           }}
         >
           <span
@@ -142,7 +144,7 @@ export const Header: React.FC<HeaderProps> = ({
               boxShadow: isLive ? "0 0 6px var(--signal-cyan)" : "none",
             }}
           />
-          {isLive ? "SIMULATION STREAM" : "REPLAY PAUSED"}
+          {isLive ? "LIVE" : "PAUSED"}
         </button>
       </div>
     </header>

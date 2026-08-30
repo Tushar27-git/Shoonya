@@ -163,7 +163,7 @@ export const LocationSearch: React.FC<LocationSearchProps> = ({ onLocationFound 
           placeholder="Search location..."
           style={{
             background: "none", border: "none", color: "var(--ink)", outline: "none",
-            fontSize: "14px", width: "250px"
+            fontSize: "13px", width: "160px"
           }}
         />
         <Search 
@@ -221,10 +221,10 @@ export const LocationSearch: React.FC<LocationSearchProps> = ({ onLocationFound 
         onClick={handleUseCurrentLocation}
         disabled={isLoading}
         style={{
-        display: "flex", alignItems: "center", gap: "8px",
+        display: "flex", alignItems: "center", gap: "6px",
         backgroundColor: "var(--panel-elevated)", border: "1px solid var(--signal-cyan)",
-        color: "var(--signal-cyan)", padding: "8px 16px", borderRadius: "20px",
-        cursor: isLoading ? "not-allowed" : "pointer", fontWeight: "bold", boxShadow: "0 4px 6px rgba(0,0,0,0.3)"
+        color: "var(--signal-cyan)", padding: "6px 12px", borderRadius: "20px", fontSize: "12px",
+        cursor: isLoading ? "not-allowed" : "pointer", fontWeight: "bold", boxShadow: "0 4px 6px rgba(0,0,0,0.3)", whiteSpace: "nowrap"
       }}>
         {isLoading ? <Loader size={16} className="lucide-spin" /> : <Navigation size={16} />}
         Use Current Location

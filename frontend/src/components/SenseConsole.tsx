@@ -346,25 +346,25 @@ export const SenseConsole: React.FC = () => {
 
         {/* Other isolated tabs that replace map */}
         {activeTab === "NGO_TASKS" && (
-          <div style={{ position: "absolute", inset: 0, zIndex: 30, backgroundColor: "var(--void)" }}>
+          <div style={{ position: "absolute", inset: 0, zIndex: 30, backgroundColor: "var(--void)", padding: "24px", overflowY: "auto" }}>
             <NgoTaskPanel needs={needs} acceptedTasks={new Set()} onAcceptTask={handleAcceptTask} />
           </div>
         )}
 
         {activeTab === "AMPLIFY_CARDS" && (
-          <div style={{ position: "absolute", inset: 0, zIndex: 30, backgroundColor: "var(--void)" }}>
+          <div style={{ position: "absolute", inset: 0, zIndex: 30, backgroundColor: "var(--void)", padding: "24px", overflowY: "auto" }}>
             <AmplifyCardPreview cards={amplifyCards} onApproveCard={handleApproveCard} />
           </div>
         )}
 
         {activeTab === "SAATHI_PROFILE" && (
-          <div style={{ position: "absolute", inset: 0, zIndex: 30, backgroundColor: "var(--void)" }}>
+          <div style={{ position: "absolute", inset: 0, zIndex: 30, backgroundColor: "var(--void)", padding: "24px", overflowY: "auto" }}>
             <SaathiProfile />
           </div>
         )}
 
         {activeTab === "IMPACT_BOARD" && (
-          <div style={{ position: "absolute", inset: 0, zIndex: 30, backgroundColor: "var(--void)" }}>
+          <div style={{ position: "absolute", inset: 0, zIndex: 30, backgroundColor: "var(--void)", padding: "24px", overflowY: "auto" }}>
             <ImpactBoard />
           </div>
         )}
@@ -376,19 +376,19 @@ export const SenseConsole: React.FC = () => {
         )}
 
         {activeTab === "FLEET_STATUS" && (
-          <div style={{ position: "absolute", inset: 0, zIndex: 30, backgroundColor: "var(--void)" }}>
+          <div style={{ position: "absolute", inset: 0, zIndex: 30, backgroundColor: "var(--void)", padding: "24px", overflowY: "auto" }}>
             <FleetStatus fleet={fleetData} />
           </div>
         )}
 
         {activeTab === "SAFETY_ALERTS" && (
-          <div style={{ position: "absolute", inset: 0, zIndex: 30, backgroundColor: "var(--void)" }}>
+          <div style={{ position: "absolute", inset: 0, zIndex: 30, backgroundColor: "var(--void)", padding: "24px", overflowY: "auto" }}>
             <SafetyAlerts location={locationName} incidents={incidents} />
           </div>
         )}
 
         {activeTab === "SETTINGS" && (
-          <div style={{ position: "absolute", inset: 0, zIndex: 30, backgroundColor: "var(--void)" }}>
+          <div style={{ position: "absolute", inset: 0, zIndex: 30, backgroundColor: "var(--void)", padding: "24px", overflowY: "auto" }}>
             <Settings />
           </div>
         )}

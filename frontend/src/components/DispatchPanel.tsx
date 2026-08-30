@@ -28,7 +28,7 @@ export const DispatchPanel: React.FC<DispatchPanelProps> = ({ incidents, resourc
   const [approverIdInput, setApproverIdInput] = useState("");
   const [approverRoleInput, setApproverRoleInput] = useState("FIELD_COMMANDER");
   const [approveError, setApproveError] = useState<string | null>(null);
-  const [selectedAssignments, setSelectedAssignments] = useState<Set<string>>(new Set());
+  const [decisions, setDecisions] = useState<Record<string, { action: 'ACCEPT' | 'OVERRULE', reason?: string }>>({});
 
   const handleGenerate = async () => {
     setIsGenerating(true);
@@ -59,9 +59,15 @@ export const DispatchPanel: React.FC<DispatchPanelProps> = ({ incidents, resourc
         }),
       });
 
-      const data: DispatchPlan = await res.json();
-      setPlan(data);
-      setSelectedAssignments(new Set(data.assignments.map((a) => a.incident_id)));
+      const newPlan = await res.json();
+      setPlan(newPlan);
+      
+      // Initialize decisions
+      const initialDecisions: Record<string, { action: 'ACCEPT' | 'OVERRULE', reason?: string }> = {};
+      newPlan.assignments.forEach((a: any) => {
+        initialDecisions[a.incident_id] = { action: 'ACCEPT' };
+      });
+      setDecisions(initialDecisions);
     } catch (e) {
       console.error("Dispatch plan error", e);
     } finally {
@@ -181,46 +187,90 @@ export const DispatchPanel: React.FC<DispatchPanelProps> = ({ incidents, resourc
               No viable assignments generated. Insufficient resources for current incident load.
             </div>
           ) : (
-            plan.assignments.map((a) => (
+            plan.assignments.map((a) => {
+              const decision = decisions[a.incident_id] || { action: 'ACCEPT' };
+              const isAccepted = decision.action === 'ACCEPT';
+              
+              return (
               <div
                 key={a.incident_id}
-                onClick={() => toggleAssignment(a.incident_id)}
                 style={{
-                  backgroundColor: selectedAssignments.has(a.incident_id) ? "rgba(79, 70, 229, 0.1)" : "var(--panel)",
-                  border: `1px solid ${selectedAssignments.has(a.incident_id) ? "var(--signal-cyan)" : "var(--grid-line)"}`,
+                  backgroundColor: "var(--panel)",
+                  border: `1px solid ${isAccepted ? "var(--signal-cyan)" : "var(--dispute-amber)"}`,
                   borderRadius: "var(--radius-lg)", padding: "16px 20px",
-                  display: "flex", justifyContent: "space-between", alignItems: "center",
-                  cursor: "pointer", transition: "all 0.15s ease",
+                  display: "flex", flexDirection: "column", gap: "12px",
+                  transition: "all 0.15s ease",
                   position: "relative", overflow: "hidden",
                 }}
               >
-                <div style={{ position: "absolute", top: 0, left: 0, width: "4px", bottom: 0, backgroundColor: resourceTypeColors[a.resource_type] || "var(--signal-cyan)" }} />
-                <div style={{ marginLeft: "12px", display: "flex", gap: "32px", alignItems: "center" }}>
-                  <div>
-                    <div style={{ fontSize: "10px", color: "var(--ink-dim)", marginBottom: "4px" }} className="mono">INCIDENT</div>
-                    <div style={{ fontSize: "13px", color: "white", fontWeight: "bold" }} className="mono">{a.incident_id}</div>
+                <div style={{ position: "absolute", top: 0, left: 0, width: "4px", bottom: 0, backgroundColor: isAccepted ? (resourceTypeColors[a.resource_type] || "var(--signal-cyan)") : "var(--dispute-amber)" }} />
+                
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                  <div style={{ marginLeft: "12px", display: "flex", gap: "32px", alignItems: "center" }}>
+                    <div>
+                      <div style={{ fontSize: "10px", color: "var(--ink-dim)", marginBottom: "4px" }} className="mono">INCIDENT</div>
+                      <div style={{ fontSize: "13px", color: "white", fontWeight: "bold" }} className="mono">{a.incident_id}</div>
+                    </div>
+                    <ChevronRight size={16} color="var(--ink-dim)" />
+                    <div>
+                      <div style={{ fontSize: "10px", color: "var(--ink-dim)", marginBottom: "4px" }} className="mono">RESOURCE</div>
+                      <div style={{ fontSize: "13px", fontWeight: "bold", color: resourceTypeColors[a.resource_type] || "white" }}>{a.resource_id}</div>
+                    </div>
+                    <div style={{ backgroundColor: "rgba(255,255,255,0.05)", padding: "4px 10px", borderRadius: "12px", border: "1px solid rgba(255,255,255,0.1)" }}>
+                      <span style={{ fontSize: "11px", color: "var(--ink-dim)" }}>{a.resource_type}</span>
+                    </div>
+                    <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                      <Clock size={13} color="var(--ink-dim)" />
+                      <span style={{ fontSize: "12px", color: "var(--ink-dim)" }}>{a.eta_minutes} min ETA</span>
+                    </div>
                   </div>
-                  <ChevronRight size={16} color="var(--ink-dim)" />
-                  <div>
-                    <div style={{ fontSize: "10px", color: "var(--ink-dim)", marginBottom: "4px" }} className="mono">RESOURCE</div>
-                    <div style={{ fontSize: "13px", fontWeight: "bold", color: resourceTypeColors[a.resource_type] || "white" }}>{a.resource_id}</div>
-                  </div>
-                  <div style={{ backgroundColor: "rgba(255,255,255,0.05)", padding: "4px 10px", borderRadius: "12px", border: "1px solid rgba(255,255,255,0.1)" }}>
-                    <span style={{ fontSize: "11px", color: "var(--ink-dim)" }}>{a.resource_type}</span>
-                  </div>
-                  <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                    <Clock size={13} color="var(--ink-dim)" />
-                    <span style={{ fontSize: "12px", color: "var(--ink-dim)" }}>{a.eta_minutes} min ETA</span>
+                  
+                  <div style={{ display: "flex", gap: "8px" }}>
+                    <button 
+                      onClick={() => setDecisions(prev => ({ ...prev, [a.incident_id]: { action: 'ACCEPT' } }))}
+                      style={{
+                        padding: "6px 12px", fontSize: "11px", fontWeight: "bold", borderRadius: "4px", cursor: "pointer",
+                        backgroundColor: isAccepted ? "rgba(79, 216, 196, 0.15)" : "transparent",
+                        color: isAccepted ? "var(--signal-cyan)" : "var(--ink-dim)",
+                        border: `1px solid ${isAccepted ? "var(--signal-cyan)" : "var(--grid-line)"}`
+                      }}
+                    >
+                      ACCEPT
+                    </button>
+                    <button 
+                      onClick={() => setDecisions(prev => ({ ...prev, [a.incident_id]: { action: 'OVERRULE', reason: prev[a.incident_id]?.reason || "" } }))}
+                      style={{
+                        padding: "6px 12px", fontSize: "11px", fontWeight: "bold", borderRadius: "4px", cursor: "pointer",
+                        backgroundColor: !isAccepted ? "rgba(245, 158, 11, 0.15)" : "transparent",
+                        color: !isAccepted ? "var(--dispute-amber)" : "var(--ink-dim)",
+                        border: `1px solid ${!isAccepted ? "var(--dispute-amber)" : "var(--grid-line)"}`
+                      }}
+                    >
+                      OVERRULE
+                    </button>
                   </div>
                 </div>
-                <div>
-                  {selectedAssignments.has(a.incident_id)
-                    ? <CheckCircle size={20} color="var(--signal-cyan)" />
-                    : <div style={{ width: "20px", height: "20px", borderRadius: "50%", border: "2px solid var(--grid-line)" }} />
-                  }
+
+                <div style={{ marginLeft: "12px", padding: "12px", backgroundColor: "var(--void)", borderRadius: "8px", border: "1px solid var(--grid-line-bright)", fontSize: "12px" }}>
+                  {isAccepted ? (
+                    <div style={{ color: "var(--ink-muted)", display: "flex", gap: "6px" }}>
+                      <strong>AI Reasoning:</strong> Optimal match for terrain. {a.resource_type} is closest and can reach the incident area safely.
+                    </div>
+                  ) : (
+                    <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                      <div style={{ color: "var(--dispute-amber)", fontWeight: "bold" }}>Provide Human Overrule Reason:</div>
+                      <input 
+                        type="text" 
+                        value={decision.reason || ""}
+                        onChange={(e) => setDecisions(prev => ({ ...prev, [a.incident_id]: { action: 'OVERRULE', reason: e.target.value } }))}
+                        placeholder="e.g. Route is flooded, need a boat instead"
+                        style={{ width: "100%", padding: "8px", backgroundColor: "var(--panel)", border: "1px solid var(--dispute-amber)", color: "white", borderRadius: "4px" }}
+                      />
+                    </div>
+                  )}
                 </div>
               </div>
-            ))
+            )})
           )}
 
           {/* Approval Section */}
@@ -231,7 +281,7 @@ export const DispatchPanel: React.FC<DispatchPanelProps> = ({ incidents, resourc
                 <h4 style={{ color: "var(--dispute-amber)", fontWeight: "bold", fontSize: "14px" }}>Human Approval Required</h4>
               </div>
               <p style={{ color: "var(--ink-dim)", fontSize: "12px" }}>
-                {selectedAssignments.size} of {plan.assignments.length} assignments selected. Enter your officer ID and role to commit dispatch to the cryptographic audit chain.
+                {Object.keys(decisions).length} assignments reviewed. Enter your officer ID and role to commit dispatch to the cryptographic audit chain.
               </p>
               <div style={{ display: "flex", gap: "12px", flexWrap: "wrap" }}>
                 <div style={{ display: "flex", alignItems: "center", gap: "8px", backgroundColor: "var(--void)", border: "1px solid var(--grid-line)", borderRadius: "var(--radius-md)", padding: "8px 12px", flex: 1 }}>
@@ -272,17 +322,17 @@ export const DispatchPanel: React.FC<DispatchPanelProps> = ({ incidents, resourc
 
               <button
                 onClick={handleApprove}
-                disabled={isApproving || selectedAssignments.size === 0}
+                disabled={isApproving}
                 style={{
                   display: "flex", alignItems: "center", justifyContent: "center", gap: "8px",
                   backgroundColor: isApproving ? "var(--panel-elevated)" : "#10B981",
                   color: "white", border: "none", borderRadius: "var(--radius-md)",
                   padding: "12px 24px", fontSize: "14px", fontWeight: "bold", cursor: "pointer",
-                  opacity: selectedAssignments.size === 0 ? 0.5 : 1,
+                  opacity: 1,
                 }}
               >
                 {isApproving ? <Loader size={16} /> : <CheckCircle size={16} />}
-                {isApproving ? "COMMITTING TO AUDIT CHAIN..." : `APPROVE & DISPATCH (${selectedAssignments.size} units)`}
+                {isApproving ? "COMMITTING TO AUDIT CHAIN..." : `APPROVE & DISPATCH (${Object.keys(decisions).length} units)`}
               </button>
             </div>
           )}
