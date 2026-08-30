@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   Bot,
   Send,
@@ -142,7 +142,6 @@ export const CopilotModal: React.FC<CopilotModalProps> = ({
         body: JSON.stringify({
           query: textToSend,
           focus_incident_id: selectedIncidentId,
-          conversation_history: conversationHistory,
         }),
       });
 
@@ -172,7 +171,7 @@ export const CopilotModal: React.FC<CopilotModalProps> = ({
         e.name === "TypeError";
 
       const errorMessage = isConnectionError
-        ? `Unable to reach the EOC decision service (${apiBase}).\nPlease ensure the backend FastAPI service is running on port 8001.`
+        ? `Unable to reach the EOC decision service (${apiBase}).\nPlease ensure the backend FastAPI service is running on port 8000.`
         : `EOC decision inference error: ${e.message || "Unknown error occurred"}`;
 
       const errorMsgId = `err-${Date.now()}-${Math.random().toString(36).substr(2, 4)}`;
