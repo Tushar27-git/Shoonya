@@ -26,7 +26,6 @@ export const TacticalMap: React.FC<TacticalMapProps> = ({
   useEffect(() => {
     if (!mapContainerRef.current || mapInstanceRef.current) return;
 
-    // Centered on Raipur East sector
     const map = L.map(mapContainerRef.current, {
       center: [26.8500, 80.9450],
       zoom: 13,
@@ -34,16 +33,16 @@ export const TacticalMap: React.FC<TacticalMapProps> = ({
       attributionControl: false,
     });
 
-    // Native dark operational basemap (Esri World Dark Gray Base)
+    // Dark operational basemap (Esri World Dark Gray Base)
     L.tileLayer(
       "https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}",
       {
         maxZoom: 18,
-        attribution: "Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ",
+        attribution: "Tiles &copy; Esri",
       }
     ).addTo(map);
 
-    // Dark reference labels
+    // Reference labels
     L.tileLayer(
       "https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Reference/MapServer/tile/{z}/{y}/{x}",
       {
@@ -71,7 +70,7 @@ export const TacticalMap: React.FC<TacticalMapProps> = ({
     const layerGroup = layerGroupRef.current;
     layerGroup.clearLayers();
 
-    // 1. Sector Boundary & Ward Labels
+    // 1. Sector Boundary & Ward Center Reference Points
     const wardCenters = [
       { name: "WARD 01 (Civil Lines)", lat: 26.8500, lng: 80.9400 },
       { name: "WARD 03 (Riverfront)", lat: 26.8620, lng: 80.9380 },
@@ -83,7 +82,7 @@ export const TacticalMap: React.FC<TacticalMapProps> = ({
     wardCenters.forEach((wc) => {
       const wardLabelMarker = L.circleMarker([wc.lat, wc.lng], {
         radius: 3,
-        color: "#475569",
+        color: "#334155",
         weight: 1,
         fillColor: "#0F172A",
         fillOpacity: 0.8,
@@ -95,7 +94,7 @@ export const TacticalMap: React.FC<TacticalMapProps> = ({
       layerGroup.addLayer(wardLabelMarker);
     });
 
-    // 2. Render Dark Zone (Ward 09) hatched polygon with NO DATA overlay
+    // 2. Render Dark Zone (Ward 09) Polygon
     const darkZonePolygon = L.polygon(
       [
         [26.860, 80.955],
@@ -107,30 +106,30 @@ export const TacticalMap: React.FC<TacticalMapProps> = ({
         color: "#F59E0B",
         weight: 1.5,
         dashArray: "6, 6",
-        fillColor: "#1E293B",
-        fillOpacity: 0.75,
+        fillColor: "#111827",
+        fillOpacity: 0.7,
       }
     );
 
     darkZonePolygon.bindPopup(`
       <div style="padding: 12px; font-family: sans-serif; min-width: 200px;">
-        <div style="font-size: 11px; font-weight: 800; color: #F59E0B; letter-spacing: 0.5px; margin-bottom: 4px;" class="mono">
+        <div style="font-size: 10px; font-weight: 800; color: #F59E0B; letter-spacing: 0.5px; margin-bottom: 3px;" class="mono">
           WARD 09 • SILENT DARK ZONE
         </div>
         <div style="font-size: 12px; font-weight: 700; color: #EF4444; margin-bottom: 6px;">
-          NO DATA — UNKNOWN OPERATIONAL STATUS
+          NO DATA — UNKNOWN STATUS
         </div>
         <div style="font-size: 11px; color: #94A3B8; margin-bottom: 8px; line-height: 1.4;">
-          Telecom towers offline. Estimated population: <strong>8,600</strong> residents exposed to potential unmonitored flood breach.
+          Telecom blackouts active. Estimated population: <strong>8,600</strong> residents exposed to potential unmonitored surge.
         </div>
-        <div style="font-size: 10px; color: #38BDF8; font-family: monospace;">
-          Recommended: Priority Drone Recon Sweep
+        <div style="font-size: 10px; color: #60A5FA; font-family: monospace;">
+          Recommended: Priority Aerial Recon Sweep
         </div>
       </div>
     `);
 
     darkZonePolygon.bindTooltip(
-      "<div style='font-family:monospace;font-size:10px;background:#0F172A;color:#F59E0B;padding:4px 8px;border:1px solid #F59E0B;border-radius:3px;'><strong>WARD 09 • SILENT DARK ZONE</strong><br/><span style='color:#EF4444;'>NO DATA (8.6k Population)</span></div>",
+      "<div style='font-family:monospace;font-size:10px;background:#0A0D14;color:#F59E0B;padding:4px 8px;border:1px solid #F59E0B;border-radius:4px;'><strong>WARD 09 • SILENT DARK ZONE</strong><br/><span style='color:#EF4444;'>NO DATA (8.6k Population)</span></div>",
       { permanent: true, direction: "center", className: "dark-zone-tooltip" }
     );
     layerGroup.addLayer(darkZonePolygon);
@@ -141,7 +140,7 @@ export const TacticalMap: React.FC<TacticalMapProps> = ({
         [26.840, 80.930],
         [26.851, 80.949],
       ],
-      { color: "#38BDF8", weight: 3.5, opacity: 0.75 }
+      { color: "#3B82F6", weight: 3, opacity: 0.8 }
     );
     openRoad.bindTooltip("Main Arterial Road • OPEN / PASSABLE", { sticky: true });
     layerGroup.addLayer(openRoad);
@@ -151,7 +150,7 @@ export const TacticalMap: React.FC<TacticalMapProps> = ({
         [26.851, 80.949],
         [26.865, 80.960],
       ],
-      { color: "#EF4444", weight: 4, dashArray: "6, 6", opacity: 0.9 }
+      { color: "#EF4444", weight: 3.5, dashArray: "6, 6", opacity: 0.9 }
     );
     floodedRoad.bindTooltip(
       "<span style='color:#EF4444;font-weight:700;'>Station Approach Road • FLOODED / IMPASSABLE</span>",
@@ -196,35 +195,35 @@ export const TacticalMap: React.FC<TacticalMapProps> = ({
     venues.forEach((v) => {
       const occPct = Math.round((v.occupancy / v.capacity) * 100);
       const isSurge = occPct >= 80;
-      const venueColor = isSurge ? "#F59E0B" : "#38BDF8";
+      const venueColor = isSurge ? "#F59E0B" : "#3B82F6";
 
       const venueMarker = L.circleMarker([v.lat, v.lng], {
-        radius: 9,
+        radius: 8,
         color: venueColor,
         weight: 2,
-        fillColor: "#0F172A",
+        fillColor: "#0A0D14",
         fillOpacity: 0.9,
       });
 
       venueMarker.bindPopup(`
-        <div style="padding: 10px; font-family: sans-serif; min-width: 190px;">
+        <div style="padding: 10px; font-family: sans-serif; min-width: 180px;">
           <div style="font-size: 10px; font-weight: 700; color: ${venueColor}; letter-spacing: 0.5px;" class="mono">
             ${v.id} • ${v.type}
           </div>
-          <div style="font-size: 13px; font-weight: 700; color: #FFFFFF; margin: 2px 0 6px 0;">
+          <div style="font-size: 12px; font-weight: 700; color: #FFFFFF; margin: 2px 0 5px 0;">
             ${v.name}
           </div>
           <div style="font-size: 11px; color: #94A3B8; margin-bottom: 4px;">
             Bed / Shelter Surge: <strong style="color: ${venueColor};">${v.occupancy} / ${v.capacity} (${occPct}%)</strong>
           </div>
           <div style="font-size: 10px; color: #64748B;">
-            Status: <span style="color: #F1F5F9;">${v.status}</span>
+            Status: <span style="color: #F8FAFC;">${v.status}</span>
           </div>
         </div>
       `);
 
       venueMarker.bindTooltip(
-        `<div style="font-family:monospace;font-size:10px;background:#0F172A;color:${venueColor};padding:3px 6px;border:1px solid ${venueColor};border-radius:2px;">
+        `<div style="font-family:monospace;font-size:10px;background:#0A0D14;color:${venueColor};padding:3px 6px;border:1px solid ${venueColor};border-radius:3px;">
           ${v.name} (${occPct}%)
         </div>`,
         { sticky: true }
@@ -238,25 +237,25 @@ export const TacticalMap: React.FC<TacticalMapProps> = ({
       const isDisputed = inc.dispute_flag;
       const isCritical = inc.priority_score >= 1.0;
 
-      let color = "#38BDF8";
+      let color = "#3B82F6";
       if (isCritical) color = "#EF4444";
       else if (isDisputed) color = "#F59E0B";
 
-      let radius = 10;
+      let radius = 9;
       let fillOpacity = 0.85;
 
       if (inc.location_precision === "MEDIUM") {
-        radius = 24;
-        fillOpacity = 0.35;
+        radius = 22;
+        fillOpacity = 0.3;
       } else if (inc.location_precision === "LOW") {
-        radius = 45;
-        fillOpacity = 0.18;
+        radius = 42;
+        fillOpacity = 0.16;
       }
 
       const marker = L.circleMarker([inc.location.lat, inc.location.lng], {
-        radius: isSelected ? radius + 5 : radius,
+        radius: isSelected ? radius + 4 : radius,
         color: isSelected ? "#FFFFFF" : color,
-        weight: isSelected ? 3.5 : 2,
+        weight: isSelected ? 3 : 1.5,
         fillColor: color,
         fillOpacity: fillOpacity,
         dashArray: isDisputed ? "4, 4" : undefined,
@@ -266,7 +265,6 @@ export const TacticalMap: React.FC<TacticalMapProps> = ({
         onSelectIncident(inc.incident_id);
       });
 
-      // Rich Interactive Popup
       const vicText =
         inc.victim_estimate.min_victims === inc.victim_estimate.max_victims
           ? `${inc.victim_estimate.best_guess}`
@@ -278,7 +276,7 @@ export const TacticalMap: React.FC<TacticalMapProps> = ({
             <span style="font-size: 11px; font-weight: 800; color: ${color};" class="mono">
               ${inc.incident_id}
             </span>
-            <span style="font-size: 10px; padding: 1px 5px; background: rgba(255,255,255,0.08); border-radius: 3px; color: #94A3B8;" class="mono">
+            <span style="font-size: 9px; padding: 1px 5px; background: rgba(255,255,255,0.08); border-radius: 3px; color: #94A3B8;" class="mono">
               ${inc.zone_id}
             </span>
           </div>
@@ -290,12 +288,12 @@ export const TacticalMap: React.FC<TacticalMapProps> = ({
           </div>
           <div style="display: flex; gap: 8px; font-size: 11px; margin-bottom: 6px;" class="mono">
             <span>P: <strong style="color:${color};">${inc.priority_score.toFixed(2)}</strong></span>
-            <span>Conf: <strong style="color:#38BDF8;">${inc.confidence_score.toFixed(2)}</strong></span>
+            <span>Conf: <strong style="color:#60A5FA;">${inc.confidence_score.toFixed(2)}</strong></span>
             <span>Victims: <strong style="color:#FFFFFF;">${vicText}</strong></span>
           </div>
           ${
             inc.micro_environment !== "NONE"
-              ? `<div style="font-size: 10px; color: #38BDF8; font-weight: 600; margin-bottom: 6px;" class="mono">
+              ? `<div style="font-size: 10px; color: #60A5FA; font-weight: 600; margin-bottom: 6px;" class="mono">
                   Tag: ${inc.micro_environment.replace(/_/g, " ")}
                 </div>`
               : ""
@@ -303,7 +301,7 @@ export const TacticalMap: React.FC<TacticalMapProps> = ({
           ${
             isDisputed
               ? `<div style="font-size: 10px; color: #F59E0B; font-weight: 700; margin-bottom: 6px;" class="mono">
-                  ⚠ MATERIAL CONTRADICTION DETECTED
+                  ⚠ CONTRADICTION DETECTED
                 </div>`
               : ""
           }
@@ -311,7 +309,7 @@ export const TacticalMap: React.FC<TacticalMapProps> = ({
             "${inc.evidence_summary[0] || "Report queued"}"
           </div>
           <div style="display: flex; gap: 6px;">
-            <button id="btn-select-${inc.incident_id}" style="flex: 1; padding: 4px 8px; background: #38BDF8; border: none; border-radius: 3px; color: #090C10; font-size: 10px; font-weight: 700; cursor: pointer;">
+            <button id="btn-select-${inc.incident_id}" style="flex: 1; padding: 5px 8px; background: #2563EB; border: none; border-radius: 4px; color: #FFFFFF; font-size: 10px; font-weight: 700; cursor: pointer;">
               SELECT INCIDENT
             </button>
           </div>
@@ -328,7 +326,7 @@ export const TacticalMap: React.FC<TacticalMapProps> = ({
       });
 
       marker.bindTooltip(
-        `<div style="font-family:monospace;font-size:10px;background:#0F172A;color:${color};padding:4px 6px;border:1px solid ${color};border-radius:2px;">
+        `<div style="font-family:monospace;font-size:10px;background:#0A0D14;color:${color};padding:3px 6px;border:1px solid ${color};border-radius:3px;">
           <strong>${inc.incident_id}</strong> (${inc.category}) | P: ${inc.priority_score.toFixed(2)}
         </div>`,
         { sticky: true }
@@ -340,23 +338,23 @@ export const TacticalMap: React.FC<TacticalMapProps> = ({
     // 6. Emergency Fleet Resources
     resources.forEach((res) => {
       const resMarker = L.circleMarker([res.current_location.lat, res.current_location.lng], {
-        radius: 7,
-        color: "#38BDF8",
+        radius: 6,
+        color: "#3B82F6",
         weight: 2,
-        fillColor: "#0F172A",
+        fillColor: "#0A0D14",
         fillOpacity: 1.0,
       });
 
       resMarker.bindPopup(`
-        <div style="padding: 10px; font-family: sans-serif; min-width: 180px;">
-          <div style="font-size: 10px; font-weight: 800; color: #38BDF8; letter-spacing: 0.5px;" class="mono">
+        <div style="padding: 10px; font-family: sans-serif; min-width: 170px;">
+          <div style="font-size: 10px; font-weight: 800; color: #3B82F6; letter-spacing: 0.5px;" class="mono">
             ${res.resource_id} • ${res.type}
           </div>
-          <div style="font-size: 12px; font-weight: 700; color: #FFFFFF; margin: 3px 0;">
+          <div style="font-size: 12px; font-weight: 700; color: #FFFFFF; margin: 2px 0;">
             ${res.name || res.type}
           </div>
           <div style="font-size: 11px; color: #94A3B8;">
-            Status: <strong style="color: #38BDF8;">${res.availability_status}</strong>
+            Status: <strong style="color: #60A5FA;">${res.availability_status}</strong>
           </div>
           <div style="font-size: 11px; color: #94A3B8;">
             Speed: ${res.travel_speed_kmh} km/h
@@ -365,7 +363,7 @@ export const TacticalMap: React.FC<TacticalMapProps> = ({
       `);
 
       resMarker.bindTooltip(
-        `<div style="font-family:monospace;font-size:10px;background:#0F172A;color:#38BDF8;padding:3px 6px;border:1px solid #38BDF8;border-radius:2px;">
+        `<div style="font-family:monospace;font-size:10px;background:#0A0D14;color:#3B82F6;padding:3px 6px;border:1px solid #3B82F6;border-radius:3px;">
           <strong>${res.resource_id}</strong> (${res.type}) • ${res.availability_status}
         </div>`,
         { sticky: true }
@@ -378,52 +376,46 @@ export const TacticalMap: React.FC<TacticalMapProps> = ({
     <div style={{ position: "relative", width: "100%", height: "100%", overflow: "hidden" }}>
       <div ref={mapContainerRef} style={{ width: "100%", height: "100%" }} />
 
-      {/* Map Header Status Badge */}
+      {/* Floating Glassmorphic Map Status Badge */}
       <div
-        className="mono"
+        className="mono glass-panel"
         style={{
           position: "absolute",
           top: "14px",
           left: "14px",
-          backgroundColor: "rgba(15, 21, 31, 0.9)",
-          backdropFilter: "blur(8px)",
-          border: "1px solid var(--grid-line)",
-          padding: "6px 12px",
-          borderRadius: "4px",
+          padding: "5px 12px",
+          borderRadius: "var(--radius-sm)",
           fontSize: "11px",
           display: "flex",
           alignItems: "center",
           gap: "8px",
           zIndex: 500,
-          boxShadow: "0 4px 14px rgba(0,0,0,0.5)",
+          boxShadow: "var(--shadow-md)",
         }}
       >
-        <Navigation size={13} color="var(--signal-cyan)" />
-        <span style={{ color: "var(--ink-dim)" }}>SECTOR MAP:</span>
-        <span style={{ color: "var(--ink-bright)", fontWeight: 700 }}>RAIPUR EAST</span>
-        <span style={{ color: "var(--ink-muted)" }}>|</span>
-        <span style={{ color: "var(--signal-cyan)" }}>{incidents.length} INCIDENTS</span>
+        <Navigation size={12} color="var(--blue-bright)" />
+        <span style={{ color: "var(--text-muted)" }}>SECTOR MAP:</span>
+        <span style={{ color: "var(--text-primary)", fontWeight: 700 }}>RAIPUR EAST</span>
+        <span style={{ color: "var(--border-default)" }}>|</span>
+        <span style={{ color: "var(--blue-light)" }}>{incidents.length} INCIDENTS</span>
       </div>
 
-      {/* Map Legend Overlay */}
+      {/* Floating Glassmorphic Collapsible Legend */}
       <div
-        className="mono"
+        className="mono glass-panel"
         style={{
           position: "absolute",
-          bottom: "16px",
-          left: "16px",
-          backgroundColor: "rgba(15, 21, 31, 0.92)",
-          backdropFilter: "blur(10px)",
-          border: "1px solid var(--grid-line)",
-          padding: "10px 14px",
-          borderRadius: "6px",
+          bottom: "14px",
+          left: "14px",
+          padding: "10px 12px",
+          borderRadius: "var(--radius-md)",
           fontSize: "10px",
           display: "flex",
           flexDirection: "column",
           gap: "6px",
           zIndex: 500,
-          boxShadow: "0 6px 20px rgba(0, 0, 0, 0.6)",
-          minWidth: "200px",
+          boxShadow: "var(--shadow-lg)",
+          minWidth: "190px",
         }}
       >
         <div
@@ -432,16 +424,16 @@ export const TacticalMap: React.FC<TacticalMapProps> = ({
             justifyContent: "space-between",
             alignItems: "center",
             cursor: "pointer",
-            borderBottom: isLegendOpen ? "1px solid var(--grid-line)" : "none",
+            borderBottom: isLegendOpen ? "1px solid var(--border-subtle)" : "none",
             paddingBottom: isLegendOpen ? "4px" : "0",
           }}
           onClick={() => setIsLegendOpen(!isLegendOpen)}
         >
-          <div style={{ display: "flex", alignItems: "center", gap: "6px", fontWeight: 700, color: "var(--ink-dim)" }}>
-            <Layers size={12} color="var(--signal-cyan)" />
+          <div style={{ display: "flex", alignItems: "center", gap: "6px", fontWeight: 700, color: "var(--text-secondary)" }}>
+            <Layers size={11} color="var(--blue-bright)" />
             <span>MAP LEGEND</span>
           </div>
-          <span style={{ fontSize: "9px", color: "var(--ink-muted)" }}>{isLegendOpen ? "▼" : "▲"}</span>
+          <span style={{ fontSize: "9px", color: "var(--text-muted)" }}>{isLegendOpen ? "▼" : "▲"}</span>
         </div>
 
         {isLegendOpen && (
@@ -449,11 +441,11 @@ export const TacticalMap: React.FC<TacticalMapProps> = ({
             <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
               <span
                 style={{
-                  width: "9px",
-                  height: "9px",
+                  width: "8px",
+                  height: "8px",
                   borderRadius: "50%",
-                  backgroundColor: "var(--critical-ember)",
-                  boxShadow: "0 0 6px var(--critical-ember)",
+                  backgroundColor: "var(--color-critical)",
+                  boxShadow: "0 0 6px var(--color-critical)",
                 }}
               />
               <span>Critical Incident (P &gt; 1.0)</span>
@@ -462,10 +454,10 @@ export const TacticalMap: React.FC<TacticalMapProps> = ({
             <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
               <span
                 style={{
-                  width: "9px",
-                  height: "9px",
+                  width: "8px",
+                  height: "8px",
                   borderRadius: "50%",
-                  backgroundColor: "var(--signal-cyan)",
+                  backgroundColor: "var(--blue-bright)",
                 }}
               />
               <span>Standard Incident Cluster</span>
@@ -474,11 +466,11 @@ export const TacticalMap: React.FC<TacticalMapProps> = ({
             <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
               <span
                 style={{
-                  width: "9px",
-                  height: "9px",
+                  width: "8px",
+                  height: "8px",
                   borderRadius: "50%",
                   backgroundColor: "transparent",
-                  border: "1.5px dashed var(--dispute-amber)",
+                  border: "1.5px dashed var(--color-warning)",
                 }}
               />
               <span>Contradiction / Dispute</span>
@@ -487,10 +479,11 @@ export const TacticalMap: React.FC<TacticalMapProps> = ({
             <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
               <span
                 style={{
-                  width: "12px",
-                  height: "10px",
-                  backgroundColor: "rgba(100, 116, 139, 0.3)",
-                  border: "1px dashed var(--dispute-amber)",
+                  width: "11px",
+                  height: "9px",
+                  backgroundColor: "rgba(100, 116, 139, 0.25)",
+                  border: "1px dashed var(--color-warning)",
+                  borderRadius: "1px",
                 }}
               />
               <span>Silent Dark Zone (Ward 09)</span>
@@ -499,11 +492,11 @@ export const TacticalMap: React.FC<TacticalMapProps> = ({
             <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
               <span
                 style={{
-                  width: "9px",
-                  height: "9px",
+                  width: "8px",
+                  height: "8px",
                   borderRadius: "50%",
-                  backgroundColor: "var(--panel)",
-                  border: "2px solid var(--signal-cyan)",
+                  backgroundColor: "var(--bg-surface)",
+                  border: "2px solid var(--blue-bright)",
                 }}
               />
               <span>Emergency Fleet (Boat/Ambulance)</span>
@@ -512,11 +505,11 @@ export const TacticalMap: React.FC<TacticalMapProps> = ({
             <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
               <span
                 style={{
-                  width: "9px",
-                  height: "9px",
+                  width: "8px",
+                  height: "8px",
                   borderRadius: "50%",
-                  backgroundColor: "var(--panel)",
-                  border: "2px solid var(--dispute-amber)",
+                  backgroundColor: "var(--bg-surface)",
+                  border: "2px solid var(--color-warning)",
                 }}
               />
               <span>Critical Venue (Hospital/Shelter)</span>

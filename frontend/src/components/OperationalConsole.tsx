@@ -5,6 +5,13 @@ import type {
   DispatchPlanResponse,
   AuditRecord,
 } from "../types/domain";
+import {
+  ShieldCheck,
+  Cpu,
+  Radio,
+  Sliders,
+  FileText,
+} from "lucide-react";
 
 interface OperationalConsoleProps {
   selectedIncident: Incident | null;
@@ -34,8 +41,6 @@ export const OperationalConsole: React.FC<OperationalConsoleProps> = ({
   onVerifyCV,
   onSplitIncident,
 }) => {
-
-
   const [activeTab, setActiveTab] = useState<"DISPATCH" | "WHAT_IF" | "REVERSE_SOS" | "EVIDENCE" | "AUDIT">("DISPATCH");
 
   // What-if sliders state
@@ -104,12 +109,11 @@ export const OperationalConsole: React.FC<OperationalConsoleProps> = ({
         body: JSON.stringify(payload),
       });
 
-
       if (!res.ok) {
         throw new Error(`Failed to dispatch alert: HTTP ${res.status}`);
       }
 
-      setSosStatusMessage(`✓ Outbound Reverse SOS successfully broadcast across ${selectedChannels.join(", ")}`);
+      setSosStatusMessage(`✓ Reverse SOS broadcast across ${selectedChannels.join(", ")}`);
       setSosRationale("");
       await onVerifyAuditChain();
     } catch (err: any) {
@@ -122,21 +126,21 @@ export const OperationalConsole: React.FC<OperationalConsoleProps> = ({
   const getAdvisoryPreview = () => {
     const loc = selectedIncident ? selectedIncident.location.address || selectedIncident.incident_id : "Affected Ward";
     if (advisoryType === "BOAT_INBOUND") {
-      if (previewLang === "HI") return `राहत दल रवाना: राहत नाव RESCUE-01 ${loc} के लिए रवाना हो गई है। अनुमानित समय: लगभग ${etaMinutes} मिनट। दृश्य संकेतों (टॉर्च/चमकीला कपड़ा) के साथ सुरक्षित ऊंचाई पर रहें।`;
-      if (previewLang === "HINGLISH") return `RESCUE UPDATE: Relief Boat RESCUE-01 ${loc} ke liye dispatch ho chuki hai. ETA: ~${etaMinutes} mins. Visible unchai par torch/bright cloth ke sath signal karein.`;
+      if (previewLang === "HI") return `राहत दल रवाना: राहत नाव RESCUE-01 ${loc} के लिए रवाना हो गई है। अनुमानित समय: लगभग ${etaMinutes} मिनट। दृश्य संकेतों के साथ सुरक्षित ऊंचाई पर रहें।`;
+      if (previewLang === "HINGLISH") return `RESCUE UPDATE: Relief Boat RESCUE-01 ${loc} ke liye dispatch ho chuki hai. ETA: ~${etaMinutes} mins. Safe unchai par signal karein.`;
       return `RESCUE DISPATCH: Relief/Rescue Boat RESCUE-01 dispatched to ${loc}. ETA: ~${etaMinutes} mins. Stay at high ground with visual signals.`;
     } else if (advisoryType === "WATER_CONTAMINATION") {
-      if (previewLang === "HI") return `गंभीर स्वास्थ्य चेतावनी: ${loc} में नल का भूजल बाढ़ के कारण दूषित हो चुका है। नल का कच्चा पानी बिल्कुल न पिएं। केवल वितरित बोतलबंद पानी पिएं।`;
-      if (previewLang === "HINGLISH") return `HEALTH WARNING: ${loc} mein ground tap water contaminate ho chuka hai. Direct tap water bilkul mat piyein. Packaged/purified water hi use karein.`;
-      return `CRITICAL HEALTH WARNING: Ground tap water in ${loc} is contaminated. DO NOT DRINK untreated tap water. Use distributed sealed bottled water.`;
+      if (previewLang === "HI") return `गंभीर स्वास्थ्य चेतावनी: ${loc} में नल का भूजल बाढ़ के कारण दूषित हो चुका है। नल का कच्चा पानी बिल्कुल न पिएं।`;
+      if (previewLang === "HINGLISH") return `HEALTH WARNING: ${loc} mein tap water contaminate ho chuka hai. Direct tap water bilkul mat piyein.`;
+      return `CRITICAL HEALTH WARNING: Ground tap water in ${loc} is contaminated. DO NOT DRINK untreated tap water.`;
     } else if (advisoryType === "EVACUATION_ORDER") {
-      if (previewLang === "HI") return `अनिवार्य निकासी आदेश: ${loc} के लिए तत्काल निकासी आदेश प्रभावी है। कृपया सुरक्षित ऊंचे मार्गों से होते हुए निकटतम राहत केंद्र पर पहुंचे।`;
-      if (previewLang === "HINGLISH") return `MANDATORY EVACUATION: ${loc} ke sabhi log safe high-ground routes use karke nearest relief center pahuchein.`;
+      if (previewLang === "HI") return `अनिवार्य निकासी आदेश: ${loc} के लिए तत्काल निकासी आदेश प्रभावी है। कृपया निकटतम राहत केंद्र पर पहुंचे।`;
+      if (previewLang === "HINGLISH") return `MANDATORY EVACUATION: ${loc} ke sabhi log nearest relief center pahuchein.`;
       return `MANDATORY EVACUATION: Immediate evacuation order for ${loc}. Proceed along high-ground routes to nearest relief center.`;
     } else {
-      if (previewLang === "HI") return `आपातकालीन चेतावनी: ${loc} में बाढ़ का पानी तेजी से बढ़ रहा है। तुरंत ऊपरी मंजिल या छत पर चले जाएं। बहते पानी में न चलें।`;
-      if (previewLang === "HINGLISH") return `EMERGENCY ALERT: ${loc} mein flood water tezi se badh raha hai. Turant upper floors ya rooftop par safe ho jayein.`;
-      return `EMERGENCY ALERT: Flood waters rising rapidly in ${loc}. Move immediately to upper floors or rooftop. Do not walk through water.`;
+      if (previewLang === "HI") return `आपातकालीन चेतावनी: ${loc} में बाढ़ का पानी तेजी से बढ़ रहा है। तुरंत ऊपरी मंजिल या छत पर चले जाएं।`;
+      if (previewLang === "HINGLISH") return `EMERGENCY ALERT: ${loc} mein flood water badh raha hai. Turant upper floors par safe ho jayein.`;
+      return `EMERGENCY ALERT: Flood waters rising rapidly in ${loc}. Move immediately to upper floors or rooftop.`;
     }
   };
 
@@ -146,51 +150,62 @@ export const OperationalConsole: React.FC<OperationalConsoleProps> = ({
         display: "flex",
         flexDirection: "column",
         height: "100%",
-        backgroundColor: "var(--panel)",
-        borderLeft: "1px solid var(--grid-line)",
+        backgroundColor: "var(--bg-surface)",
+        borderLeft: "1px solid var(--border-subtle)",
+        width: "380px",
+        minWidth: "350px",
         overflow: "hidden",
       }}
     >
-      {/* Tab Navigation Header */}
+      {/* Unified Tab Navigation Bar */}
       <div
         style={{
           display: "flex",
-          borderBottom: "1px solid var(--grid-line)",
-          backgroundColor: "var(--void)",
+          borderBottom: "1px solid var(--border-subtle)",
+          backgroundColor: "var(--bg-root)",
           padding: "4px 6px 0 6px",
           gap: "2px",
         }}
       >
         {[
-          { id: "DISPATCH", label: "DISPATCH PLAN" },
-          { id: "WHAT_IF", label: "WHAT-IF SLIDERS" },
-          { id: "REVERSE_SOS", label: "REVERSE SOS" },
-          { id: "EVIDENCE", label: "EVIDENCE DOSSIER" },
-          { id: "AUDIT", label: "AUDIT CHAIN" },
-        ].map((t) => (
-          <button
-            key={t.id}
-            onClick={() => setActiveTab(t.id as any)}
-            className="mono"
-            style={{
-              flex: 1,
-              padding: "9px 4px",
-              fontSize: "10px",
-              fontWeight: activeTab === t.id ? 800 : 600,
-              backgroundColor: activeTab === t.id ? "var(--panel)" : "transparent",
-              color: activeTab === t.id ? "var(--signal-cyan)" : "var(--ink-dim)",
-              border: "1px solid",
-              borderColor: activeTab === t.id ? "var(--grid-line-bright) var(--grid-line-bright) transparent var(--grid-line-bright)" : "transparent",
-              borderTopLeftRadius: "4px",
-              borderTopRightRadius: "4px",
-              borderBottom: activeTab === t.id ? "2px solid var(--signal-cyan)" : "none",
-              cursor: "pointer",
-              transition: "all 0.15s ease",
-            }}
-          >
-            {t.label}
-          </button>
-        ))}
+          { id: "DISPATCH", label: "DISPATCH", icon: Cpu },
+          { id: "WHAT_IF", label: "WHAT-IF", icon: Sliders },
+          { id: "REVERSE_SOS", label: "REVERSE SOS", icon: Radio },
+          { id: "EVIDENCE", label: "EVIDENCE", icon: FileText },
+          { id: "AUDIT", label: "AUDIT", icon: ShieldCheck },
+        ].map((t) => {
+          const isActive = activeTab === t.id;
+          const Icon = t.icon;
+          return (
+            <button
+              key={t.id}
+              onClick={() => setActiveTab(t.id as any)}
+              className="mono"
+              style={{
+                flex: 1,
+                padding: "8px 2px",
+                fontSize: "10px",
+                fontWeight: isActive ? 700 : 500,
+                backgroundColor: isActive ? "var(--bg-surface)" : "transparent",
+                color: isActive ? "var(--blue-light)" : "var(--text-secondary)",
+                border: "1px solid",
+                borderColor: isActive ? "var(--border-subtle) var(--border-subtle) transparent var(--border-subtle)" : "transparent",
+                borderTopLeftRadius: "var(--radius-sm)",
+                borderTopRightRadius: "var(--radius-sm)",
+                borderBottom: isActive ? "2px solid var(--blue-bright)" : "none",
+                cursor: "pointer",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                gap: "3px",
+                transition: "all 0.15s ease",
+              }}
+            >
+              <Icon size={11} color={isActive ? "var(--blue-bright)" : "var(--text-muted)"} />
+              <span>{t.label}</span>
+            </button>
+          );
+        })}
       </div>
 
       {/* Tab Body */}
@@ -199,7 +214,7 @@ export const OperationalConsole: React.FC<OperationalConsoleProps> = ({
         {activeTab === "DISPATCH" && (
           <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-              <span style={{ fontSize: "11px", fontWeight: 700, color: "var(--ink-dim)" }} className="mono">
+              <span style={{ fontSize: "11px", fontWeight: 700, color: "var(--text-primary)" }} className="mono">
                 MILP OPTIMIZATION PLAN
               </span>
               <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
@@ -208,15 +223,18 @@ export const OperationalConsole: React.FC<OperationalConsoleProps> = ({
                     onClick={onGeneratePlan}
                     className="mono"
                     style={{
-                      padding: "2px 6px",
-                      fontSize: "9px",
+                      padding: "3px 8px",
+                      fontSize: "10px",
                       fontWeight: 700,
-                      backgroundColor: "rgba(79, 216, 196, 0.15)",
-                      border: "1px solid var(--signal-cyan)",
-                      color: "var(--signal-cyan)",
-                      borderRadius: "2px",
+                      backgroundColor: "var(--blue-subtle)",
+                      border: "1px solid var(--blue-border)",
+                      color: "var(--blue-light)",
+                      borderRadius: "var(--radius-sm)",
                       cursor: "pointer",
+                      transition: "all 0.15s ease",
                     }}
+                    onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "rgba(37, 99, 235, 0.25)")}
+                    onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "var(--blue-subtle)")}
                   >
                     ⚡ SOLVE CP-SAT
                   </button>
@@ -228,19 +246,19 @@ export const OperationalConsole: React.FC<OperationalConsoleProps> = ({
                       fontSize: "9px",
                       fontWeight: 700,
                       padding: "2px 6px",
-                      borderRadius: "2px",
+                      borderRadius: "var(--radius-sm)",
                       backgroundColor:
                         dispatchPlan.plan_quality === "PLAN QUALITY: OPTIMAL"
-                          ? "rgba(79, 216, 196, 0.15)"
-                          : "rgba(232, 163, 61, 0.15)",
+                          ? "var(--color-success-bg)"
+                          : "var(--color-warning-bg)",
                       color:
                         dispatchPlan.plan_quality === "PLAN QUALITY: OPTIMAL"
-                          ? "var(--signal-cyan)"
-                          : "var(--dispute-amber)",
+                          ? "var(--color-success)"
+                          : "var(--color-warning)",
                       border: `1px solid ${
                         dispatchPlan.plan_quality === "PLAN QUALITY: OPTIMAL"
-                          ? "var(--signal-cyan)"
-                          : "var(--dispute-amber)"
+                          ? "var(--color-success-border)"
+                          : "var(--color-warning-border)"
                       }`,
                     }}
                   >
@@ -250,56 +268,56 @@ export const OperationalConsole: React.FC<OperationalConsoleProps> = ({
               </div>
             </div>
 
-
             {dispatchPlan ? (
               <>
                 <div
                   className="mono"
                   style={{
-                    backgroundColor: "var(--void)",
+                    backgroundColor: "var(--bg-root)",
                     padding: "8px 10px",
-                    border: "1px solid var(--grid-line)",
-                    borderRadius: "2px",
+                    border: "1px solid var(--border-subtle)",
+                    borderRadius: "var(--radius-sm)",
                     fontSize: "10px",
                     display: "flex",
                     justifyContent: "space-between",
+                    color: "var(--text-secondary)",
                   }}
                 >
-                  <span>SOLVE DURATION: {dispatchPlan.solver_duration_seconds.toFixed(3)}s</span>
-                  <span>SERVED: {dispatchPlan.assignments.length}</span>
-                  <span>UNSERVED: {dispatchPlan.unserved_incidents.length}</span>
+                  <span>SOLVE: <strong style={{ color: "var(--blue-light)" }}>{dispatchPlan.solver_duration_seconds.toFixed(3)}s</strong></span>
+                  <span>SERVED: <strong style={{ color: "var(--text-primary)" }}>{dispatchPlan.assignments.length}</strong></span>
+                  <span>UNSERVED: <strong style={{ color: dispatchPlan.unserved_incidents.length > 0 ? "var(--color-critical)" : "var(--text-secondary)" }}>{dispatchPlan.unserved_incidents.length}</strong></span>
                 </div>
 
                 {/* Assignment Cards */}
-                <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
                   {dispatchPlan.assignments.map((a, idx) => (
                     <div
                       key={idx}
                       style={{
-                        backgroundColor: "var(--void)",
-                        border: "1px solid var(--grid-line)",
-                        borderRadius: "2px",
+                        backgroundColor: "var(--bg-root)",
+                        border: "1px solid var(--border-subtle)",
+                        borderRadius: "var(--radius-sm)",
                         padding: "8px 10px",
                         display: "flex",
                         flexDirection: "column",
                         gap: "4px",
                       }}
                     >
-                      <div style={{ display: "flex", justifyContent: "space-between" }} className="mono">
-                        <span style={{ fontWeight: 700, color: "var(--signal-cyan)" }}>{a.resource_id}</span>
-                        <span style={{ color: "var(--ink-dim)" }}>➔ {a.incident_id}</span>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }} className="mono">
+                        <span style={{ fontWeight: 700, color: "var(--blue-light)", fontSize: "11px" }}>{a.resource_id}</span>
+                        <span style={{ color: "var(--text-muted)", fontSize: "10px" }}>➔ {a.incident_id}</span>
                       </div>
-                      <div style={{ fontSize: "11px", color: "var(--ink-dim)" }}>{a.reason}</div>
-                      <div className="mono" style={{ fontSize: "10px", color: "var(--ink-muted)" }}>
-                        EST. TRAVEL TIME: <strong style={{ color: "var(--ink)" }}>{a.estimated_travel_time_min} MIN</strong>
+                      <div style={{ fontSize: "11px", color: "var(--text-secondary)", lineHeight: 1.4 }}>{a.reason}</div>
+                      <div className="mono" style={{ fontSize: "10px", color: "var(--text-muted)" }}>
+                        EST. TRAVEL TIME: <strong style={{ color: "var(--text-primary)" }}>{a.estimated_travel_time_min} MIN</strong>
                       </div>
                     </div>
                   ))}
                 </div>
 
-                {/* Human Approval Action Controls */}
-                <div style={{ marginTop: "12px", borderTop: "1px solid var(--grid-line)", paddingTop: "12px" }}>
-                  <div className="mono" style={{ fontSize: "10px", color: "var(--ink-dim)", marginBottom: "8px" }}>
+                {/* Human Operator Approval Gate */}
+                <div style={{ marginTop: "10px", borderTop: "1px solid var(--border-subtle)", paddingTop: "12px" }}>
+                  <div className="mono" style={{ fontSize: "10px", color: "var(--text-secondary)", marginBottom: "8px" }}>
                     HUMAN OPERATOR AUTHORIZATION GATE
                   </div>
                   <div style={{ display: "flex", gap: "8px" }}>
@@ -308,13 +326,15 @@ export const OperationalConsole: React.FC<OperationalConsoleProps> = ({
                       style={{
                         flex: 1,
                         padding: "8px 0",
-                        backgroundColor: "rgba(79, 216, 196, 0.15)",
-                        border: "1px solid var(--signal-cyan)",
-                        color: "var(--signal-cyan)",
+                        backgroundColor: "var(--blue-bright)",
+                        border: "1px solid rgba(255, 255, 255, 0.15)",
+                        color: "#ffffff",
                         fontWeight: 700,
                         fontSize: "11px",
-                        borderRadius: "2px",
+                        borderRadius: "var(--radius-sm)",
                         cursor: "pointer",
+                        boxShadow: "0 2px 10px rgba(37, 99, 235, 0.3)",
+                        transition: "all 0.15s ease",
                       }}
                     >
                       ✓ AUTHORIZE PLAN
@@ -324,13 +344,14 @@ export const OperationalConsole: React.FC<OperationalConsoleProps> = ({
                       style={{
                         flex: 1,
                         padding: "8px 0",
-                        backgroundColor: "rgba(232, 163, 61, 0.15)",
-                        border: "1px solid var(--dispute-amber)",
-                        color: "var(--dispute-amber)",
+                        backgroundColor: "var(--color-warning-bg)",
+                        border: "1px solid var(--color-warning-border)",
+                        color: "var(--color-warning)",
                         fontWeight: 700,
                         fontSize: "11px",
-                        borderRadius: "2px",
+                        borderRadius: "var(--radius-sm)",
                         cursor: "pointer",
+                        transition: "all 0.15s ease",
                       }}
                     >
                       ✎ OVERRIDE...
@@ -339,7 +360,7 @@ export const OperationalConsole: React.FC<OperationalConsoleProps> = ({
                 </div>
               </>
             ) : (
-              <div style={{ textAlign: "center", padding: "30px 10px", color: "var(--ink-muted)" }} className="mono">
+              <div style={{ textAlign: "center", padding: "30px 10px", color: "var(--text-muted)" }} className="mono">
                 NO ACTIVE PLAN GENERATED
               </div>
             )}
@@ -348,8 +369,8 @@ export const OperationalConsole: React.FC<OperationalConsoleProps> = ({
 
         {/* ----------------- TAB 2: WHAT-IF SIMULATOR ----------------- */}
         {activeTab === "WHAT_IF" && (
-          <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
-            <div style={{ fontSize: "11px", fontWeight: 700, color: "var(--ink-dim)" }} className="mono">
+          <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+            <div style={{ fontSize: "11px", fontWeight: 700, color: "var(--text-primary)" }} className="mono">
               PRIORITY FORMULA WEIGHT ADJUSTMENT
             </div>
 
@@ -362,8 +383,8 @@ export const OperationalConsole: React.FC<OperationalConsoleProps> = ({
             ].map((slider) => (
               <div key={slider.id} style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
                 <div style={{ display: "flex", justifyContent: "space-between", fontSize: "10px" }} className="mono">
-                  <span>{slider.label}</span>
-                  <span style={{ color: "var(--signal-cyan)", fontWeight: 700 }}>{slider.val.toFixed(2)}</span>
+                  <span style={{ color: "var(--text-secondary)" }}>{slider.label}</span>
+                  <span style={{ color: "var(--blue-light)", fontWeight: 700 }}>{slider.val.toFixed(2)}</span>
                 </div>
                 <input
                   type="range"
@@ -374,7 +395,7 @@ export const OperationalConsole: React.FC<OperationalConsoleProps> = ({
                   onChange={(e) =>
                     setWeights({ ...weights, [slider.id]: Number(e.target.value) })
                   }
-                  style={{ accentColor: "var(--signal-cyan)" }}
+                  style={{ accentColor: "var(--blue-bright)", cursor: "pointer" }}
                 />
               </div>
             ))}
@@ -384,13 +405,15 @@ export const OperationalConsole: React.FC<OperationalConsoleProps> = ({
               style={{
                 marginTop: "8px",
                 padding: "8px 0",
-                backgroundColor: "var(--signal-cyan)",
+                backgroundColor: "var(--blue-bright)",
                 border: "none",
-                color: "var(--void)",
+                color: "#ffffff",
                 fontWeight: 700,
                 fontSize: "11px",
-                borderRadius: "2px",
+                borderRadius: "var(--radius-sm)",
                 cursor: "pointer",
+                boxShadow: "0 2px 10px rgba(37, 99, 235, 0.3)",
+                transition: "all 0.15s ease",
               }}
               className="mono"
             >
@@ -399,14 +422,14 @@ export const OperationalConsole: React.FC<OperationalConsoleProps> = ({
           </div>
         )}
 
-        {/* ----------------- TAB: REVERSE SOS & BROADCAST ----------------- */}
+        {/* ----------------- TAB 3: REVERSE SOS & BROADCAST ----------------- */}
         {activeTab === "REVERSE_SOS" && (
           <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-              <span style={{ fontSize: "11px", fontWeight: 700, color: "var(--signal-cyan)" }} className="mono">
+              <span style={{ fontSize: "11px", fontWeight: 700, color: "var(--blue-light)" }} className="mono">
                 OUTBOUND REVERSE SOS // MICRO-GUIDANCE
               </span>
-              <span className="mono" style={{ fontSize: "9px", color: "var(--ink-dim)" }}>
+              <span className="mono" style={{ fontSize: "9px", color: "var(--text-muted)" }}>
                 {selectedIncident ? `TARGET: ${selectedIncident.incident_id}` : "GEOFENCE: WARD-12"}
               </span>
             </div>
@@ -417,10 +440,10 @@ export const OperationalConsole: React.FC<OperationalConsoleProps> = ({
                 style={{
                   padding: "6px 8px",
                   fontSize: "10px",
-                  borderRadius: "2px",
-                  backgroundColor: sosStatusMessage.startsWith("✓") ? "rgba(79, 216, 196, 0.15)" : "rgba(214, 85, 60, 0.15)",
-                  color: sosStatusMessage.startsWith("✓") ? "var(--signal-cyan)" : "var(--critical-ember)",
-                  border: `1px solid ${sosStatusMessage.startsWith("✓") ? "var(--signal-cyan)" : "var(--critical-ember)"}`,
+                  borderRadius: "var(--radius-sm)",
+                  backgroundColor: sosStatusMessage.startsWith("✓") ? "var(--color-success-bg)" : "var(--color-critical-bg)",
+                  color: sosStatusMessage.startsWith("✓") ? "var(--color-success)" : "var(--color-critical)",
+                  border: `1px solid ${sosStatusMessage.startsWith("✓") ? "var(--color-success-border)" : "var(--color-critical-border)"}`,
                 }}
               >
                 {sosStatusMessage}
@@ -429,22 +452,23 @@ export const OperationalConsole: React.FC<OperationalConsoleProps> = ({
 
             {/* Advisory Type Selector */}
             <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
-              <label style={{ fontSize: "10px", color: "var(--ink-dim)" }} className="mono">
+              <label style={{ fontSize: "10px", color: "var(--text-secondary)" }} className="mono">
                 ADVISORY TYPE
               </label>
               <select
                 value={advisoryType}
                 onChange={(e) => setAdvisoryType(e.target.value)}
                 style={{
-                  backgroundColor: "var(--void)",
-                  border: "1px solid var(--grid-line)",
-                  color: "var(--ink)",
-                  padding: "6px",
+                  backgroundColor: "var(--bg-input)",
+                  border: "1px solid var(--border-subtle)",
+                  color: "var(--text-primary)",
+                  padding: "6px 8px",
                   fontSize: "11px",
-                  borderRadius: "2px",
+                  borderRadius: "var(--radius-sm)",
+                  outline: "none",
                 }}
               >
-                <option value="BOAT_INBOUND">BOAT_INBOUND (Rescue Boat ETA & Visual Signals)</option>
+                <option value="BOAT_INBOUND">BOAT_INBOUND (Rescue Boat ETA & Signals)</option>
                 <option value="FLOOD_RISING">FLOOD_RISING (Move to Rooftop / Upper Floors)</option>
                 <option value="WATER_CONTAMINATION">WATER_CONTAMINATION (Do Not Drink Tap Water)</option>
                 <option value="EVACUATION_ORDER">EVACUATION_ORDER (Proceed to Designated Shelter)</option>
@@ -455,12 +479,12 @@ export const OperationalConsole: React.FC<OperationalConsoleProps> = ({
 
             {/* Channel Selection Checkboxes */}
             <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
-              <label style={{ fontSize: "10px", color: "var(--ink-dim)" }} className="mono">
+              <label style={{ fontSize: "10px", color: "var(--text-secondary)" }} className="mono">
                 DISPATCH CHANNELS
               </label>
-              <div style={{ display: "flex", gap: "10px", flexWrap: "wrap", fontSize: "11px" }}>
+              <div style={{ display: "flex", gap: "8px", flexWrap: "wrap", fontSize: "11px" }}>
                 {["SMS", "VOICE_IVR", "CELL_BROADCAST", "RADIO"].map((ch) => (
-                  <label key={ch} style={{ display: "flex", alignItems: "center", gap: "4px", cursor: "pointer", color: "var(--ink)" }}>
+                  <label key={ch} style={{ display: "flex", alignItems: "center", gap: "4px", cursor: "pointer", color: "var(--text-primary)" }}>
                     <input
                       type="checkbox"
                       checked={selectedChannels.includes(ch)}
@@ -471,7 +495,7 @@ export const OperationalConsole: React.FC<OperationalConsoleProps> = ({
                           setSelectedChannels(selectedChannels.filter((c) => c !== ch));
                         }
                       }}
-                      style={{ accentColor: "var(--signal-cyan)" }}
+                      style={{ accentColor: "var(--blue-bright)" }}
                     />
                     <span className="mono" style={{ fontSize: "10px" }}>{ch}</span>
                   </label>
@@ -479,12 +503,12 @@ export const OperationalConsole: React.FC<OperationalConsoleProps> = ({
               </div>
             </div>
 
-            {/* ETA Input if Boat Inbound */}
+            {/* ETA Input */}
             {advisoryType === "BOAT_INBOUND" && (
               <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
                 <div style={{ display: "flex", justifyContent: "space-between", fontSize: "10px" }} className="mono">
-                  <span>ESTIMATED ARRIVAL (ETA)</span>
-                  <span style={{ color: "var(--signal-cyan)", fontWeight: 700 }}>{etaMinutes} MINS</span>
+                  <span style={{ color: "var(--text-secondary)" }}>ESTIMATED ARRIVAL (ETA)</span>
+                  <span style={{ color: "var(--blue-light)", fontWeight: 700 }}>{etaMinutes} MINS</span>
                 </div>
                 <input
                   type="range"
@@ -493,29 +517,29 @@ export const OperationalConsole: React.FC<OperationalConsoleProps> = ({
                   step="5"
                   value={etaMinutes}
                   onChange={(e) => setEtaMinutes(Number(e.target.value))}
-                  style={{ accentColor: "var(--signal-cyan)" }}
+                  style={{ accentColor: "var(--blue-bright)" }}
                 />
               </div>
             )}
 
             {/* Multi-Lingual Preview Box */}
-            <div style={{ display: "flex", flexDirection: "column", gap: "4px", backgroundColor: "var(--void)", padding: "8px", borderRadius: "2px", border: "1px solid var(--grid-line)" }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: "4px", backgroundColor: "var(--bg-input)", padding: "8px", borderRadius: "var(--radius-sm)", border: "1px solid var(--border-subtle)" }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                <span style={{ fontSize: "10px", color: "var(--ink-dim)" }} className="mono">
+                <span style={{ fontSize: "10px", color: "var(--text-muted)" }} className="mono">
                   LIVE MICRO-GUIDANCE PREVIEW
                 </span>
-                <div style={{ display: "flex", gap: "4px" }}>
+                <div style={{ display: "flex", gap: "3px" }}>
                   {(["HI", "HINGLISH", "EN"] as const).map((lang) => (
                     <button
                       key={lang}
                       onClick={() => setPreviewLang(lang)}
                       className="mono"
                       style={{
-                        padding: "2px 6px",
+                        padding: "2px 5px",
                         fontSize: "9px",
                         fontWeight: 700,
-                        backgroundColor: previewLang === lang ? "var(--signal-cyan)" : "transparent",
-                        color: previewLang === lang ? "var(--void)" : "var(--ink-dim)",
+                        backgroundColor: previewLang === lang ? "var(--blue-bright)" : "transparent",
+                        color: previewLang === lang ? "#ffffff" : "var(--text-secondary)",
                         border: "none",
                         borderRadius: "2px",
                         cursor: "pointer",
@@ -527,29 +551,29 @@ export const OperationalConsole: React.FC<OperationalConsoleProps> = ({
                 </div>
               </div>
 
-              <div style={{ fontSize: "11px", color: "var(--ink)", lineHeight: "1.4", marginTop: "4px" }}>
+              <div style={{ fontSize: "11px", color: "var(--text-primary)", lineHeight: "1.4", marginTop: "4px" }}>
                 {getAdvisoryPreview()}
               </div>
             </div>
 
             {/* Mandatory Rationale Input */}
             <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
-              <label style={{ fontSize: "10px", color: "var(--dispute-amber)" }} className="mono">
+              <label style={{ fontSize: "10px", color: "var(--color-warning)" }} className="mono">
                 COMMANDER RATIONALE // MANDATORY AUDIT
               </label>
               <textarea
                 rows={2}
-                placeholder="State operational justification (e.g. Boat dispatched to rooftop victims; water contamination warning)..."
+                placeholder="State operational justification..."
                 value={sosRationale}
                 onChange={(e) => setSosRationale(e.target.value)}
                 style={{
                   width: "100%",
-                  padding: "6px",
-                  backgroundColor: "var(--void)",
-                  border: "1px solid var(--grid-line)",
-                  color: "var(--ink)",
+                  padding: "6px 8px",
+                  backgroundColor: "var(--bg-input)",
+                  border: "1px solid var(--border-subtle)",
+                  color: "var(--text-primary)",
                   fontSize: "11px",
-                  borderRadius: "2px",
+                  borderRadius: "var(--radius-sm)",
                   outline: "none",
                   resize: "none",
                 }}
@@ -562,13 +586,15 @@ export const OperationalConsole: React.FC<OperationalConsoleProps> = ({
               onClick={handleSendReverseSOS}
               style={{
                 padding: "8px 0",
-                backgroundColor: sosRationale.trim() && selectedChannels.length > 0 ? "var(--signal-cyan)" : "var(--grid-line)",
+                backgroundColor: sosRationale.trim() && selectedChannels.length > 0 ? "var(--blue-bright)" : "var(--bg-input)",
                 border: "none",
-                color: "var(--void)",
+                color: sosRationale.trim() && selectedChannels.length > 0 ? "#ffffff" : "var(--text-muted)",
                 fontWeight: 700,
                 fontSize: "11px",
-                borderRadius: "2px",
+                borderRadius: "var(--radius-sm)",
                 cursor: sosRationale.trim() && selectedChannels.length > 0 ? "pointer" : "not-allowed",
+                boxShadow: sosRationale.trim() && selectedChannels.length > 0 ? "0 2px 10px rgba(37, 99, 235, 0.3)" : "none",
+                transition: "all 0.15s ease",
               }}
               className="mono"
             >
@@ -579,15 +605,14 @@ export const OperationalConsole: React.FC<OperationalConsoleProps> = ({
 
         {/* ----------------- TAB 4: EVIDENCE & DISPUTES ----------------- */}
         {activeTab === "EVIDENCE" && (
-
           <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
             {selectedIncident ? (
               <>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                  <span style={{ fontSize: "11px", fontWeight: 700, color: "var(--ink)" }} className="mono">
+                  <span style={{ fontSize: "11px", fontWeight: 700, color: "var(--text-primary)" }} className="mono">
                     {selectedIncident.incident_id} // EVIDENCE DOSSIER
                   </span>
-                  <span className="mono" style={{ fontSize: "10px", color: "var(--ink-dim)" }}>
+                  <span className="mono" style={{ fontSize: "10px", color: "var(--text-secondary)" }}>
                     REPORTS: {selectedIncident.constituent_report_ids.length}
                   </span>
                 </div>
@@ -598,25 +623,25 @@ export const OperationalConsole: React.FC<OperationalConsoleProps> = ({
                     className="hatched-amber"
                     style={{
                       padding: "10px",
-                      borderRadius: "2px",
+                      borderRadius: "var(--radius-sm)",
                       display: "flex",
                       flexDirection: "column",
                       gap: "6px",
                     }}
                   >
-                    <div style={{ fontWeight: 700, color: "var(--dispute-amber)", fontSize: "11px" }} className="mono">
+                    <div style={{ fontWeight: 700, color: "var(--color-warning)", fontSize: "11px" }} className="mono">
                       ⚠ MATERIAL CONTRADICTION DETECTED
                     </div>
                     {selectedIncident.disputes.map((d, idx) => (
-                      <div key={idx} style={{ fontSize: "11px", color: "var(--ink)", display: "flex", flexDirection: "column", gap: "4px" }}>
-                        <div style={{ color: "var(--ink-dim)" }} className="mono">
+                      <div key={idx} style={{ fontSize: "11px", color: "var(--text-primary)", display: "flex", flexDirection: "column", gap: "4px" }}>
+                        <div style={{ color: "var(--text-secondary)" }} className="mono">
                           FIELD: {d.field_disputed}
                         </div>
-                        <div style={{ backgroundColor: "rgba(0,0,0,0.3)", padding: "4px", borderRadius: "2px" }}>
-                          <strong style={{ color: "var(--signal-cyan)" }}>CLAIM A ({d.claim_a_source}):</strong> {d.claim_a_text}
+                        <div style={{ backgroundColor: "rgba(0,0,0,0.4)", padding: "5px 8px", borderRadius: "3px" }}>
+                          <strong style={{ color: "var(--blue-light)" }}>CLAIM A ({d.claim_a_source}):</strong> {d.claim_a_text}
                         </div>
-                        <div style={{ backgroundColor: "rgba(0,0,0,0.3)", padding: "4px", borderRadius: "2px" }}>
-                          <strong style={{ color: "var(--critical-ember)" }}>CLAIM B ({d.claim_b_source}):</strong> {d.claim_b_text}
+                        <div style={{ backgroundColor: "rgba(0,0,0,0.4)", padding: "5px 8px", borderRadius: "3px" }}>
+                          <strong style={{ color: "var(--color-critical)" }}>CLAIM B ({d.claim_b_source}):</strong> {d.claim_b_text}
                         </div>
                       </div>
                     ))}
@@ -625,20 +650,20 @@ export const OperationalConsole: React.FC<OperationalConsoleProps> = ({
 
                 {/* Constituent Reports List */}
                 <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-                  <span className="mono" style={{ fontSize: "10px", color: "var(--ink-dim)" }}>
+                  <span className="mono" style={{ fontSize: "10px", color: "var(--text-secondary)" }}>
                     RAW CONSTITUENT OBSERVATIONS
                   </span>
                   {selectedIncident.evidence_summary.map((text, idx) => (
                     <div
                       key={idx}
                       style={{
-                        backgroundColor: "var(--void)",
-                        border: "1px solid var(--grid-line)",
-                        borderRadius: "2px",
-                        padding: "8px",
+                        backgroundColor: "var(--bg-root)",
+                        border: "1px solid var(--border-subtle)",
+                        borderRadius: "var(--radius-sm)",
+                        padding: "8px 10px",
                         fontSize: "11px",
                         lineHeight: "1.4",
-                        color: "var(--ink)",
+                        color: "var(--text-primary)",
                       }}
                     >
                       "{text}"
@@ -647,9 +672,9 @@ export const OperationalConsole: React.FC<OperationalConsoleProps> = ({
                 </div>
 
                 {/* Evidence Verification Action Controls */}
-                <div style={{ display: "flex", flexDirection: "column", gap: "6px", marginTop: "10px" }}>
-                  <span className="mono" style={{ fontSize: "10px", color: "var(--ink-dim)" }}>
-                    OPERATIONAL SENSOR FUSION & ACTIONS
+                <div style={{ display: "flex", flexDirection: "column", gap: "6px", marginTop: "8px" }}>
+                  <span className="mono" style={{ fontSize: "10px", color: "var(--text-secondary)" }}>
+                    OPERATIONAL SENSOR FUSION
                   </span>
                   <div style={{ display: "flex", gap: "6px", flexWrap: "wrap" }}>
                     {onVerifyCV && (
@@ -661,10 +686,10 @@ export const OperationalConsole: React.FC<OperationalConsoleProps> = ({
                           padding: "6px 8px",
                           fontSize: "10px",
                           fontWeight: 700,
-                          backgroundColor: "rgba(79, 216, 196, 0.15)",
-                          border: "1px solid var(--signal-cyan)",
-                          color: "var(--signal-cyan)",
-                          borderRadius: "2px",
+                          backgroundColor: "var(--blue-subtle)",
+                          border: "1px solid var(--blue-border)",
+                          color: "var(--blue-light)",
+                          borderRadius: "var(--radius-sm)",
                           cursor: "pointer",
                         }}
                       >
@@ -687,10 +712,10 @@ export const OperationalConsole: React.FC<OperationalConsoleProps> = ({
                           padding: "6px 8px",
                           fontSize: "10px",
                           fontWeight: 700,
-                          backgroundColor: "rgba(232, 163, 61, 0.15)",
-                          border: "1px solid var(--dispute-amber)",
-                          color: "var(--dispute-amber)",
-                          borderRadius: "2px",
+                          backgroundColor: "var(--color-warning-bg)",
+                          border: "1px solid var(--color-warning-border)",
+                          color: "var(--color-warning)",
+                          borderRadius: "var(--radius-sm)",
                           cursor: "pointer",
                         }}
                       >
@@ -706,10 +731,10 @@ export const OperationalConsole: React.FC<OperationalConsoleProps> = ({
                           padding: "6px 8px",
                           fontSize: "10px",
                           fontWeight: 700,
-                          backgroundColor: "rgba(214, 85, 60, 0.15)",
-                          border: "1px solid var(--critical-ember)",
-                          color: "var(--critical-ember)",
-                          borderRadius: "2px",
+                          backgroundColor: "var(--color-critical-bg)",
+                          border: "1px solid var(--color-critical-border)",
+                          color: "var(--color-critical)",
+                          borderRadius: "var(--radius-sm)",
                           cursor: "pointer",
                         }}
                       >
@@ -719,32 +744,31 @@ export const OperationalConsole: React.FC<OperationalConsoleProps> = ({
                   </div>
                 </div>
               </>
-
             ) : (
-              <div style={{ textAlign: "center", padding: "30px 10px", color: "var(--ink-muted)" }} className="mono">
+              <div style={{ textAlign: "center", padding: "30px 10px", color: "var(--text-muted)" }} className="mono">
                 SELECT AN INCIDENT TO VIEW EVIDENCE
               </div>
             )}
           </div>
         )}
 
-        {/* ----------------- TAB 4: CRYPTOGRAPHIC AUDIT LOG ----------------- */}
+        {/* ----------------- TAB 5: CRYPTOGRAPHIC AUDIT LOG ----------------- */}
         {activeTab === "AUDIT" && (
           <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-              <span style={{ fontSize: "11px", fontWeight: 700, color: "var(--ink-dim)" }} className="mono">
+              <span style={{ fontSize: "11px", fontWeight: 700, color: "var(--text-primary)" }} className="mono">
                 TAMPER-EVIDENT AUDIT TRAIL
               </span>
               <button
                 onClick={onVerifyAuditChain}
                 style={{
-                  padding: "2px 6px",
-                  fontSize: "9px",
+                  padding: "3px 8px",
+                  fontSize: "10px",
                   fontWeight: 700,
-                  backgroundColor: "rgba(79, 216, 196, 0.15)",
-                  border: "1px solid var(--signal-cyan)",
-                  color: "var(--signal-cyan)",
-                  borderRadius: "2px",
+                  backgroundColor: "var(--blue-subtle)",
+                  border: "1px solid var(--blue-border)",
+                  color: "var(--blue-light)",
+                  borderRadius: "var(--radius-sm)",
                   cursor: "pointer",
                 }}
                 className="mono"
@@ -755,7 +779,7 @@ export const OperationalConsole: React.FC<OperationalConsoleProps> = ({
 
             <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
               {auditRecords.length === 0 ? (
-                <div style={{ textAlign: "center", padding: "20px", color: "var(--ink-muted)" }} className="mono">
+                <div style={{ textAlign: "center", padding: "20px", color: "var(--text-muted)" }} className="mono">
                   NO AUDIT BLOCKS RECORDED
                 </div>
               ) : (
@@ -763,9 +787,9 @@ export const OperationalConsole: React.FC<OperationalConsoleProps> = ({
                   <div
                     key={idx}
                     style={{
-                      backgroundColor: "var(--void)",
-                      border: "1px solid var(--grid-line)",
-                      borderRadius: "2px",
+                      backgroundColor: "var(--bg-root)",
+                      border: "1px solid var(--border-subtle)",
+                      borderRadius: "var(--radius-sm)",
                       padding: "8px 10px",
                       display: "flex",
                       flexDirection: "column",
@@ -775,19 +799,19 @@ export const OperationalConsole: React.FC<OperationalConsoleProps> = ({
                     className="mono"
                   >
                     <div style={{ display: "flex", justifyContent: "space-between" }}>
-                      <strong style={{ color: "var(--signal-cyan)" }}>{r.action_type}</strong>
-                      <span style={{ color: "var(--ink-dim)" }}>{r.record_id}</span>
+                      <strong style={{ color: "var(--blue-light)" }}>{r.action_type}</strong>
+                      <span style={{ color: "var(--text-secondary)" }}>{r.record_id}</span>
                     </div>
-                    <div style={{ color: "var(--ink-dim)" }}>
+                    <div style={{ color: "var(--text-secondary)" }}>
                       ACTOR: {r.actor_id} ({r.actor_role})
                     </div>
                     {r.operator_rationale && (
-                      <div style={{ color: "var(--dispute-amber)", marginTop: "2px" }}>
+                      <div style={{ color: "var(--color-warning)", marginTop: "2px" }}>
                         RATIONALE: "{r.operator_rationale}"
                       </div>
                     )}
-                    <div style={{ color: "var(--ink-muted)", fontSize: "9px", overflow: "hidden", textOverflow: "ellipsis" }}>
-                      HASH: {r.record_hash?.substring(0, 18)}...
+                    <div style={{ color: "var(--text-muted)", fontSize: "9px", overflow: "hidden", textOverflow: "ellipsis" }}>
+                      HASH: {r.record_hash?.substring(0, 20)}...
                     </div>
                   </div>
                 ))
@@ -806,7 +830,8 @@ export const OperationalConsole: React.FC<OperationalConsoleProps> = ({
             left: 0,
             right: 0,
             bottom: 0,
-            backgroundColor: "rgba(0,0,0,0.75)",
+            backgroundColor: "rgba(0,0,0,0.8)",
+            backdropFilter: "blur(6px)",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
@@ -816,19 +841,20 @@ export const OperationalConsole: React.FC<OperationalConsoleProps> = ({
           <div
             style={{
               width: "440px",
-              backgroundColor: "var(--panel)",
-              border: "1px solid var(--dispute-amber)",
-              borderRadius: "3px",
+              backgroundColor: "var(--bg-surface)",
+              border: "1px solid var(--color-warning-border)",
+              borderRadius: "var(--radius-md)",
               padding: "18px",
               display: "flex",
               flexDirection: "column",
               gap: "12px",
+              boxShadow: "var(--shadow-lg)",
             }}
           >
-            <div style={{ fontWeight: 700, color: "var(--dispute-amber)", fontSize: "12px" }} className="mono">
+            <div style={{ fontWeight: 700, color: "var(--color-warning)", fontSize: "12px" }} className="mono">
               OPERATOR DISPATCH OVERRIDE // MANDATORY RATIONALE
             </div>
-            <div style={{ fontSize: "11px", color: "var(--ink-dim)" }}>
+            <div style={{ fontSize: "11px", color: "var(--text-secondary)", lineHeight: 1.4 }}>
               Under constitutional guardrails, overriding optimization requires a permanent,
               tamper-evident justification recorded in the immutable audit log.
             </div>
@@ -841,11 +867,11 @@ export const OperationalConsole: React.FC<OperationalConsoleProps> = ({
               style={{
                 width: "100%",
                 padding: "8px",
-                backgroundColor: "var(--void)",
-                border: "1px solid var(--grid-line)",
-                color: "var(--ink)",
+                backgroundColor: "var(--bg-input)",
+                border: "1px solid var(--border-subtle)",
+                color: "var(--text-primary)",
                 fontSize: "11px",
-                borderRadius: "2px",
+                borderRadius: "var(--radius-sm)",
                 outline: "none",
                 resize: "none",
               }}
@@ -857,9 +883,9 @@ export const OperationalConsole: React.FC<OperationalConsoleProps> = ({
                 style={{
                   padding: "6px 12px",
                   backgroundColor: "transparent",
-                  border: "1px solid var(--grid-line)",
-                  color: "var(--ink-dim)",
-                  borderRadius: "2px",
+                  border: "1px solid var(--border-subtle)",
+                  color: "var(--text-secondary)",
+                  borderRadius: "var(--radius-sm)",
                   cursor: "pointer",
                 }}
               >
@@ -869,12 +895,12 @@ export const OperationalConsole: React.FC<OperationalConsoleProps> = ({
                 disabled={!overrideReason.trim() || isSubmitting}
                 onClick={handleOverrideSubmit}
                 style={{
-                  padding: "6px 12px",
-                  backgroundColor: overrideReason.trim() ? "var(--dispute-amber)" : "var(--grid-line)",
+                  padding: "6px 14px",
+                  backgroundColor: overrideReason.trim() ? "var(--color-warning)" : "var(--bg-input)",
                   border: "none",
-                  color: "var(--void)",
+                  color: overrideReason.trim() ? "var(--bg-root)" : "var(--text-muted)",
                   fontWeight: 700,
-                  borderRadius: "2px",
+                  borderRadius: "var(--radius-sm)",
                   cursor: overrideReason.trim() ? "pointer" : "not-allowed",
                 }}
               >

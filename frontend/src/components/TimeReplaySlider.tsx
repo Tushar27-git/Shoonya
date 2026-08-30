@@ -1,7 +1,6 @@
 import React from "react";
 import { Play, Pause } from "lucide-react";
 
-
 interface TimeReplaySliderProps {
   replayMinutesAgo: number;
   maxMinutesAgo?: number;
@@ -27,10 +26,8 @@ export const TimeReplaySlider: React.FC<TimeReplaySliderProps> = ({
   onAdvanceSimTick,
   onResetSim,
 }) => {
-
   const isLive = replayMinutesAgo === 0;
 
-  // Format relative time label
   const formatTimeLabel = (mins: number) => {
     if (mins === 0) return "LIVE (T = 0)";
     const h = Math.floor(mins / 60);
@@ -41,16 +38,17 @@ export const TimeReplaySlider: React.FC<TimeReplaySliderProps> = ({
 
   return (
     <div
+      className="glass-panel"
       style={{
-        height: "48px",
-        backgroundColor: "var(--panel)",
-        borderTop: "1px solid var(--grid-line)",
+        height: "44px",
+        borderTop: "1px solid var(--border-subtle)",
         display: "flex",
         alignItems: "center",
         padding: "0 16px",
-        gap: "16px",
+        gap: "14px",
         userSelect: "none",
         zIndex: 100,
+        position: "relative",
       }}
     >
       {/* Play / Pause / Jump Controls */}
@@ -61,17 +59,20 @@ export const TimeReplaySlider: React.FC<TimeReplaySliderProps> = ({
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            width: "28px",
-            height: "28px",
-            backgroundColor: "var(--void)",
-            border: "1px solid var(--grid-line)",
-            color: "var(--ink)",
-            borderRadius: "2px",
+            width: "26px",
+            height: "26px",
+            backgroundColor: "var(--bg-input)",
+            border: "1px solid var(--border-subtle)",
+            color: "var(--text-primary)",
+            borderRadius: "var(--radius-sm)",
             cursor: "pointer",
+            transition: "all 0.15s ease",
           }}
+          onMouseEnter={(e) => (e.currentTarget.style.borderColor = "var(--blue-border)")}
+          onMouseLeave={(e) => (e.currentTarget.style.borderColor = "var(--border-subtle)")}
           title={isPlaying ? "Pause Timeline" : "Play Timeline"}
         >
-          {isPlaying ? <Pause size={14} color="var(--signal-cyan)" /> : <Play size={14} />}
+          {isPlaying ? <Pause size={12} color="var(--blue-bright)" /> : <Play size={12} />}
         </button>
 
         {/* Speed Selector */}
@@ -85,11 +86,12 @@ export const TimeReplaySlider: React.FC<TimeReplaySliderProps> = ({
                 padding: "3px 6px",
                 fontSize: "10px",
                 fontWeight: 600,
-                backgroundColor: playbackSpeed === spd ? "var(--grid-line-bright)" : "var(--void)",
-                color: playbackSpeed === spd ? "var(--signal-cyan)" : "var(--ink-dim)",
-                border: "1px solid var(--grid-line)",
-                borderRadius: "2px",
+                backgroundColor: playbackSpeed === spd ? "var(--blue-subtle)" : "var(--bg-input)",
+                color: playbackSpeed === spd ? "var(--blue-light)" : "var(--text-secondary)",
+                border: `1px solid ${playbackSpeed === spd ? "var(--blue-border)" : "var(--border-subtle)"}`,
+                borderRadius: "var(--radius-sm)",
                 cursor: "pointer",
+                transition: "all 0.15s ease",
               }}
             >
               {spd}x
@@ -99,8 +101,8 @@ export const TimeReplaySlider: React.FC<TimeReplaySliderProps> = ({
       </div>
 
       {/* Timeline Slider */}
-      <div style={{ flex: 1, display: "flex", alignItems: "center", gap: "12px" }}>
-        <span className="mono" style={{ fontSize: "10px", color: "var(--ink-dim)" }}>
+      <div style={{ flex: 1, display: "flex", alignItems: "center", gap: "10px" }}>
+        <span className="mono" style={{ fontSize: "10px", color: "var(--text-muted)" }}>
           T-6h
         </span>
 
@@ -113,30 +115,38 @@ export const TimeReplaySlider: React.FC<TimeReplaySliderProps> = ({
           onChange={(e) => onSeek(maxMinutesAgo - Number(e.target.value))}
           style={{
             flex: 1,
-            accentColor: isLive ? "var(--signal-cyan)" : "var(--dispute-amber)",
+            accentColor: isLive ? "var(--blue-bright)" : "var(--color-warning)",
             cursor: "pointer",
           }}
         />
 
-        <span className="mono" style={{ fontSize: "10px", color: "var(--signal-cyan)" }}>
+        <span
+          className="mono"
+          style={{
+            fontSize: "10px",
+            color: isLive ? "var(--blue-light)" : "var(--text-muted)",
+            fontWeight: isLive ? 700 : 500,
+          }}
+        >
           LIVE
         </span>
       </div>
 
-      {/* Current Replay Indicator & Action Buttons */}
-      <div style={{ display: "flex", alignItems: "center", gap: "8px" }} className="mono">
+      {/* Replay Status & Action Controls */}
+      <div style={{ display: "flex", alignItems: "center", gap: "6px" }} className="mono">
         {onAdvanceSimTick && (
           <button
             onClick={onAdvanceSimTick}
             style={{
-              padding: "4px 8px",
-              backgroundColor: "rgba(232, 163, 61, 0.15)",
-              border: "1px solid var(--dispute-amber)",
-              color: "var(--dispute-amber)",
-              borderRadius: "2px",
+              padding: "3px 7px",
+              backgroundColor: "var(--color-warning-bg)",
+              border: "1px solid var(--color-warning-border)",
+              color: "var(--color-warning)",
+              borderRadius: "var(--radius-sm)",
               fontSize: "10px",
               fontWeight: 700,
               cursor: "pointer",
+              transition: "all 0.15s ease",
             }}
             title="Advance discrete disaster simulation by 15 minutes"
           >
@@ -148,14 +158,15 @@ export const TimeReplaySlider: React.FC<TimeReplaySliderProps> = ({
           <button
             onClick={onResetSim}
             style={{
-              padding: "4px 8px",
-              backgroundColor: "rgba(214, 85, 60, 0.15)",
-              border: "1px solid var(--critical-ember)",
-              color: "var(--critical-ember)",
-              borderRadius: "2px",
+              padding: "3px 7px",
+              backgroundColor: "var(--color-critical-bg)",
+              border: "1px solid var(--color-critical-border)",
+              color: "var(--color-critical)",
+              borderRadius: "var(--radius-sm)",
               fontSize: "10px",
               fontWeight: 700,
               cursor: "pointer",
+              transition: "all 0.15s ease",
             }}
             title="Reset simulation to T = 0"
           >
@@ -165,12 +176,12 @@ export const TimeReplaySlider: React.FC<TimeReplaySliderProps> = ({
 
         <div
           style={{
-            padding: "3px 8px",
-            backgroundColor: "var(--void)",
-            border: `1px solid ${isLive ? "var(--signal-cyan)" : "var(--dispute-amber)"}`,
-            color: isLive ? "var(--signal-cyan)" : "var(--dispute-amber)",
-            borderRadius: "2px",
-            fontSize: "11px",
+            padding: "3px 7px",
+            backgroundColor: "var(--bg-input)",
+            border: `1px solid ${isLive ? "var(--blue-border)" : "var(--color-warning-border)"}`,
+            color: isLive ? "var(--blue-light)" : "var(--color-warning)",
+            borderRadius: "var(--radius-sm)",
+            fontSize: "10px",
             fontWeight: 700,
           }}
         >
@@ -181,14 +192,15 @@ export const TimeReplaySlider: React.FC<TimeReplaySliderProps> = ({
           <button
             onClick={onResetToLive}
             style={{
-              padding: "4px 8px",
-              backgroundColor: "rgba(79, 216, 196, 0.15)",
-              border: "1px solid var(--signal-cyan)",
-              color: "var(--signal-cyan)",
-              borderRadius: "2px",
+              padding: "3px 7px",
+              backgroundColor: "var(--blue-bright)",
+              border: "1px solid rgba(255, 255, 255, 0.15)",
+              color: "#ffffff",
+              borderRadius: "var(--radius-sm)",
               fontSize: "10px",
               fontWeight: 700,
               cursor: "pointer",
+              transition: "all 0.15s ease",
             }}
           >
             JUMP TO LIVE
@@ -198,4 +210,3 @@ export const TimeReplaySlider: React.FC<TimeReplaySliderProps> = ({
     </div>
   );
 };
-

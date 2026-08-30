@@ -16,46 +16,54 @@ export const ZeroGauge: React.FC<ZeroGaugeProps> = ({
   const clampedScore = Math.max(0, Math.min(1, score));
   const pct = Math.round(clampedScore * 100);
 
-  // Determine active tier color
-  let activeColor = "var(--dark-zone-grey)";
+  // Determine active tier color and label
+  let activeColor = "var(--text-muted)";
   let tierLabel = "LOW";
 
   if (isDisputed) {
-    activeColor = "var(--dispute-amber)";
+    activeColor = "var(--color-warning)";
     tierLabel = "DISPUTED";
   } else if (clampedScore >= 0.75) {
-    activeColor = "var(--signal-cyan)";
+    activeColor = "var(--blue-bright)";
     tierLabel = "VERIFIED";
   } else if (clampedScore >= 0.4) {
-    activeColor = "var(--dispute-amber)";
+    activeColor = "var(--color-warning)";
     tierLabel = "MODERATE";
   }
 
   const heightMap = {
-    sm: "4px",
-    md: "6px",
-    lg: "10px",
+    sm: "3px",
+    md: "5px",
+    lg: "8px",
   };
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "3px", width: "100%" }}>
+    <div style={{ display: "flex", flexDirection: "column", gap: "2px", width: "100%" }}>
       {showLabel && (
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: "10px" }} className="mono">
-          <span style={{ color: "var(--ink-dim)", letterSpacing: "0.5px" }}>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            fontSize: "9px",
+          }}
+          className="mono"
+        >
+          <span style={{ color: "var(--text-muted)", letterSpacing: "0.5px" }}>
             ZERO GAUGE // {tierLabel}
           </span>
-          <span style={{ color: activeColor, fontWeight: 600 }}>
-            {(clampedScore).toFixed(2)}
+          <span style={{ color: activeColor, fontWeight: 700 }}>
+            {clampedScore.toFixed(2)}
           </span>
         </div>
       )}
-      
+
       <div
         style={{
           width: "100%",
           height: heightMap[size],
-          backgroundColor: "var(--void)",
-          border: "1px solid var(--grid-line)",
+          backgroundColor: "var(--bg-input)",
+          border: "1px solid var(--border-subtle)",
           borderRadius: "1px",
           overflow: "hidden",
           position: "relative",
@@ -67,8 +75,8 @@ export const ZeroGauge: React.FC<ZeroGaugeProps> = ({
             width: `${pct}%`,
             height: "100%",
             backgroundColor: activeColor,
-            transition: "width 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
-            boxShadow: clampedScore >= 0.75 ? "0 0 6px rgba(79, 216, 196, 0.4)" : "none",
+            transition: "width 0.25s cubic-bezier(0.4, 0, 0.2, 1)",
+            boxShadow: clampedScore >= 0.75 && !isDisputed ? "0 0 6px rgba(59, 130, 246, 0.4)" : "none",
           }}
         />
         {/* Disputed hatched overlay */}

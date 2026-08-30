@@ -7,7 +7,7 @@ import {
   Layers,
   Sparkles,
   FileCheck,
-  CheckCircle2,
+  ShieldCheck,
 } from "lucide-react";
 import type { SystemTelemetry } from "../types/domain";
 
@@ -25,54 +25,56 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       style={{
         minHeight: "100vh",
         width: "100vw",
-        backgroundColor: "var(--void)",
+        backgroundColor: "var(--bg-root)",
         backgroundImage: `
-          radial-gradient(circle at 50% 15%, rgba(56, 189, 248, 0.07) 0%, transparent 60%),
-          radial-gradient(circle at 80% 85%, rgba(245, 158, 11, 0.04) 0%, transparent 50%),
-          linear-gradient(180deg, rgba(9, 12, 16, 0) 0%, rgba(9, 12, 16, 0.8) 100%)
+          radial-gradient(circle at 50% 12%, rgba(37, 99, 235, 0.08) 0%, transparent 55%),
+          radial-gradient(circle at 85% 85%, rgba(37, 99, 235, 0.03) 0%, transparent 45%)
         `,
         display: "flex",
         flexDirection: "column",
         justifyContent: "space-between",
-        color: "var(--ink)",
+        color: "var(--text-primary)",
         overflowY: "auto",
         position: "relative",
       }}
     >
-      {/* Top Bar / System Status */}
+      {/* Top Navigation Bar with Glassmorphic Floating Style */}
       <header
+        className="glass-panel"
         style={{
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
-          padding: "20px 40px",
-          borderBottom: "1px solid var(--grid-line)",
-          backgroundColor: "rgba(15, 21, 31, 0.6)",
-          backdropFilter: "blur(12px)",
+          padding: "16px 36px",
+          borderBottom: "1px solid var(--border-subtle)",
+          position: "sticky",
+          top: 0,
+          zIndex: 100,
         }}
       >
+        {/* Brand */}
         <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
           <div
             style={{
               width: "32px",
               height: "32px",
-              borderRadius: "6px",
-              backgroundColor: "var(--signal-cyan-glow)",
-              border: "1px solid var(--signal-cyan-border)",
+              borderRadius: "var(--radius-md)",
+              backgroundColor: "var(--blue-subtle)",
+              border: "1px solid var(--blue-border)",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
             }}
           >
-            <Layers size={18} color="var(--signal-cyan)" />
+            <Layers size={16} color="var(--blue-bright)" />
           </div>
-          <div>
+          <div style={{ display: "flex", alignItems: "baseline", gap: "8px" }}>
             <span
               style={{
-                fontSize: "18px",
+                fontSize: "17px",
                 fontWeight: 800,
-                letterSpacing: "2px",
-                color: "var(--ink-bright)",
+                letterSpacing: "1.5px",
+                color: "var(--text-primary)",
               }}
             >
               SHOONYA
@@ -80,49 +82,50 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             <span
               className="mono"
               style={{
-                fontSize: "11px",
-                color: "var(--ink-dim)",
-                marginLeft: "8px",
+                fontSize: "10px",
+                color: "var(--text-secondary)",
                 padding: "2px 6px",
-                backgroundColor: "var(--panel)",
-                border: "1px solid var(--grid-line)",
-                borderRadius: "3px",
+                backgroundColor: "var(--bg-surface)",
+                border: "1px solid var(--border-subtle)",
+                borderRadius: "var(--radius-sm)",
+                letterSpacing: "0.5px",
               }}
             >
-              CRISIS INTELLIGENCE PLATFORM
+              CRISIS INTELLIGENCE
             </span>
           </div>
         </div>
 
-        <div style={{ display: "flex", alignItems: "center", gap: "20px" }}>
+        {/* Right Status Pill & CTA */}
+        <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
           <div
             className="mono"
             style={{
               display: "flex",
               alignItems: "center",
               gap: "8px",
-              fontSize: "12px",
-              padding: "6px 12px",
-              backgroundColor: "var(--panel)",
-              border: "1px solid var(--grid-line)",
-              borderRadius: "4px",
+              fontSize: "11px",
+              padding: "5px 12px",
+              backgroundColor: "var(--bg-surface)",
+              border: "1px solid var(--border-subtle)",
+              borderRadius: "var(--radius-sm)",
             }}
           >
             <span
               style={{
-                width: "8px",
-                height: "8px",
+                width: "6px",
+                height: "6px",
                 borderRadius: "50%",
-                backgroundColor: "var(--signal-cyan)",
-                boxShadow: "0 0 8px var(--signal-cyan)",
+                backgroundColor: "var(--blue-bright)",
+                boxShadow: "0 0 8px var(--blue-bright)",
               }}
             />
-            <span style={{ color: "var(--ink-dim)" }}>SYSTEM:</span>
-            <span style={{ color: "var(--signal-cyan)", fontWeight: 700 }}>
-              OPERATIONAL
+            <span style={{ color: "var(--text-muted)" }}>SYSTEM:</span>
+            <span style={{ color: "var(--blue-light)", fontWeight: 700 }}>
+              ONLINE
             </span>
-            <span style={{ color: "var(--ink-muted)", margin: "0 4px" }}>|</span>
-            <span style={{ color: "var(--ink-dim)" }}>SECTOR 4 RAIPUR EAST</span>
+            <span style={{ color: "var(--border-default)" }}>|</span>
+            <span style={{ color: "var(--text-secondary)" }}>RAIPUR EAST SECTOR 4</span>
           </div>
 
           <button
@@ -132,23 +135,26 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               alignItems: "center",
               gap: "8px",
               padding: "8px 18px",
-              backgroundColor: "var(--signal-cyan)",
-              border: "none",
-              borderRadius: "4px",
-              color: "var(--void)",
+              backgroundColor: "var(--blue-bright)",
+              border: "1px solid rgba(255, 255, 255, 0.15)",
+              borderRadius: "var(--radius-sm)",
+              color: "#ffffff",
               fontWeight: 700,
               fontSize: "12px",
               cursor: "pointer",
               letterSpacing: "0.5px",
-              transition: "transform 0.15s ease, box-shadow 0.15s ease",
+              boxShadow: "0 2px 10px rgba(37, 99, 235, 0.3)",
+              transition: "all 0.15s ease",
             }}
             onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = "var(--blue-primary)";
+              e.currentTarget.style.boxShadow = "0 4px 16px rgba(37, 99, 235, 0.5)";
               e.currentTarget.style.transform = "translateY(-1px)";
-              e.currentTarget.style.boxShadow = "0 4px 16px rgba(56, 189, 248, 0.4)";
             }}
             onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = "var(--blue-bright)";
+              e.currentTarget.style.boxShadow = "0 2px 10px rgba(37, 99, 235, 0.3)";
               e.currentTarget.style.transform = "translateY(0)";
-              e.currentTarget.style.boxShadow = "none";
             }}
           >
             ENTER DASHBOARD
@@ -157,10 +163,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({
         </div>
       </header>
 
-      {/* Main Hero Section */}
+      {/* Main Hero Content */}
       <main
         style={{
-          maxWidth: "1200px",
+          maxWidth: "1160px",
           margin: "0 auto",
           padding: "50px 24px",
           display: "flex",
@@ -171,49 +177,49 @@ export const LandingPage: React.FC<LandingPageProps> = ({
           justifyContent: "center",
         }}
       >
-        {/* Subtle Badge */}
+        {/* Subtle Top Badge */}
         <div
           className="mono"
           style={{
             display: "inline-flex",
             alignItems: "center",
-            gap: "8px",
+            gap: "7px",
             padding: "5px 14px",
-            backgroundColor: "rgba(56, 189, 248, 0.08)",
-            border: "1px solid var(--signal-cyan-border)",
+            backgroundColor: "var(--blue-subtle)",
+            border: "1px solid var(--blue-border)",
             borderRadius: "20px",
             fontSize: "11px",
-            color: "var(--signal-cyan)",
-            marginBottom: "24px",
+            color: "var(--blue-light)",
+            marginBottom: "22px",
             letterSpacing: "0.5px",
           }}
         >
-          <Sparkles size={13} />
-          NEXT-GENERATION EMERGENCY OPERATIONS DECISION SUPPORT
+          <Sparkles size={12} color="var(--blue-bright)" />
+          NEXT-GEN EMERGENCY OPERATIONS DECISION SUPPORT
         </div>
 
-        {/* Hero Title */}
+        {/* Title */}
         <h1
           style={{
-            fontSize: "64px",
+            fontSize: "58px",
             fontWeight: 800,
-            letterSpacing: "4px",
+            letterSpacing: "3px",
             lineHeight: 1.1,
-            marginBottom: "18px",
-            color: "var(--ink-bright)",
+            marginBottom: "16px",
+            color: "var(--text-primary)",
             textTransform: "uppercase",
           }}
         >
           SHOONYA
         </h1>
 
-        {/* Tagline */}
+        {/* Subtitle */}
         <p
           style={{
-            fontSize: "20px",
-            fontWeight: 500,
-            color: "var(--signal-cyan)",
-            maxWidth: "780px",
+            fontSize: "19px",
+            fontWeight: 600,
+            color: "var(--blue-light)",
+            maxWidth: "760px",
             marginBottom: "16px",
             lineHeight: 1.4,
           }}
@@ -221,50 +227,52 @@ export const LandingPage: React.FC<LandingPageProps> = ({
           Closed-Loop Crisis Intelligence & Autonomous Rescue Optimization System
         </p>
 
-        {/* Concise Description */}
+        {/* Technical Description */}
         <p
           style={{
             fontSize: "14px",
-            color: "var(--ink-dim)",
-            maxWidth: "720px",
-            lineHeight: 1.7,
-            marginBottom: "36px",
+            color: "var(--text-secondary)",
+            maxWidth: "700px",
+            lineHeight: 1.65,
+            marginBottom: "34px",
           }}
         >
-          SHOONYA continuously ingests multi-channel emergency reports, resolves geospatial contradictions, identifies silent telecom dark zones, and solves constraint-based MILP rescue resource dispatching under strict human commander verification.
+          Continuous multi-channel report ingestion, geospatial contradiction resolution, silent telecom dark-zone identification, and constraint-based MILP rescue dispatching under strict human commander verification.
         </p>
 
-        {/* Enter Dashboard CTA Button */}
-        <div style={{ display: "flex", gap: "16px", marginBottom: "50px" }}>
+        {/* CTA Launch Button */}
+        <div style={{ display: "flex", gap: "16px", marginBottom: "48px" }}>
           <button
             onClick={onEnterDashboard}
             style={{
               display: "flex",
               alignItems: "center",
               gap: "10px",
-              padding: "14px 34px",
-              backgroundColor: "var(--signal-cyan)",
+              padding: "13px 32px",
+              backgroundColor: "var(--blue-bright)",
               border: "1px solid rgba(255, 255, 255, 0.2)",
-              borderRadius: "6px",
-              color: "var(--void)",
-              fontWeight: 800,
-              fontSize: "14px",
-              letterSpacing: "1px",
+              borderRadius: "var(--radius-md)",
+              color: "#ffffff",
+              fontWeight: 700,
+              fontSize: "13px",
+              letterSpacing: "0.5px",
               cursor: "pointer",
-              boxShadow: "0 6px 24px rgba(56, 189, 248, 0.35)",
-              transition: "all 0.2s ease",
+              boxShadow: "0 4px 20px rgba(37, 99, 235, 0.4)",
+              transition: "all 0.15s ease",
             }}
             onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = "var(--blue-primary)";
+              e.currentTarget.style.boxShadow = "0 6px 26px rgba(37, 99, 235, 0.6)";
               e.currentTarget.style.transform = "translateY(-2px)";
-              e.currentTarget.style.boxShadow = "0 8px 30px rgba(56, 189, 248, 0.5)";
             }}
             onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = "var(--blue-bright)";
+              e.currentTarget.style.boxShadow = "0 4px 20px rgba(37, 99, 235, 0.4)";
               e.currentTarget.style.transform = "translateY(0)";
-              e.currentTarget.style.boxShadow = "0 6px 24px rgba(56, 189, 248, 0.35)";
             }}
           >
-            ENTER OPERATIONAL DASHBOARD
-            <ArrowRight size={18} />
+            LAUNCH OPERATIONAL COMMAND CENTER
+            <ArrowRight size={16} />
           </button>
         </div>
 
@@ -273,17 +281,17 @@ export const LandingPage: React.FC<LandingPageProps> = ({
           style={{
             display: "grid",
             gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))",
-            gap: "18px",
+            gap: "16px",
             width: "100%",
             textAlign: "left",
           }}
         >
-          {/* Pillar 1: Spatial Triage */}
+          {/* Pillar 1 */}
           <div
             style={{
-              backgroundColor: "var(--panel)",
-              border: "1px solid var(--grid-line)",
-              borderRadius: "6px",
+              backgroundColor: "var(--bg-surface)",
+              border: "1px solid var(--border-subtle)",
+              borderRadius: "var(--radius-md)",
               padding: "20px",
               display: "flex",
               flexDirection: "column",
@@ -291,41 +299,42 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               transition: "border-color 0.2s ease, transform 0.2s ease",
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.borderColor = "var(--signal-cyan-border)";
+              e.currentTarget.style.borderColor = "var(--blue-border)";
               e.currentTarget.style.transform = "translateY(-2px)";
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.borderColor = "var(--grid-line)";
+              e.currentTarget.style.borderColor = "var(--border-subtle)";
               e.currentTarget.style.transform = "translateY(0)";
             }}
           >
             <div
               style={{
-                width: "36px",
-                height: "36px",
-                borderRadius: "6px",
-                backgroundColor: "var(--signal-cyan-glow)",
+                width: "34px",
+                height: "34px",
+                borderRadius: "var(--radius-sm)",
+                backgroundColor: "var(--blue-subtle)",
+                border: "1px solid var(--blue-border)",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
               }}
             >
-              <Radio size={18} color="var(--signal-cyan)" />
+              <Radio size={16} color="var(--blue-light)" />
             </div>
-            <h3 style={{ fontSize: "14px", fontWeight: 700, color: "var(--ink-bright)" }}>
+            <h3 style={{ fontSize: "14px", fontWeight: 700, color: "var(--text-primary)" }}>
               Multi-Source Ingestion & Triage
             </h3>
-            <p style={{ fontSize: "12px", color: "var(--ink-dim)", lineHeight: 1.5 }}>
-              Ingests Voice, Radio, SMS, and Social feeds. Employs multilingual NLP for automated casualty estimates, micro-environment tagging, and severity ranking.
+            <p style={{ fontSize: "12px", color: "var(--text-secondary)", lineHeight: 1.5 }}>
+              Ingests Voice, Radio, SMS, and Social feeds. Multilingual NLP estimates casualties, assigns micro-environment tags, and calculates priority ranking.
             </p>
           </div>
 
-          {/* Pillar 2: Tactical Geospatial Map */}
+          {/* Pillar 2 */}
           <div
             style={{
-              backgroundColor: "var(--panel)",
-              border: "1px solid var(--grid-line)",
-              borderRadius: "6px",
+              backgroundColor: "var(--bg-surface)",
+              border: "1px solid var(--border-subtle)",
+              borderRadius: "var(--radius-md)",
               padding: "20px",
               display: "flex",
               flexDirection: "column",
@@ -333,41 +342,42 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               transition: "border-color 0.2s ease, transform 0.2s ease",
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.borderColor = "var(--dispute-amber-border)";
+              e.currentTarget.style.borderColor = "var(--blue-border)";
               e.currentTarget.style.transform = "translateY(-2px)";
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.borderColor = "var(--grid-line)";
+              e.currentTarget.style.borderColor = "var(--border-subtle)";
               e.currentTarget.style.transform = "translateY(0)";
             }}
           >
             <div
               style={{
-                width: "36px",
-                height: "36px",
-                borderRadius: "6px",
-                backgroundColor: "var(--dispute-amber-glow)",
+                width: "34px",
+                height: "34px",
+                borderRadius: "var(--radius-sm)",
+                backgroundColor: "var(--color-warning-bg)",
+                border: "1px solid var(--color-warning-border)",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
               }}
             >
-              <MapPin size={18} color="var(--dispute-amber)" />
+              <MapPin size={16} color="var(--color-warning)" />
             </div>
-            <h3 style={{ fontSize: "14px", fontWeight: 700, color: "var(--ink-bright)" }}>
+            <h3 style={{ fontSize: "14px", fontWeight: 700, color: "var(--text-primary)" }}>
               Tactical Map & Dark Zones
             </h3>
-            <p style={{ fontSize: "12px", color: "var(--ink-dim)", lineHeight: 1.5 }}>
-              Provides precision-tiered geospatial tracking. Detects unmonitored communication blackouts and tracks flood-threatened hospital bed capacities.
+            <p style={{ fontSize: "12px", color: "var(--text-secondary)", lineHeight: 1.5 }}>
+              Precision-tiered geospatial tracking. Detects unmonitored communication blackouts and tracks hospital surge and road passability in real time.
             </p>
           </div>
 
-          {/* Pillar 3: MILP Dispatch Solver */}
+          {/* Pillar 3 */}
           <div
             style={{
-              backgroundColor: "var(--panel)",
-              border: "1px solid var(--grid-line)",
-              borderRadius: "6px",
+              backgroundColor: "var(--bg-surface)",
+              border: "1px solid var(--border-subtle)",
+              borderRadius: "var(--radius-md)",
               padding: "20px",
               display: "flex",
               flexDirection: "column",
@@ -375,41 +385,42 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               transition: "border-color 0.2s ease, transform 0.2s ease",
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.borderColor = "var(--critical-ember-border)";
+              e.currentTarget.style.borderColor = "var(--blue-border)";
               e.currentTarget.style.transform = "translateY(-2px)";
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.borderColor = "var(--grid-line)";
+              e.currentTarget.style.borderColor = "var(--border-subtle)";
               e.currentTarget.style.transform = "translateY(0)";
             }}
           >
             <div
               style={{
-                width: "36px",
-                height: "36px",
-                borderRadius: "6px",
-                backgroundColor: "var(--critical-ember-glow)",
+                width: "34px",
+                height: "34px",
+                borderRadius: "var(--radius-sm)",
+                backgroundColor: "var(--blue-subtle)",
+                border: "1px solid var(--blue-border)",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
               }}
             >
-              <Cpu size={18} color="var(--critical-ember)" />
+              <Cpu size={16} color="var(--blue-light)" />
             </div>
-            <h3 style={{ fontSize: "14px", fontWeight: 700, color: "var(--ink-bright)" }}>
+            <h3 style={{ fontSize: "14px", fontWeight: 700, color: "var(--text-primary)" }}>
               MILP CP-SAT Dispatch Solver
             </h3>
-            <p style={{ fontSize: "12px", color: "var(--ink-dim)", lineHeight: 1.5 }}>
-              Mathematical constraint solver allocating boats, ambulances, and heavy excavators within a 3–5 second budget with a human commander approval gate.
+            <p style={{ fontSize: "12px", color: "var(--text-secondary)", lineHeight: 1.5 }}>
+              Mathematical constraint solver allocating boats, ambulances, and heavy rescue vehicles within 3–5 seconds with human commander approval gate.
             </p>
           </div>
 
-          {/* Pillar 4: EOC Copilot */}
+          {/* Pillar 4 */}
           <div
             style={{
-              backgroundColor: "var(--panel)",
-              border: "1px solid var(--grid-line)",
-              borderRadius: "6px",
+              backgroundColor: "var(--bg-surface)",
+              border: "1px solid var(--border-subtle)",
+              borderRadius: "var(--radius-md)",
               padding: "20px",
               display: "flex",
               flexDirection: "column",
@@ -417,32 +428,33 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               transition: "border-color 0.2s ease, transform 0.2s ease",
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.borderColor = "var(--signal-cyan-border)";
+              e.currentTarget.style.borderColor = "var(--blue-border)";
               e.currentTarget.style.transform = "translateY(-2px)";
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.borderColor = "var(--grid-line)";
+              e.currentTarget.style.borderColor = "var(--border-subtle)";
               e.currentTarget.style.transform = "translateY(0)";
             }}
           >
             <div
               style={{
-                width: "36px",
-                height: "36px",
-                borderRadius: "6px",
-                backgroundColor: "var(--signal-cyan-glow)",
+                width: "34px",
+                height: "34px",
+                borderRadius: "var(--radius-sm)",
+                backgroundColor: "var(--color-success-bg)",
+                border: "1px solid var(--color-success-border)",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
               }}
             >
-              <FileCheck size={18} color="var(--signal-cyan)" />
+              <FileCheck size={16} color="var(--color-success)" />
             </div>
-            <h3 style={{ fontSize: "14px", fontWeight: 700, color: "var(--ink-bright)" }}>
+            <h3 style={{ fontSize: "14px", fontWeight: 700, color: "var(--text-primary)" }}>
               EOC AI Copilot & SITREP
             </h3>
-            <p style={{ fontSize: "12px", color: "var(--ink-dim)", lineHeight: 1.5 }}>
-              Context-grounded operational assistant with strict entity citations, automated SITREP generation, and reverse SOS multi-channel citizen broadcasting.
+            <p style={{ fontSize: "12px", color: "var(--text-secondary)", lineHeight: 1.5 }}>
+              Context-grounded operational copilot with verified citations, automated SITREP generation, and reverse SOS citizen broadcast capabilities.
             </p>
           </div>
         </div>
@@ -450,28 +462,36 @@ export const LandingPage: React.FC<LandingPageProps> = ({
 
       {/* Footer / Telemetry Strip */}
       <footer
+        className="glass-panel"
         style={{
-          borderTop: "1px solid var(--grid-line)",
-          backgroundColor: "var(--panel)",
-          padding: "14px 40px",
+          borderTop: "1px solid var(--border-subtle)",
+          padding: "12px 36px",
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
           fontSize: "11px",
-          color: "var(--ink-dim)",
+          color: "var(--text-secondary)",
         }}
-        className="mono"
       >
-        <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
-          <span>LIVE TELEMETRY:</span>
-          <span>INCIDENTS: <strong style={{ color: "var(--critical-ember)" }}>{telemetry.active_incidents}</strong></span>
-          <span>DISPUTES: <strong style={{ color: "var(--dispute-amber)" }}>{telemetry.disputed_incidents}</strong></span>
-          <span>DARK ZONES: <strong style={{ color: "var(--ink)" }}>{telemetry.dark_zones}</strong></span>
+        <div style={{ display: "flex", alignItems: "center", gap: "18px" }} className="mono">
+          <span style={{ color: "var(--text-muted)" }}>LIVE TELEMETRY:</span>
+          <span>
+            INCIDENTS: <strong style={{ color: "var(--color-critical)" }}>{telemetry.active_incidents}</strong>
+          </span>
+          <span>
+            DISPUTES: <strong style={{ color: "var(--color-warning)" }}>{telemetry.disputed_incidents}</strong>
+          </span>
+          <span>
+            DARK ZONES: <strong style={{ color: "var(--text-primary)" }}>{telemetry.dark_zones}</strong>
+          </span>
+          <span>
+            LATENCY: <strong style={{ color: "var(--blue-light)" }}>{telemetry.ingestion_to_map_latency_sec.toFixed(2)}s</strong>
+          </span>
         </div>
 
-        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-          <CheckCircle2 size={13} color="var(--signal-cyan)" />
-          <span>CRYPTOGRAPHIC AUDIT TRAIL ACTIVE // SHA-256</span>
+        <div style={{ display: "flex", alignItems: "center", gap: "6px" }} className="mono">
+          <ShieldCheck size={14} color="var(--blue-bright)" />
+          <span style={{ color: "var(--text-secondary)" }}>CRYPTOGRAPHIC AUDIT CHAIN ACTIVE // SHA-256</span>
         </div>
       </footer>
     </div>

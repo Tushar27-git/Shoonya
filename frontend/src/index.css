@@ -1,153 +1,192 @@
 @import "leaflet/dist/leaflet.css";
 
+/* -----------------------------------------------------------------------------
+ * SHOONYA MODERN DARK DESIGN SYSTEM
+ * Visual Identity: BLACK + BLUE + SUBTLE GLASSMORPHISM
+ * -------------------------------------------------------------------------- */
 :root {
-  /* Dark Void & Surface Hierarchy */
-  --void: #090C10;
-  --void-deep: #050709;
-  --panel: #0F151F;
-  --panel-elevated: #151D2A;
-  --panel-hover: #1C2738;
-  --panel-glass: rgba(15, 21, 31, 0.88);
+  /* Surfaces & Backgrounds */
+  --bg-root: #06070a;
+  --bg-surface: #0a0d14;
+  --bg-surface-elevated: #0f1420;
+  --bg-surface-hover: #141b2a;
+  --bg-input: #07090e;
   
-  /* Borders & Grids */
-  --grid-line: #1E293B;
-  --grid-line-bright: #2D3D54;
-  --grid-line-subtle: rgba(255, 255, 255, 0.06);
+  /* Subtle Glassmorphism Tokens (Applied only to active cards, key panels, navigation, modals) */
+  --bg-glass: rgba(10, 13, 20, 0.76);
+  --bg-glass-active: rgba(15, 23, 42, 0.82);
+  --bg-glass-overlay: rgba(5, 7, 10, 0.85);
+  --backdrop-blur: blur(14px);
 
-  /* 3 Curated Subtle Accent Colors */
-  /* 1. Primary Signal (Cyan/Sky) */
-  --signal-cyan: #38BDF8;
-  --signal-cyan-dim: #0284C7;
-  --signal-cyan-glow: rgba(56, 189, 248, 0.16);
-  --signal-cyan-border: rgba(56, 189, 248, 0.35);
+  /* Low-Contrast Precision Borders */
+  --border-subtle: rgba(255, 255, 255, 0.07);
+  --border-default: rgba(255, 255, 255, 0.11);
+  --border-hover: rgba(255, 255, 255, 0.18);
+  --border-focus: rgba(59, 130, 246, 0.6);
 
-  /* 2. Caution / Dispute (Warm Amber) */
-  --dispute-amber: #F59E0B;
-  --dispute-amber-dim: #D97706;
-  --dispute-amber-glow: rgba(245, 158, 11, 0.16);
-  --dispute-amber-border: rgba(245, 158, 11, 0.35);
+  /* Primary Accent: Controlled Modern Blue */
+  --blue-primary: #2563eb;
+  --blue-bright: #3b82f6;
+  --blue-light: #60a5fa;
+  --blue-subtle: rgba(37, 99, 235, 0.12);
+  --blue-border: rgba(59, 130, 246, 0.32);
+  --blue-glow: rgba(59, 130, 246, 0.18);
 
-  /* 3. Critical / Urgent Alert (Coral Ember) */
-  --critical-ember: #EF4444;
-  --critical-ember-dim: #DC2626;
-  --critical-ember-glow: rgba(239, 68, 68, 0.18);
-  --critical-ember-border: rgba(239, 68, 68, 0.4);
+  /* Semantic Colors (Strictly Functional Usage) */
+  --color-success: #10b981;
+  --color-success-bg: rgba(16, 185, 129, 0.12);
+  --color-success-border: rgba(16, 185, 129, 0.3);
 
-  /* Secondary Neutral Accents */
-  --dark-zone-grey: #64748B;
-  --dark-zone-dark: #141B26;
+  --color-warning: #f59e0b;
+  --color-warning-bg: rgba(245, 158, 11, 0.12);
+  --color-warning-border: rgba(245, 158, 11, 0.32);
+
+  --color-critical: #ef4444;
+  --color-critical-bg: rgba(239, 68, 68, 0.12);
+  --color-critical-border: rgba(239, 68, 68, 0.32);
 
   /* Typography Colors */
-  --ink: #F1F5F9;
-  --ink-bright: #FFFFFF;
-  --ink-dim: #94A3B8;
-  --ink-muted: #64748B;
+  --text-primary: #f8fafc;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+  --text-disabled: #475569;
 
-  /* Fonts */
+  /* Font Families */
+  --font-sans: "Inter", "Plus Jakarta Sans", "Outfit", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   --font-mono: "JetBrains Mono", "SF Mono", "Fira Code", monospace;
-  --font-sans: "Outfit", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+
+  /* Elevation & Radii */
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 10px;
+  --radius-xl: 14px;
+  
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.5);
+  --shadow-lg: 0 12px 36px rgba(0, 0, 0, 0.65);
+  --shadow-active: 0 0 0 1px var(--blue-bright), 0 4px 20px rgba(37, 99, 235, 0.22);
 }
 
-* {
+/* -----------------------------------------------------------------------------
+ * Reset & Base Setup
+ * -------------------------------------------------------------------------- */
+*, *::before, *::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
 }
 
-body {
-  background-color: var(--void);
-  color: var(--ink);
+html, body, #root {
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  background-color: var(--bg-root);
+  color: var(--text-primary);
   font-family: var(--font-sans);
   font-size: 13px;
   line-height: 1.45;
-  overflow: hidden;
-  height: 100vh;
-  width: 100vw;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-/* Scrollbars */
+/* -----------------------------------------------------------------------------
+ * Custom Minimal Scrollbar
+ * -------------------------------------------------------------------------- */
 ::-webkit-scrollbar {
   width: 5px;
   height: 5px;
 }
+
 ::-webkit-scrollbar-track {
-  background: var(--void);
-}
-::-webkit-scrollbar-thumb {
-  background: var(--grid-line);
-  border-radius: 3px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: var(--grid-line-bright);
+  background: var(--bg-root);
 }
 
-/* Monospace Utilities */
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* -----------------------------------------------------------------------------
+ * Typography & Utility Classes
+ * -------------------------------------------------------------------------- */
 .mono {
   font-family: var(--font-mono);
   font-feature-settings: "tnum" 1, "zero" 1;
 }
 
-/* Hatched patterns */
+/* Subtle Glassmorphism Utility (Controlled Depth) */
+.glass-panel {
+  background-color: var(--bg-glass);
+  backdrop-filter: var(--backdrop-blur);
+  -webkit-backdrop-filter: var(--backdrop-blur);
+  border: 1px solid var(--border-default);
+}
+
+.glass-active {
+  background-color: var(--bg-glass-active);
+  backdrop-filter: var(--backdrop-blur);
+  -webkit-backdrop-filter: var(--backdrop-blur);
+  border: 1px solid var(--blue-bright);
+  box-shadow: var(--shadow-active);
+}
+
+/* Hatched Warning/Dispute Background */
 .hatched-amber {
   background: repeating-linear-gradient(
     45deg,
-    rgba(245, 158, 11, 0.08),
-    rgba(245, 158, 11, 0.08) 6px,
-    rgba(245, 158, 11, 0.16) 6px,
-    rgba(245, 158, 11, 0.16) 12px
+    rgba(245, 158, 11, 0.05),
+    rgba(245, 158, 11, 0.05) 6px,
+    rgba(245, 158, 11, 0.12) 6px,
+    rgba(245, 158, 11, 0.12) 12px
   );
-  border: 1px solid var(--dispute-amber-border);
+  border: 1px solid var(--color-warning-border);
 }
 
-.hatched-dark-zone {
-  background: repeating-linear-gradient(
-    -45deg,
-    rgba(100, 116, 139, 0.12),
-    rgba(100, 116, 139, 0.12) 8px,
-    rgba(20, 27, 38, 0.85) 8px,
-    rgba(20, 27, 38, 0.85) 16px
-  );
-  border: 1px dashed var(--dark-zone-grey);
-}
-
-/* Leaflet Dark Tactical Map Customization */
+/* -----------------------------------------------------------------------------
+ * Leaflet Dark Tactical Map Customization
+ * -------------------------------------------------------------------------- */
 .leaflet-container {
-  background-color: #090c10 !important;
+  background-color: var(--bg-root) !important;
   font-family: var(--font-sans) !important;
 }
 
 .leaflet-tile-pane {
-  filter: brightness(0.65) contrast(1.3) saturate(0.25) !important;
+  filter: brightness(0.6) contrast(1.35) saturate(0.2) !important;
 }
 
 .leaflet-control-zoom {
-  border: 1px solid var(--grid-line) !important;
-  background: var(--panel) !important;
-  border-radius: 4px !important;
+  border: 1px solid var(--border-default) !important;
+  background: var(--bg-glass) !important;
+  backdrop-filter: var(--backdrop-blur) !important;
+  border-radius: var(--radius-md) !important;
   overflow: hidden;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5) !important;
+  box-shadow: var(--shadow-md) !important;
 }
 
 .leaflet-control-zoom a {
-  background: var(--panel) !important;
-  color: var(--ink) !important;
-  border-bottom: 1px solid var(--grid-line) !important;
+  background: var(--bg-surface) !important;
+  color: var(--text-primary) !important;
+  border-bottom: 1px solid var(--border-subtle) !important;
   transition: background 0.15s ease, color 0.15s ease;
 }
 
 .leaflet-control-zoom a:hover {
-  background: var(--panel-hover) !important;
-  color: var(--signal-cyan) !important;
+  background: var(--bg-surface-hover) !important;
+  color: var(--blue-bright) !important;
 }
 
 .leaflet-popup-content-wrapper {
-  background: var(--panel-glass) !important;
-  backdrop-filter: blur(12px) !important;
-  border: 1px solid var(--grid-line-bright) !important;
-  color: var(--ink) !important;
-  border-radius: 6px !important;
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.7) !important;
+  background: var(--bg-glass-active) !important;
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
+  border: 1px solid var(--border-default) !important;
+  color: var(--text-primary) !important;
+  border-radius: var(--radius-md) !important;
+  box-shadow: var(--shadow-lg) !important;
   padding: 0 !important;
 }
 
@@ -157,24 +196,26 @@ body {
 }
 
 .leaflet-popup-tip {
-  background: var(--panel) !important;
+  background: var(--bg-surface-elevated) !important;
 }
 
-/* Keyframes & Pulse Effects */
+/* -----------------------------------------------------------------------------
+ * Keyframe Animations
+ * -------------------------------------------------------------------------- */
 @keyframes pulse-critical {
-  0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.6); }
-  70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+  0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.5); }
+  70% { box-shadow: 0 0 0 8px rgba(239, 68, 68, 0); }
   100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
 }
 
-@keyframes pulse-cyan {
-  0% { box-shadow: 0 0 0 0 rgba(56, 189, 248, 0.6); }
-  70% { box-shadow: 0 0 0 8px rgba(56, 189, 248, 0); }
-  100% { box-shadow: 0 0 0 0 rgba(56, 189, 248, 0); }
+@keyframes pulse-blue {
+  0% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.5); }
+  70% { box-shadow: 0 0 0 8px rgba(59, 130, 246, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0); }
 }
 
-@keyframes pulse-amber {
-  0% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.6); }
+@keyframes pulse-warning {
+  0% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.5); }
   70% { box-shadow: 0 0 0 8px rgba(245, 158, 11, 0); }
   100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); }
 }
@@ -183,10 +224,10 @@ body {
   animation: pulse-critical 2s infinite;
 }
 
-.pulsing-cyan {
-  animation: pulse-cyan 2.5s infinite;
+.pulsing-blue {
+  animation: pulse-blue 2.5s infinite;
 }
 
-.pulsing-amber {
-  animation: pulse-amber 2.5s infinite;
+.pulsing-warning {
+  animation: pulse-warning 2.5s infinite;
 }

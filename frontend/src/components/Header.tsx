@@ -1,6 +1,15 @@
 import React from "react";
 import type { SystemTelemetry } from "../types/domain";
-import { Activity, ShieldAlert, Radio, Clock, Cpu, Bot, Home } from "lucide-react";
+import {
+  Activity,
+  ShieldAlert,
+  Radio,
+  Clock,
+  Cpu,
+  Bot,
+  Home,
+  Wifi,
+} from "lucide-react";
 
 interface HeaderProps {
   telemetry: SystemTelemetry;
@@ -19,46 +28,46 @@ export const Header: React.FC<HeaderProps> = ({
 }) => {
   return (
     <header
+      className="glass-panel"
       style={{
-        height: "48px",
-        backgroundColor: "var(--panel)",
-        borderBottom: "1px solid var(--grid-line)",
+        height: "46px",
         display: "flex",
         alignItems: "center",
         justifyContent: "space-between",
-        padding: "0 18px",
+        padding: "0 16px",
         userSelect: "none",
         zIndex: 100,
-        boxShadow: "0 2px 10px rgba(0, 0, 0, 0.4)",
+        borderBottom: "1px solid var(--border-subtle)",
+        position: "relative",
       }}
     >
-      {/* Brand & Sector */}
-      <div style={{ display: "flex", alignItems: "center", gap: "14px" }}>
+      {/* Left: Brand, Overview Back Button & Sector */}
+      <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
         {onNavigateToLanding && (
           <button
             onClick={onNavigateToLanding}
-            title="Return to Landing Page"
+            title="Return to Overview"
             style={{
               display: "flex",
               alignItems: "center",
               gap: "5px",
               padding: "4px 8px",
-              backgroundColor: "var(--void)",
-              border: "1px solid var(--grid-line)",
-              borderRadius: "4px",
-              color: "var(--ink-dim)",
+              backgroundColor: "var(--bg-surface)",
+              border: "1px solid var(--border-subtle)",
+              borderRadius: "var(--radius-sm)",
+              color: "var(--text-secondary)",
               fontSize: "11px",
               fontWeight: 600,
               cursor: "pointer",
               transition: "all 0.15s ease",
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.color = "var(--signal-cyan)";
-              e.currentTarget.style.borderColor = "var(--signal-cyan-border)";
+              e.currentTarget.style.color = "var(--blue-bright)";
+              e.currentTarget.style.borderColor = "var(--blue-border)";
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.color = "var(--ink-dim)";
-              e.currentTarget.style.borderColor = "var(--grid-line)";
+              e.currentTarget.style.color = "var(--text-secondary)";
+              e.currentTarget.style.borderColor = "var(--border-subtle)";
             }}
           >
             <Home size={12} />
@@ -66,13 +75,13 @@ export const Header: React.FC<HeaderProps> = ({
           </button>
         )}
 
-        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
           <span
             style={{
-              fontSize: "16px",
+              fontSize: "15px",
               fontWeight: 800,
-              letterSpacing: "1.5px",
-              color: "var(--ink-bright)",
+              letterSpacing: "1.2px",
+              color: "var(--text-primary)",
             }}
           >
             SHOONYA
@@ -82,133 +91,154 @@ export const Header: React.FC<HeaderProps> = ({
         <div
           className="mono"
           style={{
-            fontSize: "11px",
-            color: "var(--ink-dim)",
-            padding: "3px 8px",
-            backgroundColor: "var(--void)",
-            border: "1px solid var(--grid-line)",
-            borderRadius: "4px",
+            fontSize: "10px",
+            color: "var(--text-secondary)",
+            padding: "2px 7px",
+            backgroundColor: "var(--bg-surface)",
+            border: "1px solid var(--border-subtle)",
+            borderRadius: "var(--radius-sm)",
             display: "flex",
             alignItems: "center",
-            gap: "6px",
+            gap: "5px",
           }}
         >
-          <span style={{ color: "var(--signal-cyan)", fontWeight: 700 }}>SECTOR 4</span>
-          <span style={{ color: "var(--ink-muted)" }}>•</span>
-          <span>RAIPUR EAST COMMAND</span>
+          <span style={{ color: "var(--blue-bright)", fontWeight: 700 }}>SECTOR 4</span>
+          <span style={{ color: "var(--text-muted)" }}>•</span>
+          <span>RAIPUR EAST</span>
         </div>
       </div>
 
-      {/* Real-time Telemetry Readouts */}
-      <div style={{ display: "flex", alignItems: "center", gap: "20px" }} className="mono">
+      {/* Center: Live Telemetry Metric Badges */}
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: "8px",
+          overflowX: "auto",
+          maxWidth: "calc(100vw - 420px)",
+        }}
+        className="mono"
+      >
+        {/* Queue Depth */}
         <div
           style={{
             display: "flex",
             alignItems: "center",
-            gap: "6px",
+            gap: "5px",
             fontSize: "11px",
             padding: "3px 8px",
-            backgroundColor: "var(--void)",
-            borderRadius: "4px",
-            border: "1px solid var(--grid-line)",
+            backgroundColor: "var(--bg-surface)",
+            borderRadius: "var(--radius-sm)",
+            border: "1px solid var(--border-subtle)",
           }}
         >
-          <Radio size={12} color="var(--signal-cyan)" />
-          <span style={{ color: "var(--ink-dim)" }}>QUEUE:</span>
-          <span style={{ color: "var(--ink-bright)", fontWeight: 700 }}>{telemetry.queue_depth}</span>
+          <Radio size={11} color="var(--blue-bright)" />
+          <span style={{ color: "var(--text-muted)", fontSize: "10px" }}>QUEUE</span>
+          <span style={{ color: "var(--text-primary)", fontWeight: 700 }}>{telemetry.queue_depth}</span>
         </div>
 
+        {/* Active Incidents */}
         <div
           style={{
             display: "flex",
             alignItems: "center",
-            gap: "6px",
+            gap: "5px",
             fontSize: "11px",
             padding: "3px 8px",
-            backgroundColor: "rgba(239, 68, 68, 0.08)",
-            borderRadius: "4px",
-            border: "1px solid var(--critical-ember-border)",
+            backgroundColor: "var(--color-critical-bg)",
+            borderRadius: "var(--radius-sm)",
+            border: "1px solid var(--color-critical-border)",
           }}
         >
-          <Activity size={12} color="var(--critical-ember)" />
-          <span style={{ color: "var(--ink-dim)" }}>ACTIVE:</span>
-          <span style={{ color: "var(--critical-ember)", fontWeight: 800 }}>{telemetry.active_incidents}</span>
+          <Activity size={11} color="var(--color-critical)" />
+          <span style={{ color: "var(--text-secondary)", fontSize: "10px" }}>ACTIVE</span>
+          <span style={{ color: "var(--color-critical)", fontWeight: 800 }}>{telemetry.active_incidents}</span>
         </div>
 
+        {/* Disputes */}
         <div
           style={{
             display: "flex",
             alignItems: "center",
-            gap: "6px",
+            gap: "5px",
             fontSize: "11px",
             padding: "3px 8px",
-            backgroundColor: "rgba(245, 158, 11, 0.08)",
-            borderRadius: "4px",
-            border: "1px solid var(--dispute-amber-border)",
+            backgroundColor: telemetry.disputed_incidents > 0 ? "var(--color-warning-bg)" : "var(--bg-surface)",
+            borderRadius: "var(--radius-sm)",
+            border: `1px solid ${telemetry.disputed_incidents > 0 ? "var(--color-warning-border)" : "var(--border-subtle)"}`,
           }}
         >
-          <ShieldAlert size={12} color="var(--dispute-amber)" />
-          <span style={{ color: "var(--ink-dim)" }}>DISPUTES:</span>
-          <span style={{ color: "var(--dispute-amber)", fontWeight: 700 }}>{telemetry.disputed_incidents}</span>
-        </div>
-
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "6px",
-            fontSize: "11px",
-            padding: "3px 8px",
-            backgroundColor: "var(--void)",
-            borderRadius: "4px",
-            border: "1px solid var(--grid-line)",
-          }}
-        >
+          <ShieldAlert size={11} color={telemetry.disputed_incidents > 0 ? "var(--color-warning)" : "var(--text-muted)"} />
+          <span style={{ color: "var(--text-muted)", fontSize: "10px" }}>DISPUTES</span>
           <span
             style={{
-              width: "7px",
-              height: "7px",
-              borderRadius: "50%",
-              backgroundColor: telemetry.dark_zones > 0 ? "var(--dispute-amber)" : "var(--dark-zone-grey)",
+              color: telemetry.disputed_incidents > 0 ? "var(--color-warning)" : "var(--text-secondary)",
+              fontWeight: 700,
             }}
-          />
-          <span style={{ color: "var(--ink-dim)" }}>DARK ZONES:</span>
-          <span style={{ color: "var(--ink-bright)", fontWeight: 700 }}>{telemetry.dark_zones}</span>
+          >
+            {telemetry.disputed_incidents}
+          </span>
         </div>
 
+        {/* Dark Zones */}
         <div
           style={{
             display: "flex",
             alignItems: "center",
-            gap: "6px",
+            gap: "5px",
             fontSize: "11px",
             padding: "3px 8px",
-            backgroundColor: "var(--void)",
-            borderRadius: "4px",
-            border: "1px solid var(--grid-line)",
+            backgroundColor: "var(--bg-surface)",
+            borderRadius: "var(--radius-sm)",
+            border: "1px solid var(--border-subtle)",
           }}
         >
-          <Cpu size={12} color="var(--signal-cyan)" />
-          <span style={{ color: "var(--ink-dim)" }}>SOLVER:</span>
-          <span style={{ color: "var(--signal-cyan)", fontWeight: 700 }}>{telemetry.solver_status}</span>
+          <Wifi size={11} color={telemetry.dark_zones > 0 ? "var(--color-warning)" : "var(--text-muted)"} />
+          <span style={{ color: "var(--text-muted)", fontSize: "10px" }}>DARK ZONES</span>
+          <span style={{ color: "var(--text-primary)", fontWeight: 700 }}>{telemetry.dark_zones}</span>
         </div>
 
+        {/* Solver */}
         <div
           style={{
             display: "flex",
             alignItems: "center",
-            gap: "6px",
+            gap: "5px",
             fontSize: "11px",
+            padding: "3px 8px",
+            backgroundColor: "var(--blue-subtle)",
+            borderRadius: "var(--radius-sm)",
+            border: "1px solid var(--blue-border)",
           }}
         >
-          <Clock size={12} color="var(--ink-dim)" />
-          <span style={{ color: "var(--ink-dim)" }}>LATENCY:</span>
-          <span style={{ color: "var(--ink)", fontWeight: 600 }}>{telemetry.ingestion_to_map_latency_sec.toFixed(2)}s</span>
+          <Cpu size={11} color="var(--blue-bright)" />
+          <span style={{ color: "var(--text-secondary)", fontSize: "10px" }}>SOLVER</span>
+          <span style={{ color: "var(--blue-light)", fontWeight: 700 }}>{telemetry.solver_status}</span>
+        </div>
+
+        {/* Latency */}
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "5px",
+            fontSize: "11px",
+            padding: "3px 8px",
+            backgroundColor: "var(--bg-surface)",
+            borderRadius: "var(--radius-sm)",
+            border: "1px solid var(--border-subtle)",
+          }}
+        >
+          <Clock size={11} color="var(--text-muted)" />
+          <span style={{ color: "var(--text-muted)", fontSize: "10px" }}>LATENCY</span>
+          <span style={{ color: "var(--text-secondary)", fontWeight: 600 }}>
+            {telemetry.ingestion_to_map_latency_sec.toFixed(2)}s
+          </span>
         </div>
       </div>
 
-      {/* Action Controls & Live / Paused Status Toggle */}
-      <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+      {/* Right: Copilot AI & Live / Paused State Button */}
+      <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
         <button
           onClick={onOpenCopilot}
           className="mono"
@@ -217,25 +247,25 @@ export const Header: React.FC<HeaderProps> = ({
             alignItems: "center",
             gap: "6px",
             padding: "5px 12px",
-            backgroundColor: "var(--signal-cyan-glow)",
-            border: "1px solid var(--signal-cyan-border)",
-            color: "var(--signal-cyan)",
-            borderRadius: "4px",
+            backgroundColor: "var(--blue-subtle)",
+            border: "1px solid var(--blue-border)",
+            color: "var(--blue-light)",
+            borderRadius: "var(--radius-sm)",
             cursor: "pointer",
             fontSize: "11px",
             fontWeight: 700,
             transition: "all 0.15s ease",
           }}
           onMouseEnter={(e) => {
-            e.currentTarget.style.backgroundColor = "rgba(56, 189, 248, 0.25)";
-            e.currentTarget.style.boxShadow = "0 0 10px var(--signal-cyan-glow)";
+            e.currentTarget.style.backgroundColor = "rgba(37, 99, 235, 0.25)";
+            e.currentTarget.style.borderColor = "var(--blue-bright)";
           }}
           onMouseLeave={(e) => {
-            e.currentTarget.style.backgroundColor = "var(--signal-cyan-glow)";
-            e.currentTarget.style.boxShadow = "none";
+            e.currentTarget.style.backgroundColor = "var(--blue-subtle)";
+            e.currentTarget.style.borderColor = "var(--blue-border)";
           }}
         >
-          <Bot size={13} />
+          <Bot size={13} color="var(--blue-bright)" />
           <span>COPILOT AI</span>
         </button>
 
@@ -247,10 +277,10 @@ export const Header: React.FC<HeaderProps> = ({
             alignItems: "center",
             gap: "6px",
             padding: "5px 12px",
-            backgroundColor: isLive ? "var(--signal-cyan-glow)" : "var(--critical-ember-glow)",
-            border: `1px solid ${isLive ? "var(--signal-cyan-border)" : "var(--critical-ember-border)"}`,
-            color: isLive ? "var(--signal-cyan)" : "var(--critical-ember)",
-            borderRadius: "4px",
+            backgroundColor: isLive ? "var(--bg-surface)" : "var(--color-critical-bg)",
+            border: `1px solid ${isLive ? "var(--blue-border)" : "var(--color-critical-border)"}`,
+            color: isLive ? "var(--blue-light)" : "var(--color-critical)",
+            borderRadius: "var(--radius-sm)",
             cursor: "pointer",
             fontSize: "11px",
             fontWeight: 700,
@@ -262,11 +292,11 @@ export const Header: React.FC<HeaderProps> = ({
               width: "6px",
               height: "6px",
               borderRadius: "50%",
-              backgroundColor: isLive ? "var(--signal-cyan)" : "var(--critical-ember)",
-              boxShadow: isLive ? "0 0 8px var(--signal-cyan)" : "none",
+              backgroundColor: isLive ? "var(--blue-bright)" : "var(--color-critical)",
+              boxShadow: isLive ? "0 0 6px var(--blue-bright)" : "none",
             }}
           />
-          {isLive ? "LIVE TELEMETRY" : "REPLAY PAUSED"}
+          {isLive ? "LIVE" : "PAUSED"}
         </button>
       </div>
     </header>
