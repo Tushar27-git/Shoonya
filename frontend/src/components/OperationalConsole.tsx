@@ -283,9 +283,9 @@ export const OperationalConsole: React.FC<OperationalConsoleProps> = ({
                     color: "var(--text-secondary)",
                   }}
                 >
-                  <span>SOLVE: <strong style={{ color: "var(--blue-light)" }}>{dispatchPlan.solver_duration_seconds.toFixed(3)}s</strong></span>
-                  <span>SERVED: <strong style={{ color: "var(--text-primary)" }}>{dispatchPlan.assignments.length}</strong></span>
-                  <span>UNSERVED: <strong style={{ color: dispatchPlan.unserved_incidents.length > 0 ? "var(--color-critical)" : "var(--text-secondary)" }}>{dispatchPlan.unserved_incidents.length}</strong></span>
+                  <span>SOLVE: <strong style={{ color: "var(--blue-light)" }}>{(dispatchPlan.solver_duration_seconds ?? 0).toFixed(3)}s</strong></span>
+                  <span>SERVED: <strong style={{ color: "var(--text-primary)" }}>{dispatchPlan.assignments?.length ?? 0}</strong></span>
+                  <span>UNSERVED: <strong style={{ color: (dispatchPlan.unserved_incidents?.length ?? 0) > 0 ? "var(--color-critical)" : "var(--text-secondary)" }}>{dispatchPlan.unserved_incidents?.length ?? 0}</strong></span>
                 </div>
 
                 {/* Assignment Cards */}
