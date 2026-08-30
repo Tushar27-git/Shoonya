@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+﻿import React, { useState, useEffect, useRef } from "react";
 import {
   Bot,
   Send,
@@ -268,7 +268,7 @@ ${data.operational_recommendations?.map((r: string, i: number) => `${i + 1}. ${r
     if (onExecuteAction && act.action_type && act.target_id) {
       onExecuteAction(act.action_type, act.target_id, act.parameters);
     }
-    setActionSuccessMsg(`✓ Executed: ${act.description || act.action_type || "Tactical Action"}`);
+    setActionSuccessMsg(`âœ“ Executed: ${act.description || act.action_type || "Tactical Action"}`);
     setTimeout(() => setActionSuccessMsg(null), 4000);
   };
 
@@ -280,7 +280,7 @@ ${data.operational_recommendations?.map((r: string, i: number) => `${i + 1}. ${r
         left: 0,
         right: 0,
         bottom: 0,
-        backgroundColor: "var(--bg-glass-overlay)",
+        backgroundColor: "rgba(15, 23, 42, 0.85)",
         backdropFilter: "blur(8px)",
         WebkitBackdropFilter: "blur(8px)",
         display: "flex",
@@ -298,24 +298,24 @@ ${data.operational_recommendations?.map((r: string, i: number) => `${i + 1}. ${r
           maxWidth: "94vw",
           height: "85vh",
           maxHeight: "720px",
-          backgroundColor: "var(--bg-surface)",
-          border: "1px solid var(--border-default)",
+          backgroundColor: "var(--panel)",
+          border: "1px solid var(--grid-line-bright)",
           borderRadius: "var(--radius-lg)",
           display: "flex",
           flexDirection: "column",
           overflow: "hidden",
-          boxShadow: "var(--shadow-lg)",
+          boxShadow: "0 10px 15px -3px rgba(0,0,0,0.5)",
         }}
       >
         {/* Modal Header */}
         <div
           style={{
             padding: "12px 18px",
-            borderBottom: "1px solid var(--border-subtle)",
+            borderBottom: "1px solid var(--grid-line)",
             display: "flex",
             justifyContent: "space-between",
             alignItems: "center",
-            backgroundColor: "var(--bg-root)",
+            backgroundColor: "var(--void)",
           }}
         >
           <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
@@ -324,14 +324,14 @@ ${data.operational_recommendations?.map((r: string, i: number) => `${i + 1}. ${r
                 width: "32px",
                 height: "32px",
                 borderRadius: "var(--radius-sm)",
-                backgroundColor: "var(--blue-subtle)",
-                border: "1px solid var(--blue-border)",
+                backgroundColor: "var(--signal-cyan-glow)",
+                border: "1px solid var(--signal-cyan)",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
               }}
             >
-              <Bot size={16} color="var(--blue-bright)" />
+              <Bot size={16} color="var(--signal-cyan)" />
             </div>
             <div>
               <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
@@ -339,7 +339,7 @@ ${data.operational_recommendations?.map((r: string, i: number) => `${i + 1}. ${r
                   style={{
                     fontSize: "13px",
                     fontWeight: 800,
-                    color: "var(--text-primary)",
+                    color: "var(--ink)",
                     letterSpacing: "0.8px",
                   }}
                   className="mono"
@@ -351,18 +351,18 @@ ${data.operational_recommendations?.map((r: string, i: number) => `${i + 1}. ${r
                   style={{
                     fontSize: "9px",
                     padding: "1px 6px",
-                    backgroundColor: "var(--blue-subtle)",
-                    color: "var(--blue-light)",
+                    backgroundColor: "var(--signal-cyan-glow)",
+                    color: "var(--signal-cyan)",
                     borderRadius: "var(--radius-sm)",
                     fontWeight: 700,
-                    border: "1px solid var(--blue-border)",
+                    border: "1px solid var(--signal-cyan)",
                   }}
                 >
                   TACTICAL ADVISOR
                 </span>
               </div>
-              <span style={{ fontSize: "11px", color: "var(--text-secondary)" }}>
-                Context-Grounded Crisis Decision Support • Sector 4 (Raipur East)
+              <span style={{ fontSize: "11px", color: "var(--ink-dim)" }}>
+                Context-Grounded Crisis Decision Support â€¢ Sector 4 (Raipur East)
               </span>
             </div>
           </div>
@@ -379,9 +379,9 @@ ${data.operational_recommendations?.map((r: string, i: number) => `${i + 1}. ${r
                 padding: "6px 11px",
                 fontSize: "11px",
                 fontWeight: 700,
-                backgroundColor: isLoading ? "var(--bg-input)" : "var(--blue-subtle)",
-                border: "1px solid var(--blue-border)",
-                color: isLoading ? "var(--text-muted)" : "var(--blue-light)",
+                backgroundColor: isLoading ? "var(--void)" : "var(--signal-cyan-glow)",
+                border: "1px solid var(--signal-cyan)",
+                color: isLoading ? "var(--ink-muted)" : "var(--signal-cyan)",
                 borderRadius: "var(--radius-sm)",
                 cursor: isLoading ? "not-allowed" : "pointer",
                 transition: "all 0.15s ease",
@@ -390,7 +390,7 @@ ${data.operational_recommendations?.map((r: string, i: number) => `${i + 1}. ${r
                 if (!isLoading) e.currentTarget.style.backgroundColor = "rgba(37, 99, 235, 0.25)";
               }}
               onMouseLeave={(e) => {
-                if (!isLoading) e.currentTarget.style.backgroundColor = "var(--blue-subtle)";
+                if (!isLoading) e.currentTarget.style.backgroundColor = "var(--signal-cyan-glow)";
               }}
             >
               <FileText size={12} />
@@ -402,7 +402,7 @@ ${data.operational_recommendations?.map((r: string, i: number) => `${i + 1}. ${r
               style={{
                 background: "none",
                 border: "none",
-                color: "var(--text-secondary)",
+                color: "var(--ink-dim)",
                 cursor: "pointer",
                 padding: "5px",
                 borderRadius: "var(--radius-sm)",
@@ -410,8 +410,8 @@ ${data.operational_recommendations?.map((r: string, i: number) => `${i + 1}. ${r
                 alignItems: "center",
                 justifyContent: "center",
               }}
-              onMouseEnter={(e) => (e.currentTarget.style.color = "var(--text-primary)")}
-              onMouseLeave={(e) => (e.currentTarget.style.color = "var(--text-secondary)")}
+              onMouseEnter={(e) => (e.currentTarget.style.color = "var(--ink)")}
+              onMouseLeave={(e) => (e.currentTarget.style.color = "var(--ink-dim)")}
             >
               <X size={18} />
             </button>
@@ -424,9 +424,9 @@ ${data.operational_recommendations?.map((r: string, i: number) => `${i + 1}. ${r
             className="mono"
             style={{
               padding: "8px 16px",
-              backgroundColor: "var(--color-success-bg)",
-              borderBottom: "1px solid var(--color-success-border)",
-              color: "var(--color-success)",
+              backgroundColor: "rgba(16, 185, 129, 0.1)",
+              borderBottom: "1px solid #10B981",
+              color: "#10B981",
               fontSize: "11px",
               display: "flex",
               alignItems: "center",
@@ -448,7 +448,7 @@ ${data.operational_recommendations?.map((r: string, i: number) => `${i + 1}. ${r
             display: "flex",
             flexDirection: "column",
             gap: "14px",
-            backgroundColor: "var(--bg-root)",
+            backgroundColor: "var(--void)",
           }}
         >
           {messages.map((m) => (
@@ -460,18 +460,18 @@ ${data.operational_recommendations?.map((r: string, i: number) => `${i + 1}. ${r
                 alignSelf: m.role === "user" ? "flex-end" : "flex-start",
                 maxWidth: m.role === "user" ? "80%" : "95%",
                 width: m.role === "user" ? "auto" : "100%",
-                backgroundColor: m.role === "user" ? "var(--blue-subtle)" : "var(--bg-surface)",
+                backgroundColor: m.role === "user" ? "var(--signal-cyan-glow)" : "var(--panel)",
                 border: `1px solid ${
                   m.isError
-                    ? "var(--color-critical-border)"
+                    ? "var(--critical-ember)"
                     : m.role === "user"
-                    ? "var(--blue-border)"
-                    : "var(--border-subtle)"
+                    ? "var(--signal-cyan)"
+                    : "var(--grid-line)"
                 }`,
                 borderRadius: "var(--radius-md)",
                 padding: "12px 14px",
                 gap: "8px",
-                boxShadow: "var(--shadow-sm)",
+                boxShadow: "0 1px 2px rgba(0,0,0,0.5)",
               }}
             >
               {/* Message Header */}
@@ -481,10 +481,10 @@ ${data.operational_recommendations?.map((r: string, i: number) => `${i + 1}. ${r
                   style={{
                     fontSize: "10px",
                     color: m.isError
-                      ? "var(--color-critical)"
+                      ? "var(--critical-ember)"
                       : m.role === "user"
-                      ? "var(--blue-light)"
-                      : "var(--text-secondary)",
+                      ? "var(--signal-cyan)"
+                      : "var(--ink-dim)",
                     fontWeight: 700,
                     display: "flex",
                     alignItems: "center",
@@ -498,18 +498,18 @@ ${data.operational_recommendations?.map((r: string, i: number) => `${i + 1}. ${r
                     </>
                   ) : m.isError ? (
                     <>
-                      <ShieldAlert size={12} color="var(--color-critical)" />
+                      <ShieldAlert size={12} color="var(--critical-ember)" />
                       <span>SERVICE CONNECTION ADVISORY</span>
                     </>
                   ) : (
                     <>
-                      <Sparkles size={11} color="var(--blue-bright)" />
+                      <Sparkles size={11} color="var(--signal-cyan)" />
                       <span>TACTICAL DECISION ASSESSMENT</span>
                     </>
                   )}
                 </div>
                 {m.timestamp && (
-                  <span className="mono" style={{ fontSize: "9px", color: "var(--text-muted)" }}>
+                  <span className="mono" style={{ fontSize: "9px", color: "var(--ink-muted)" }}>
                     {m.timestamp}
                   </span>
                 )}
@@ -519,7 +519,7 @@ ${data.operational_recommendations?.map((r: string, i: number) => `${i + 1}. ${r
               <div
                 style={{
                   fontSize: "12px",
-                  color: m.isError ? "var(--color-critical)" : "var(--text-primary)",
+                  color: m.isError ? "var(--critical-ember)" : "var(--ink)",
                   whiteSpace: "pre-wrap",
                   lineHeight: "1.55",
                 }}
@@ -547,9 +547,9 @@ ${data.operational_recommendations?.map((r: string, i: number) => `${i + 1}. ${r
                       padding: "5px 10px",
                       fontSize: "10px",
                       fontWeight: 700,
-                      backgroundColor: "var(--color-critical-bg)",
-                      border: "1px solid var(--color-critical-border)",
-                      color: "var(--color-critical)",
+                      backgroundColor: "var(--critical-ember-glow)",
+                      border: "1px solid var(--critical-ember)",
+                      color: "var(--critical-ember)",
                       borderRadius: "var(--radius-sm)",
                       cursor: isLoading ? "not-allowed" : "pointer",
                     }}
@@ -570,10 +570,10 @@ ${data.operational_recommendations?.map((r: string, i: number) => `${i + 1}. ${r
                     flexWrap: "wrap",
                     marginTop: "4px",
                     paddingTop: "6px",
-                    borderTop: "1px solid var(--border-subtle)",
+                    borderTop: "1px solid var(--grid-line)",
                   }}
                 >
-                  <span className="mono" style={{ fontSize: "9px", color: "var(--text-muted)", fontWeight: 700 }}>
+                  <span className="mono" style={{ fontSize: "9px", color: "var(--ink-muted)", fontWeight: 700 }}>
                     VERIFIED ENTITY CITATIONS:
                   </span>
                   {m.citations.map((cit) => (
@@ -589,9 +589,9 @@ ${data.operational_recommendations?.map((r: string, i: number) => `${i + 1}. ${r
                         padding: "2px 7px",
                         fontSize: "9px",
                         fontWeight: 700,
-                        backgroundColor: "var(--blue-subtle)",
-                        border: "1px solid var(--blue-border)",
-                        color: "var(--blue-light)",
+                        backgroundColor: "var(--signal-cyan-glow)",
+                        border: "1px solid var(--signal-cyan)",
+                        color: "var(--signal-cyan)",
                         borderRadius: "var(--radius-sm)",
                         cursor: "pointer",
                         display: "inline-flex",
@@ -612,9 +612,9 @@ ${data.operational_recommendations?.map((r: string, i: number) => `${i + 1}. ${r
                   className="mono"
                   style={{
                     fontSize: "10px",
-                    color: "var(--color-warning)",
-                    backgroundColor: "var(--color-warning-bg)",
-                    border: "1px solid var(--color-warning-border)",
+                    color: "var(--dispute-amber)",
+                    backgroundColor: "var(--dispute-amber-glow)",
+                    border: "1px solid var(--dispute-amber)",
                     borderRadius: "var(--radius-sm)",
                     padding: "7px 9px",
                     display: "flex",
@@ -634,7 +634,7 @@ ${data.operational_recommendations?.map((r: string, i: number) => `${i + 1}. ${r
               {/* Recommended Executable Actions */}
               {m.actions && m.actions.length > 0 && (
                 <div style={{ display: "flex", flexDirection: "column", gap: "6px", marginTop: "4px" }}>
-                  <span className="mono" style={{ fontSize: "9px", color: "var(--blue-light)", fontWeight: 700 }}>
+                  <span className="mono" style={{ fontSize: "9px", color: "var(--signal-cyan)", fontWeight: 700 }}>
                     RECOMMENDED EXECUTABLE ACTIONS:
                   </span>
                   {m.actions.map((act, aIdx) => (
@@ -647,9 +647,9 @@ ${data.operational_recommendations?.map((r: string, i: number) => `${i + 1}. ${r
                         alignItems: "center",
                         justifyContent: "space-between",
                         padding: "7px 11px",
-                        backgroundColor: "var(--bg-surface-elevated)",
-                        border: "1px solid var(--blue-border)",
-                        color: "var(--text-primary)",
+                        backgroundColor: "var(--panel-elevated)",
+                        border: "1px solid var(--signal-cyan)",
+                        color: "var(--ink)",
                         borderRadius: "var(--radius-sm)",
                         cursor: "pointer",
                         fontSize: "11px",
@@ -657,16 +657,16 @@ ${data.operational_recommendations?.map((r: string, i: number) => `${i + 1}. ${r
                         transition: "all 0.15s ease",
                       }}
                       onMouseEnter={(e) => {
-                        e.currentTarget.style.backgroundColor = "var(--blue-subtle)";
-                        e.currentTarget.style.borderColor = "var(--blue-bright)";
+                        e.currentTarget.style.backgroundColor = "var(--signal-cyan-glow)";
+                        e.currentTarget.style.borderColor = "var(--signal-cyan)";
                       }}
                       onMouseLeave={(e) => {
-                        e.currentTarget.style.backgroundColor = "var(--bg-surface-elevated)";
-                        e.currentTarget.style.borderColor = "var(--blue-border)";
+                        e.currentTarget.style.backgroundColor = "var(--panel-elevated)";
+                        e.currentTarget.style.borderColor = "var(--signal-cyan)";
                       }}
                     >
-                      <span>⚡ {act.description || act.label || `Execute ${act.action_type || "Action"}`}</span>
-                      <ArrowRight size={11} color="var(--blue-bright)" />
+                      <span>âš¡ {act.description || act.label || `Execute ${act.action_type || "Action"}`}</span>
+                      <ArrowRight size={11} color="var(--signal-cyan)" />
                     </button>
                   ))}
                 </div>
@@ -680,10 +680,10 @@ ${data.operational_recommendations?.map((r: string, i: number) => `${i + 1}. ${r
               className="mono"
               style={{
                 fontSize: "11px",
-                color: "var(--blue-light)",
+                color: "var(--signal-cyan)",
                 padding: "8px 12px",
-                backgroundColor: "var(--blue-subtle)",
-                border: "1px solid var(--blue-border)",
+                backgroundColor: "var(--signal-cyan-glow)",
+                border: "1px solid var(--signal-cyan)",
                 borderRadius: "var(--radius-sm)",
                 display: "inline-flex",
                 alignItems: "center",
@@ -697,7 +697,7 @@ ${data.operational_recommendations?.map((r: string, i: number) => `${i + 1}. ${r
                   width: "7px",
                   height: "7px",
                   borderRadius: "50%",
-                  backgroundColor: "var(--blue-bright)",
+                  backgroundColor: "var(--signal-cyan)",
                 }}
               />
               <span>{LOADING_PHASES[loadingPhaseIndex]}</span>
@@ -709,15 +709,15 @@ ${data.operational_recommendations?.map((r: string, i: number) => `${i + 1}. ${r
         <div
           style={{
             padding: "8px 16px",
-            backgroundColor: "var(--bg-root)",
-            borderTop: "1px solid var(--border-subtle)",
+            backgroundColor: "var(--void)",
+            borderTop: "1px solid var(--grid-line)",
             display: "flex",
             gap: "6px",
             flexWrap: "wrap",
             alignItems: "center",
           }}
         >
-          <span className="mono" style={{ fontSize: "9px", color: "var(--text-muted)", fontWeight: 700 }}>
+          <span className="mono" style={{ fontSize: "9px", color: "var(--ink-muted)", fontWeight: 700 }}>
             QUICK PROMPTS:
           </span>
           {[
@@ -735,23 +735,23 @@ ${data.operational_recommendations?.map((r: string, i: number) => `${i + 1}. ${r
               style={{
                 padding: "4px 9px",
                 fontSize: "10px",
-                backgroundColor: "var(--bg-surface)",
-                border: "1px solid var(--border-subtle)",
-                color: isLoading ? "var(--text-muted)" : "var(--text-secondary)",
+                backgroundColor: "var(--panel)",
+                border: "1px solid var(--grid-line)",
+                color: isLoading ? "var(--ink-muted)" : "var(--ink-dim)",
                 borderRadius: "var(--radius-sm)",
                 cursor: isLoading ? "not-allowed" : "pointer",
                 transition: "all 0.15s ease",
               }}
               onMouseEnter={(e) => {
                 if (!isLoading) {
-                  e.currentTarget.style.color = "var(--blue-light)";
-                  e.currentTarget.style.borderColor = "var(--blue-border)";
+                  e.currentTarget.style.color = "var(--signal-cyan)";
+                  e.currentTarget.style.borderColor = "var(--signal-cyan)";
                 }
               }}
               onMouseLeave={(e) => {
                 if (!isLoading) {
-                  e.currentTarget.style.color = "var(--text-secondary)";
-                  e.currentTarget.style.borderColor = "var(--border-subtle)";
+                  e.currentTarget.style.color = "var(--ink-dim)";
+                  e.currentTarget.style.borderColor = "var(--grid-line)";
                 }
               }}
             >
@@ -764,10 +764,10 @@ ${data.operational_recommendations?.map((r: string, i: number) => `${i + 1}. ${r
         <div
           style={{
             padding: "12px 16px",
-            borderTop: "1px solid var(--border-subtle)",
+            borderTop: "1px solid var(--grid-line)",
             display: "flex",
             gap: "8px",
-            backgroundColor: "var(--bg-surface)",
+            backgroundColor: "var(--panel)",
           }}
         >
           <input
@@ -786,9 +786,9 @@ ${data.operational_recommendations?.map((r: string, i: number) => `${i + 1}. ${r
             style={{
               flex: 1,
               padding: "9px 12px",
-              backgroundColor: "var(--bg-input)",
-              border: "1px solid var(--border-subtle)",
-              color: "var(--text-primary)",
+              backgroundColor: "var(--void)",
+              border: "1px solid var(--grid-line)",
+              color: "var(--ink)",
               fontSize: "12px",
               borderRadius: "var(--radius-sm)",
               outline: "none",
@@ -799,9 +799,9 @@ ${data.operational_recommendations?.map((r: string, i: number) => `${i + 1}. ${r
             disabled={!query.trim() || isLoading}
             style={{
               padding: "9px 18px",
-              backgroundColor: query.trim() && !isLoading ? "var(--blue-bright)" : "var(--bg-input)",
+              backgroundColor: query.trim() && !isLoading ? "var(--signal-cyan)" : "var(--void)",
               border: "none",
-              color: query.trim() && !isLoading ? "#ffffff" : "var(--text-muted)",
+              color: query.trim() && !isLoading ? "#ffffff" : "var(--ink-muted)",
               fontWeight: 700,
               fontSize: "11px",
               borderRadius: "var(--radius-sm)",
@@ -822,3 +822,4 @@ ${data.operational_recommendations?.map((r: string, i: number) => `${i + 1}. ${r
     </div>
   );
 };
+

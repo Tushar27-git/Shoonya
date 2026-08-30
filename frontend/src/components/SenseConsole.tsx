@@ -371,7 +371,7 @@ export const SenseConsole: React.FC = () => {
 
         {activeTab === "DISPATCH" && (
           <div style={{ position: "absolute", inset: 0, zIndex: 30, backgroundColor: "var(--void)", padding: "24px", overflowY: "auto" }}>
-            <DispatchPanel incidents={incidents} resources={resources} />
+            <DispatchPanel incidents={incidents} resources={fleetData} />
           </div>
         )}
 
