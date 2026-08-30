@@ -42,7 +42,7 @@ from .models.domain import (
     DispatchApproveRequest,
     SystemTelemetry,
 )
-from app.ai.router import router as ai_router
+from .ai.router import router as ai_router
 from .ingestion.router import router as ingestion_router
 from .ingestion.processor import LocationResolver, zone_tracker, KNOWN_DISTRICT_ZONES
 from .nlp.router import router as nlp_router
