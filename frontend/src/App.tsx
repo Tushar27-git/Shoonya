@@ -496,6 +496,7 @@ export const App: React.FC = () => {
           setIsCopilotOpen(false);
         }}
         onExecuteAction={handleExecuteCopilotAction}
+        apiBase={API_BASE}
       />
     </div>
   );
