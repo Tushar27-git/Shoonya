@@ -14,8 +14,9 @@ import { SafetyAlerts } from "./SafetyAlerts";
 import { Settings } from "./Settings";
 import { EmergencyContacts } from "./EmergencyContacts";
 import { CopilotModal } from "./CopilotModal";
+import { DispatchPanel } from "./DispatchPanel";
 import { useDashboardState } from "../hooks/useDashboardState";
-import { Shield, Map as MapIcon, BarChart2, Truck, CheckSquare, Bell, User, Settings as SettingsIcon, AlertOctagon } from "lucide-react";
+import { Shield, Map as MapIcon, BarChart2, Truck, CheckSquare, Bell, User, Settings as SettingsIcon, AlertOctagon, Send } from "lucide-react";
 
 const API_BASE = "http://127.0.0.1:8000";
 
@@ -142,6 +143,7 @@ export const SenseConsole: React.FC = () => {
               { id: "SENSE_MAP", label: "Command Center", icon: <MapIcon size={18} /> },
               { id: "ROUTE_ANALYSIS", label: "Route Analysis", icon: <MapIcon size={18} /> },
               { id: "RISK_ANALYTICS", label: "Risk Analytics", icon: <BarChart2 size={18} /> },
+              { id: "DISPATCH", label: "Dispatch", icon: <Send size={18} /> },
               { id: "FLEET_STATUS", label: "Fleet Status", icon: <Truck size={18} /> },
               { id: "SAFETY_AUDITS", label: "Safety Audits", icon: <CheckSquare size={18} /> },
               { id: "SAFETY_ALERTS", label: "Safety Alerts", icon: <Bell size={18} /> },
@@ -364,6 +366,12 @@ export const SenseConsole: React.FC = () => {
         {activeTab === "IMPACT_BOARD" && (
           <div style={{ position: "absolute", inset: 0, zIndex: 30, backgroundColor: "var(--void)" }}>
             <ImpactBoard />
+          </div>
+        )}
+
+        {activeTab === "DISPATCH" && (
+          <div style={{ position: "absolute", inset: 0, zIndex: 30, backgroundColor: "var(--void)", padding: "24px", overflowY: "auto" }}>
+            <DispatchPanel incidents={incidents} resources={resources} />
           </div>
         )}
 
