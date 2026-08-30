@@ -54,6 +54,33 @@ class LocationInfo(BaseModel):
     def raw_text(self) -> Optional[str]:
         return self.address
 
+Location = LocationInfo
+
+class WeakSignal(BaseModel):
+    signal_id: str
+    signal_type: str  # or SignalType from enums
+    location: LocationInfo
+    timestamp: datetime = Field(default_factory=utc_now)
+    source_report_id: str
+
+SMS_CODE_MAP: Dict[str, Dict[str, Any]] = {
+    "911": {
+        "category": HazardType.FLOOD,
+        "micro_environment": MicroEnvironmentTag.ROOFTOP_STRANDED,
+        "urgency_default": 0.95
+    },
+    "101": {
+        "category": HazardType.COLLAPSE,
+        "micro_environment": MicroEnvironmentTag.DEBRIS_TRAPPED,
+        "urgency_default": 0.90
+    },
+    "102": {
+        "category": HazardType.SHELTER_UTILITY_FAILURE,
+        "micro_environment": MicroEnvironmentTag.SHELTER_MEDICAL_RISK,
+        "urgency_default": 0.85
+    }
+}
+
 
 # -----------------------------------------------------------------------------
 # Incident Evidence & Measurement Sub-Models
@@ -540,12 +567,11 @@ class WaterStatus(str, Enum):
     UNKNOWN = "UNKNOWN"
 
 class NeedCard(BaseModel):
-    incident_id: str
-    location: Tuple[float, float]
-    affected_population: int = 0
-    needed_items: List[str] = Field(default_factory=list)
-    access_note: str = ""
-    last_verified: datetime
-    status_label: str
-    recommended_partners: List[str] = Field(default_factory=list)
+    need_id: str
+    incident_id: Optional[str] = None
+    category: str
+    description: str
+    quantity_needed: int = 1
+    priority: str = "MEDIUM"
+    status: str = "PENDING"
 

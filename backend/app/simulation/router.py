@@ -116,8 +116,8 @@ async def run_perception_feed_task():
                 print(f"Error submitting report to {endpoint}: {e}")
     FEED_STATUS = "COMPLETE"
 
-@router.post("/simulation/run")
-async def run_simulation(background_tasks: BackgroundTasks):
+@router.post("/simulation/run-legacy")
+async def run_simulation_legacy(background_tasks: BackgroundTasks):
     """
     Replays the full perception feed through the real pipeline at accelerated speed.
     """

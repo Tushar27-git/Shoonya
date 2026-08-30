@@ -19,6 +19,24 @@ class SourceChannel(str, Enum):
     VOICE = "VOICE"
     RADIO = "RADIO"
     SOCIAL = "SOCIAL"
+    FIELD = "FIELD"
+    SAT = "SAT"
+    SATELLITE = "SATELLITE"
+    DRONE = "DRONE"
+    WEB = "WEB"
+    SMS_CODE = "SMS_CODE"
+
+ReportChannel = SourceChannel
+
+class ObservationModality(str, Enum):
+    SEEN = "SEEN"
+    HEARSAY = "HEARSAY"
+
+class SignalType(str, Enum):
+    TREMOR_FELT = "TREMOR_FELT"
+    CRACK_OBSERVED = "CRACK_OBSERVED"
+    WATER_LEVEL_RISING = "WATER_LEVEL_RISING"
+    UNUSUAL_SOUND = "UNUSUAL_SOUND"
     WEB = "WEB"
     SATELLITE = "SATELLITE"
     DRONE = "DRONE"
@@ -30,6 +48,7 @@ class MicroEnvironmentTag(str, Enum):
     CRUSH_INJURY = "CRUSH_INJURY"
     CUT_OFF_ACCESS = "CUT_OFF_ACCESS"
     ELECTRICAL_HAZARD = "ELECTRICAL_HAZARD"
+    SHELTER_MEDICAL_RISK = "SHELTER_MEDICAL_RISK"
     NONE = "NONE"
 
 class VulnerabilityTag(str, Enum):
@@ -48,6 +67,8 @@ class HazardType(str, Enum):
     ELECTRICAL_FAULT = "ELECTRICAL_FAULT"
     MEDICAL_EMERGENCY = "MEDICAL_EMERGENCY"
     SHELTER_UTILITY_FAILURE = "SHELTER_UTILITY_FAILURE"
+    COLLAPSE = "COLLAPSE"
+    DEBRIS = "DEBRIS"
     OTHER = "OTHER"
 
 class VenueType(str, Enum):

@@ -9,7 +9,11 @@ from app.core.queue import queue
 from app.needs.generator import generate_need_card
 from app.simulation.router import FEED_STATUS
 
-async def build_dashboard_state() -> Dict[str, Any]:
+from app.clustering.weak_signals import WeakSignalCorrelator
+from app.operations.service import FLEET_STORE
+
+# The user asked for `tick` parameter support
+async def build_dashboard_state(tick: int = 0) -> Dict[str, Any]:
     # 1. Incidents
     active_incidents_models = cluster_engine.list_incidents()
     incidents = []
@@ -52,10 +56,21 @@ async def build_dashboard_state() -> Dict[str, Any]:
     except Exception:
         q_depth = 0
 
+    # 9. Fleet Data
+    fleet_data = [f.model_dump(mode="json") for f in FLEET_STORE.values()]
+
     return {
         "mode": "SIMULATION",
         "simulation_status": FEED_STATUS,
-        "elapsed_seconds": 0,
+        "elapsed_seconds": tick, # scrub parameter
+        "active_incidents": incidents,
+        "disputes": road_disputes,
+        "dark_zones": dark_zones,
+        "emerging_risk_zones": [], # TODO: add from phase 6 correlator if available
+        "queue_depth": q_depth,
+        "advisory_solver": "READY",
+        
+        # Keep old ones for UI compatibility if needed
         "counters": {
             "queue": q_depth,
             "active_incidents": len(incidents),
@@ -64,11 +79,11 @@ async def build_dashboard_state() -> Dict[str, Any]:
             "latency_ms": 120
         },
         "incidents": incidents,
-        "dark_zones": dark_zones,
         "road_disputes": road_disputes,
         "shelters": shelters,
         "tasks": tasks,
         "resources": [],
+        "fleet": fleet_data,
         "amplify_cards": amplify_cards,
         "audit_timeline": audit_timeline
     }

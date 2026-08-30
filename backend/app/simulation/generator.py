@@ -1,136 +1,169 @@
+import json
 import random
-from typing import List, Dict, Any
-from datetime import datetime, timedelta, timezone
+import uuid
+from typing import List
+from pathlib import Path
+from datetime import datetime, timezone
+from app.models.domain import RawReport
+from app.models.enums import SourceChannel
 
 class SimulationGenerator:
-    """
-    Generates a deterministic 24-hour scenario script (seed=42).
-    Includes duplicates, contradictions, dark zones, WeakSignal clusters, and SHELTER_UTILITY_FAILURE.
-    """
     def __init__(self, seed: int = 42):
         self.seed = seed
-        self.start_time = datetime.utcnow().replace(tzinfo=timezone.utc, hour=0, minute=0, second=0, microsecond=0)
+        self.gazetteer_path = Path(__file__).resolve().parent.parent / "data" / "gazetteer.json"
+        self.locations = self._load_locations()
         
-    def generate_scenario(self) -> List[Dict[str, Any]]:
+    def _load_locations(self) -> List[dict]:
+        if self.gazetteer_path.exists():
+            with open(self.gazetteer_path, "r", encoding="utf-8") as f:
+                return json.load(f)
+        return [{"id": "LOC_001", "name": "Default Ward", "population_density": 1000}]
+
+    def generate_scenario(self, center_lat: float = None, center_lng: float = None) -> List[RawReport]:
         random.seed(self.seed)
-        events = []
+        events: List[RawReport] = []
         
-        # We will generate about 200 reports spread over 24 hours (1440 minutes)
-        # 1. Background noise (normal incidents)
-        for i in range(100):
-            offset_min = random.randint(0, 1440)
-            events.append({
-                "time_offset_minutes": offset_min,
-                "report": {
-                    "text": f"Water logging near location {random.randint(1, 50)}",
-                    "channel": "SMS",
-                    "source_id": f"USER-{random.randint(1000, 9999)}",
-                    "location_hint": "WARD-01"
-                },
-                "checkpoint": None
-            })
+        # Identify dark zone ward (highest population, 0 reports)
+        sorted_locs = sorted(self.locations, key=lambda x: x.get("population_density", 0), reverse=True)
+        dark_zone_ward = sorted_locs[0] if sorted_locs else self.locations[0]
+        
+        active_locs = [loc for loc in self.locations if loc["id"] != dark_zone_ward["id"]]
+        if not active_locs:
+            active_locs = self.locations
+
+        import copy
+        active_locs = copy.deepcopy(active_locs)
+        
+        if center_lat is not None and center_lng is not None:
+            for loc in active_locs:
+                loc['coordinates']['lat'] = center_lat + random.uniform(-0.02, 0.02)
+                loc['coordinates']['lon'] = center_lng + random.uniform(-0.02, 0.02)
             
-        # 2. Deliberate Duplicates (Clustering test)
-        cluster_time = 120 # T+02:00
-        for i in range(25):
-            events.append({
-                "time_offset_minutes": cluster_time + random.randint(0, 30),
-                "report": {
-                    "text": "Huge flood at the main market! Send boats immediately! We are stuck.",
-                    "channel": "SOCIAL",
-                    "source_id": f"USER-{random.randint(1000, 9999)}",
-                    "location_hint": "WARD-02"
-                },
-                "checkpoint": "T+02:00 Initial Flooding Cluster" if i == 0 else None
-            })
+        def create_report(text: str, channel: SourceChannel, source_id: str, loc_coords: dict = None, hazard_type: str = "FLOOD") -> RawReport:
+            from ..models.domain import LocationInfo, ExtractionResult
+            from ..models.enums import HazardType
             
-        # 3. Contradiction / Dispute (Road status)
-        dispute_time = 360 # T+06:00
-        events.append({
-            "time_offset_minutes": dispute_time,
-            "report": {
-                "text": "ROAD-BRIDGE-04 is totally collapsed and CLOSED.",
-                "channel": "FIELD",
-                "source_id": "OFFICER-1",
-                "location_hint": "ROAD-BRIDGE-04"
-            },
-            "checkpoint": "T+06:00 Infrastructure Contradiction"
-        })
-        events.append({
-            "time_offset_minutes": dispute_time + 5,
-            "report": {
-                "text": "ROAD-BRIDGE-04 is OPEN, we just crossed it.",
-                "channel": "SOCIAL",
-                "source_id": "CIVILIAN-9",
-                "location_hint": "ROAD-BRIDGE-04"
-            },
-            "checkpoint": None
-        })
+            try:
+                hz = HazardType(hazard_type)
+            except ValueError:
+                hz = HazardType.OTHER
+
+            report = RawReport(
+                report_id=f"SIM-{uuid.uuid4().hex[:8]}",
+                source_channel=channel,
+                raw_text=text,
+                source_id=source_id,
+                timestamp=datetime.now(timezone.utc),
+                extracted_data=ExtractionResult(
+                    hazard_type=hz,
+                    raw_evidence_text=text
+                )
+            )
+            if loc_coords:
+                report.resolved_location = LocationInfo(lat=loc_coords['lat'], lng=loc_coords['lon'])
+            return report
+
+        # Determine likely hazards based on geography
+        likely_hazards = ["FLOOD", "BUILDING_COLLAPSE", "MEDICAL_EMERGENCY"]
+        if center_lng is not None:
+            if center_lng > 85: # East India (Guwahati, etc)
+                likely_hazards = ["FLOOD", "LANDSLIDE", "BRIDGE_FAILURE"]
+            elif center_lng < 80: # North/West India (Delhi, Mumbai etc)
+                likely_hazards = ["BUILDING_COLLAPSE", "MEDICAL_EMERGENCY", "ELECTRICAL_FAULT", "OTHER"]
+
+        # 1. Background noise (150-250 total target)
+        # We need 30 duplicates + 2 contradictions + 3 weak signals + 1 utility = 36 fixed reports
+        # So background noise should be 114 to 214.
+        noise_count = random.randint(114, 214)
+        for _ in range(noise_count):
+            loc = random.choice(active_locs)
+            hz = random.choice(likely_hazards)
+            events.append(create_report(
+                text=f"Incident reported at {loc['name']}. Need assistance.",
+                channel=SourceChannel.SMS,
+                source_id=f"USR-{random.randint(100, 9999)}",
+                loc_coords=loc['coordinates'],
+                hazard_type=hz
+            ))
+            
+        # 2. Repeated duplicate reports (30 for the same major event)
+        major_loc = random.choice(active_locs)
+        hazard = random.choice(likely_hazards)
+        hazard_texts = {
+            "FLOOD": f"Severe flooding at {major_loc['name']}. Water level rising rapidly!",
+            "LANDSLIDE": f"Massive landslide near {major_loc['name']}. Road blocked!",
+            "BUILDING_COLLAPSE": f"Major building collapse in {major_loc['name']}. People trapped under debris.",
+            "MEDICAL_EMERGENCY": f"Mass casualty medical emergency reported at {major_loc['name']}. Multiple ambulances needed.",
+            "BRIDGE_FAILURE": f"Bridge collapse reported near {major_loc['name']}. Traffic halted.",
+            "ELECTRICAL_FAULT": f"Major electrical explosion and fire near {major_loc['name']}!",
+            "OTHER": f"Massive fire broken out near {major_loc['name']}. Spreading quickly!"
+        }
+        for _ in range(30):
+            events.append(create_report(
+                text=hazard_texts.get(hazard, f"Emergency at {major_loc['name']}"),
+                channel=SourceChannel.SOCIAL,
+                source_id=f"USR-{random.randint(100, 9999)}",
+                loc_coords=major_loc['coordinates'],
+                hazard_type=hazard
+            ))
+            
+        # 3. Road status contradictions (2 reports)
+        road_loc = random.choice(active_locs)
+        road_segment = road_loc.get("road_segments", ["RS_X_1"])[0]
+        events.append(create_report(
+            text=f"Road {road_segment} in {road_loc['name']} is completely CLOSED.",
+            channel=SourceChannel.FIELD,
+            source_id="OFFICER-01",
+            loc_coords=road_loc['coordinates'],
+            hazard_type="ROAD_WASHOUT"
+        ))
+        events.append(create_report(
+            text=f"Road {road_segment} in {road_loc['name']} is OPEN and clear.",
+            channel=SourceChannel.SOCIAL,
+            source_id="CITIZEN-01",
+            loc_coords=road_loc['coordinates'],
+            hazard_type="ROAD_WASHOUT"
+        ))
+
+        # 4. WeakSignal reports near embankment (3 reports)
+        embankment_loc = random.choice(active_locs)
+        events.append(create_report(
+            text=f"Felt a tremor near the embankment at {embankment_loc['name']}.",
+            channel=SourceChannel.SMS,
+            source_id="WS-01",
+            loc_coords=embankment_loc['coordinates'],
+            hazard_type="LANDSLIDE"
+        ))
+        events.append(create_report(
+            text=f"Seeing cracks forming on the embankment structure near {embankment_loc['name']}.",
+            channel=SourceChannel.SOCIAL,
+            source_id="WS-02",
+            loc_coords=embankment_loc['coordinates'],
+            hazard_type="LANDSLIDE"
+        ))
+        events.append(create_report(
+            text=f"Water is seeping rapidly through the embankment wall in {embankment_loc['name']}.",
+            channel=SourceChannel.RADIO,
+            source_id="WS-03",
+            loc_coords=embankment_loc['coordinates'],
+            hazard_type="FLOOD"
+        ))
+
+        # 5. SHELTER_UTILITY_FAILURE report (1 report)
+        shelter_loc = random.choice(active_locs)
+        events.append(create_report(
+            text=f"Generator failed at shelter in {shelter_loc['name']}. Insulin is spoiling, need power immediately.",
+            channel=SourceChannel.SMS,
+            source_id="SHELTER-ADMIN",
+            loc_coords=shelter_loc['coordinates'],
+            hazard_type="SHELTER_UTILITY_FAILURE"
+        ))
         
-        # 4. WeakSignal Cluster (Phase 6 Correlator)
-        weak_time = 480 # T+08:00
-        # Tremor
-        events.append({
-            "time_offset_minutes": weak_time,
-            "report": {
-                "text": "Zameen hil rahi hai dam ke paas (Tremor felt near Dam)",
-                "channel": "SMS",
-                "source_id": "USER-W1",
-                "location_hint": "WARD-03"
-            },
-            "checkpoint": "T+08:00 Emerging Risk Zone (Weak Signals)"
-        })
-        # Crack
-        events.append({
-            "time_offset_minutes": weak_time + 10,
-            "report": {
-                "text": "Embankment me crack dikh raha hai",
-                "channel": "RADIO",
-                "source_id": "USER-W2",
-                "location_hint": "WARD-03"
-            },
-            "checkpoint": None
-        })
-        # Water Rise
-        events.append({
-            "time_offset_minutes": weak_time + 15,
-            "report": {
-                "text": "Paani bahut tezi se badh raha hai yahan",
-                "channel": "SOCIAL",
-                "source_id": "USER-W3",
-                "location_hint": "WARD-03"
-            },
-            "checkpoint": None
-        })
+        # Note: dark_zone_ward has 0 reports generated, satisfying the dark zone requirement.
+
+        # Shuffle the events to mix duplicates, contradictions, and noise.
+        random.shuffle(events)
         
-        # 5. SHELTER_UTILITY_FAILURE
-        shelter_time = 600 # T+10:00
-        events.append({
-            "time_offset_minutes": shelter_time,
-            "report": {
-                "text": "Shelter camp me power cut ho gaya hai, medicine spoiling, insulin needs fridge",
-                "channel": "SMS",
-                "source_id": "CAMP-ADMIN-1",
-                "location_hint": "WARD-05"
-            },
-            "checkpoint": "T+10:00 Shelter Utility Failure"
-        })
-        
-        # 6. Dark Zone Generation (Lack of reports in high pop zone)
-        # We simulate this by having T+14:00 checkpoint without sending reports for WARD-09
-        events.append({
-            "time_offset_minutes": 840, # T+14:00
-            "report": {
-                "text": "General status update from HQ",
-                "channel": "RADIO",
-                "source_id": "HQ",
-                "location_hint": "WARD-01"
-            },
-            "checkpoint": "T+14:00 Silence Risk Triggers (Dark Zone in WARD-09)"
-        })
-        
-        # Sort by time
-        events.sort(key=lambda x: x["time_offset_minutes"])
         return events
 
 generator = SimulationGenerator(seed=42)

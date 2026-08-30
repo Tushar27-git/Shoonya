@@ -5,7 +5,6 @@ from .models import (
     FleetUnit, RouteSegmentRisk, RoutePlan, SafetyAudit, SafetyAlert,
     FleetStatus, AuditResult, AlertSeverity, AlertAudience, AlertStatus
 )
-from app.dashboard.state_builder import build_dashboard_state
 
 # Mock database
 FLEET_STORE: Dict[str, FleetUnit] = {
@@ -20,6 +19,7 @@ AUDIT_STORE: Dict[str, SafetyAudit] = {}
 ALERT_STORE: Dict[str, SafetyAlert] = {}
 
 async def compute_risk_summary() -> List[Dict[str, Any]]:
+    from app.dashboard.state_builder import build_dashboard_state
     # Reads from existing state
     dashboard_state = await build_dashboard_state()
     risks = []
@@ -142,6 +142,7 @@ def run_safety_audit(entity_type: str, entity_id: str, task_id: str) -> SafetyAu
     return audit
 
 async def evaluate_alert_triggers():
+    from app.dashboard.state_builder import build_dashboard_state
     dashboard_state = await build_dashboard_state()
     # If BR04 is disputed, alert NGO partner
     has_br04 = any(d.get('segment_id') == 'BR04' for d in dashboard_state.get("road_disputes", []))

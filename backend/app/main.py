@@ -65,6 +65,27 @@ app.include_router(simulation_router)
 
 from app.copilot.router import router as copilot_router
 app.include_router(copilot_router)
+from pydantic import BaseModel
+
+class SimRunRequest(BaseModel):
+    lat: float = None
+    lng: float = None
+
+@app.post("/simulation/run")
+async def run_deterministic_simulation(req: SimRunRequest = None):
+    from app.simulation.generator import generator
+    from app.core.queue import queue
+    
+    lat = req.lat if req else None
+    lng = req.lng if req else None
+    events = generator.generate_scenario(center_lat=lat, center_lng=lng)
+    
+    count = 0
+    for report in events:
+        await queue.enqueue(report)
+        count += 1
+    return {"status": "done", "injected_count": count}
+
 @app.get("/health")
 async def health_check():
     return {"status": "OPERATIONAL", "system": "SHOONYA"}

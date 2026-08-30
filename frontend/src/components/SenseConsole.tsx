@@ -8,9 +8,14 @@ import { ImpactBoard } from "./ImpactBoard";
 import { LocationSearch } from "./LocationSearch";
 import { RiskAnalytics } from "./RiskAnalytics";
 import { RouteAnalysis } from "./RouteAnalysis";
+import { FleetStatus } from "./FleetStatus";
+import { SafetyAudits } from "./SafetyAudits";
+import { SafetyAlerts } from "./SafetyAlerts";
+import { Settings } from "./Settings";
 import { EmergencyContacts } from "./EmergencyContacts";
+import { CopilotModal } from "./CopilotModal";
 import { useDashboardState } from "../hooks/useDashboardState";
-import { Shield, Map as MapIcon, BarChart2, Truck, CheckSquare, Bell, User, Settings, AlertOctagon } from "lucide-react";
+import { Shield, Map as MapIcon, BarChart2, Truck, CheckSquare, Bell, User, Settings as SettingsIcon, AlertOctagon } from "lucide-react";
 
 const API_BASE = "http://127.0.0.1:8000";
 
@@ -20,19 +25,30 @@ export const SenseConsole: React.FC = () => {
   const [showEmergencyContacts, setShowEmergencyContacts] = useState(false);
   const [mapCenter, setMapCenter] = useState<[number, number] | undefined>(undefined);
   const [locationName, setLocationName] = useState<string>("Connaught Place, New Delhi");
+  const [isCopilotOpen, setIsCopilotOpen] = useState(false);
 
   const { state } = useDashboardState();
-  const incidents = state?.incidents || [];
+  const incidents = state?.active_incidents || state?.incidents || [];
   const needs = state?.tasks || [];
   const amplifyCards = state?.amplify_cards || [];
-  const telemetry = state?.counters || { queue: 0, active_incidents: 0, disputed_incidents: 0, dark_zones: 0 };
+  const emergingRiskZones = state?.emerging_risk_zones || [];
+  const queueDepth = state?.queue_depth ?? (state?.counters?.queue || 0);
+  const roadDisputes = state?.disputes || state?.road_disputes || [];
+  const darkZones = state?.dark_zones || [];
+  const fleetData = state?.fleet || [];
+  const auditTimeline = state?.audit_timeline || [];
   
   const isSimulating = state?.simulation_status === "RUNNING";
   const simulationComplete = state?.simulation_status === "COMPLETE";
 
   const handleRunSimulation = async () => {
     try {
-      await fetch(`${API_BASE}/simulation/run`, { method: "POST" });
+      const payload = mapCenter ? { lat: mapCenter[0], lng: mapCenter[1] } : {};
+      await fetch(`${API_BASE}/simulation/run`, { 
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
     } catch (e) {
       console.error(e);
     }
@@ -76,15 +92,23 @@ export const SenseConsole: React.FC = () => {
 
   const selectedIncident = incidents.find((i: any) => i.incident_id === selectedIncidentId);
 
+  const primaryIncidentCategory = incidents.length > 0 
+    ? incidents.reduce((prev: any, current: any) => (prev.priority_score > current.priority_score) ? prev : current).category 
+    : "HAZARD";
+
   return (
     <div style={{ display: "flex", flexDirection: "column", height: "100vh", width: "100vw", backgroundColor: "var(--void)" }}>
       <Header telemetry={{ 
-        queue_depth: telemetry.queue, 
+        queue_depth: queueDepth, 
         active_incidents: incidents.length, 
-        disputed_incidents: (state?.road_disputes || []).length, 
-        dark_zones: (state?.dark_zones || []).length, 
-        solver_status: "READY" 
-      } as any} isLive={true} onToggleLive={() => {}} onOpenCopilot={() => {}} />
+        disputed_incidents: roadDisputes.length, 
+        dark_zones: darkZones.length, 
+        solver_status: state?.advisory_solver || "READY" 
+      } as any} isLive={true} onToggleLive={() => {}} onOpenCopilot={() => setIsCopilotOpen(true)} 
+      onLocationFound={(coords, name) => {
+        setMapCenter(coords);
+        setLocationName(name);
+      }} />
       
       {isSimulating && (
         <div className="mono" style={{ 
@@ -100,11 +124,13 @@ export const SenseConsole: React.FC = () => {
         {/* SHOONYA Left Sidebar */}
         <div style={{
           width: "240px",
-          backgroundColor: "var(--void)",
+          backgroundColor: "var(--panel-elevated)",
           borderRight: "1px solid var(--grid-line)",
           display: "flex",
           flexDirection: "column",
           padding: "16px 0",
+          zIndex: 50,
+          boxShadow: "4px 0 24px rgba(0,0,0,0.5)"
         }}>
           <div style={{ padding: "0 24px", marginBottom: "32px", display: "flex", alignItems: "center", gap: "12px" }}>
             <Shield size={24} color="var(--signal-cyan)" />
@@ -120,7 +146,7 @@ export const SenseConsole: React.FC = () => {
               { id: "SAFETY_AUDITS", label: "Safety Audits", icon: <CheckSquare size={18} /> },
               { id: "SAFETY_ALERTS", label: "Safety Alerts", icon: <Bell size={18} /> },
               { id: "SAATHI_PROFILE", label: "Profile & Access", icon: <User size={18} /> },
-              { id: "SETTINGS", label: "Settings", icon: <Settings size={18} /> },
+              { id: "SETTINGS", label: "Settings", icon: <SettingsIcon size={18} /> },
             ].map(tab => (
               <button
                 key={tab.id}
@@ -170,10 +196,34 @@ export const SenseConsole: React.FC = () => {
           </div>
         </div>
       
-        {activeTab === "SENSE_MAP" && (
-          <>
-            {/* Left Side Panel: Priority Queue & Detail View */}
-            <div style={{ width: "30%", minWidth: "350px", borderRight: "1px solid var(--grid-line)", display: "flex", flexDirection: "column", backgroundColor: "var(--panel)" }}>
+        {/* Main Map Container */}
+        <div style={{ flex: 1, position: "relative", overflow: "hidden" }}>
+          
+          {/* Permanent Tactical Map */}
+          <div style={{ position: "absolute", inset: 0, zIndex: 1 }}>
+            <TacticalMap 
+              incidents={incidents}
+              resources={[]} 
+              darkZones={darkZones}
+              roadDisputes={roadDisputes}
+              emergingRiskZones={emergingRiskZones}
+              shelters={state?.shelters || []}
+              selectedIncidentId={selectedIncidentId}
+              onSelectIncident={setSelectedIncidentId}
+              mapCenter={mapCenter}
+              showRoutes={activeTab === "ROUTE_ANALYSIS"}
+              primaryIncidentCategory={primaryIncidentCategory}
+            />
+          </div>
+
+          {/* SENSE MAP (Command Center) Feed Overlay */}
+          {activeTab === "SENSE_MAP" && (
+            <div style={{ 
+              position: "absolute", top: 0, left: 0, bottom: 0, 
+              width: "380px", borderRight: "1px solid var(--grid-line)", display: "flex", flexDirection: "column", 
+              backgroundColor: "rgba(10, 15, 20, 0.85)", backdropFilter: "blur(12px)", zIndex: 10,
+              boxShadow: "4px 0 24px rgba(0,0,0,0.5)"
+            }}>
               
               <div style={{ padding: "16px", borderBottom: "1px solid var(--grid-line)", display: "flex", gap: "8px", flexDirection: "column" }}>
                 <button 
@@ -185,8 +235,9 @@ export const SenseConsole: React.FC = () => {
                   onClick={handleRunSimulation}
                   disabled={isSimulating}
                 >
-                  {isSimulating ? "SIMULATING..." : "▶ RUN SIMULATION"}
+                  {isSimulating ? "SIMULATING..." : "▶ RUN DEMO SIMULATION"}
                 </button>
+                <span style={{ fontSize: "10px", color: "var(--ink-dim)", textAlign: "center", marginTop: "-4px" }}>Generates synthetic incident data for testing</span>
 
                 <button 
                   className="mono"
@@ -215,7 +266,7 @@ export const SenseConsole: React.FC = () => {
 
               {/* Incident Feed */}
               <div style={{ flex: 1, overflowY: "auto", padding: "12px" }}>
-                <h3 className="mono" style={{ color: "var(--ink-dim)", marginBottom: "12px" }}>PRIORITY QUEUE ({incidents.length})</h3>
+                <h3 className="mono" style={{ color: "var(--ink-dim)", marginBottom: "12px" }}>LIVE INCIDENT FEED ({incidents.length})</h3>
                 
                 {incidents
                   .sort((a: any, b: any) => b.priority_score - a.priority_score)
@@ -232,9 +283,9 @@ export const SenseConsole: React.FC = () => {
                     }}
                   >
                     <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "4px" }}>
-                      <span className="mono" style={{ color: "var(--signal-cyan)" }}>{inc.incident_id}</span>
+                      <span className="mono" style={{ color: "var(--signal-cyan)" }}>Incident {inc.incident_id}</span>
                       <span className="mono" style={{ color: inc.priority_score >= 1.0 ? "var(--critical-ember)" : "var(--ink)" }}>
-                        P: {inc.priority_score.toFixed(2)}
+                        Severity: {Math.round(inc.priority_score * 100)}%
                       </span>
                     </div>
                     <div style={{ fontSize: "14px", fontWeight: "bold" }}>{inc.category}</div>
@@ -245,7 +296,7 @@ export const SenseConsole: React.FC = () => {
 
               {/* Incident Detail */}
               {selectedIncident && (
-                <div style={{ height: "40%", borderTop: "1px solid var(--grid-line)", padding: "16px", overflowY: "auto", backgroundColor: "var(--panel-elevated)" }}>
+                <div style={{ height: "40%", borderTop: "1px solid var(--grid-line)", padding: "16px", overflowY: "auto", backgroundColor: "rgba(15, 20, 25, 0.95)" }}>
                   <h3 className="mono" style={{ color: "var(--signal-cyan)" }}>DETAIL: {selectedIncident.incident_id}</h3>
                   
                   {selectedIncident.dispute_flag ? (
@@ -253,11 +304,11 @@ export const SenseConsole: React.FC = () => {
                       <h4 className="mono" style={{ color: "var(--dispute-amber)", marginBottom: "8px" }}>⚠ DISPUTED</h4>
                       <div style={{ display: "flex", gap: "8px" }}>
                         <div style={{ flex: 1, padding: "8px", backgroundColor: "var(--void)" }}>
-                          <strong className="mono" style={{color: "var(--ink-dim)"}}>CLAIM A</strong>
+                          <strong className="mono" style={{color: "var(--ink-dim)"}}>REPORT 1</strong>
                           <p style={{marginTop: "4px", fontSize: "12px"}}>Evidence extracted from social media indicates heavy flooding.</p>
                         </div>
                         <div style={{ flex: 1, padding: "8px", backgroundColor: "var(--void)" }}>
-                          <strong className="mono" style={{color: "var(--ink-dim)"}}>CLAIM B</strong>
+                          <strong className="mono" style={{color: "var(--ink-dim)"}}>REPORT 2</strong>
                           <p style={{marginTop: "4px", fontSize: "12px"}}>Ground saathi reports area is dry and clear.</p>
                         </div>
                       </div>
@@ -271,75 +322,84 @@ export const SenseConsole: React.FC = () => {
                 </div>
               )}
             </div>
-
-            {/* Right Area: Map */}
-            <div style={{ flex: 1, position: "relative" }}>
-              <LocationSearch onLocationFound={(coords, name) => {
-                setMapCenter(coords);
-                setLocationName(name);
-              }} />
-              <TacticalMap 
-                incidents={incidents}
-                resources={[]} 
-                darkZones={state?.dark_zones || []}
-                roadDisputes={state?.road_disputes || []}
-                shelters={state?.shelters || []}
-                selectedIncidentId={selectedIncidentId}
-                onSelectIncident={setSelectedIncidentId}
-                mapCenter={mapCenter}
-              />
-            </div>
-          </>
-        )}
+          )}
 
         {activeTab === "ROUTE_ANALYSIS" && (
-          <div style={{ flex: 1, backgroundColor: "var(--panel)" }}>
-            <RouteAnalysis />
+          <div style={{ position: "absolute", top: 24, right: 24, zIndex: 20, width: "450px", maxHeight: "calc(100vh - 100px)", overflowY: "auto" }}>
+            <RouteAnalysis origin={locationName} incidents={incidents} />
           </div>
         )}
 
         {activeTab === "RISK_ANALYTICS" && (
-          <div style={{ flex: 1, backgroundColor: "var(--panel)" }}>
-            <RiskAnalytics />
+          <div style={{ position: "absolute", inset: 0, zIndex: 30, backgroundColor: "var(--void)", padding: "24px", overflowY: "auto" }}>
+            <RiskAnalytics origin={locationName} incidents={incidents} />
           </div>
         )}
 
+        {activeTab === "SAFETY_AUDITS" && (
+          <div style={{ position: "absolute", inset: 0, zIndex: 30, backgroundColor: "var(--void)", padding: "24px", overflowY: "auto" }}>
+            <SafetyAudits audits={auditTimeline} location={locationName} incidents={incidents} />
+          </div>
+        )}
+
+        {/* Other isolated tabs that replace map */}
         {activeTab === "NGO_TASKS" && (
-          <div style={{ flex: 1 }}>
+          <div style={{ position: "absolute", inset: 0, zIndex: 30, backgroundColor: "var(--void)" }}>
             <NgoTaskPanel needs={needs} acceptedTasks={new Set()} onAcceptTask={handleAcceptTask} />
           </div>
         )}
 
         {activeTab === "AMPLIFY_CARDS" && (
-          <div style={{ flex: 1 }}>
+          <div style={{ position: "absolute", inset: 0, zIndex: 30, backgroundColor: "var(--void)" }}>
             <AmplifyCardPreview cards={amplifyCards} onApproveCard={handleApproveCard} />
           </div>
         )}
 
         {activeTab === "SAATHI_PROFILE" && (
-          <div style={{ flex: 1 }}>
+          <div style={{ position: "absolute", inset: 0, zIndex: 30, backgroundColor: "var(--void)" }}>
             <SaathiProfile />
           </div>
         )}
 
         {activeTab === "IMPACT_BOARD" && (
-          <div style={{ flex: 1 }}>
+          <div style={{ position: "absolute", inset: 0, zIndex: 30, backgroundColor: "var(--void)" }}>
             <ImpactBoard />
           </div>
         )}
 
-        {["FLEET_STATUS", "SAFETY_AUDITS", "SAFETY_ALERTS", "SETTINGS"].includes(activeTab) && (
-          <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", color: "var(--ink-dim)" }}>
-            <h2>Module in Development</h2>
+        {activeTab === "FLEET_STATUS" && (
+          <div style={{ position: "absolute", inset: 0, zIndex: 30, backgroundColor: "var(--void)" }}>
+            <FleetStatus fleet={fleetData} />
           </div>
         )}
 
+        {activeTab === "SAFETY_ALERTS" && (
+          <div style={{ position: "absolute", inset: 0, zIndex: 30, backgroundColor: "var(--void)" }}>
+            <SafetyAlerts location={locationName} incidents={incidents} />
+          </div>
+        )}
+
+        {activeTab === "SETTINGS" && (
+          <div style={{ position: "absolute", inset: 0, zIndex: 30, backgroundColor: "var(--void)" }}>
+            <Settings />
+          </div>
+        )}
+
+      </div>
       </div>
 
       <EmergencyContacts 
         isOpen={showEmergencyContacts} 
         onClose={() => setShowEmergencyContacts(false)} 
         location={locationName} 
+      />
+
+      <CopilotModal 
+        isOpen={isCopilotOpen}
+        onClose={() => setIsCopilotOpen(false)}
+        selectedIncidentId={selectedIncidentId}
+        onSelectIncident={setSelectedIncidentId}
+        userLocation={locationName}
       />
     </div>
   );

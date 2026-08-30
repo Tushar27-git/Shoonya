@@ -25,7 +25,7 @@ export function useDashboardState() {
     
     fetchState(); // Initial fetch
     
-    const interval = setInterval(fetchState, 1000); // 1-second polling
+    const interval = setInterval(fetchState, 2000); // 2-second polling
     
     return () => {
       isMounted = false;

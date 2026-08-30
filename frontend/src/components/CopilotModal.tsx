@@ -9,6 +9,7 @@ interface CopilotModalProps {
   onClose: () => void;
   selectedIncidentId: string | null;
   onSelectIncident: (id: string) => void;
+  userLocation?: string;
 }
 
 export const CopilotModal: React.FC<CopilotModalProps> = ({
@@ -16,6 +17,7 @@ export const CopilotModal: React.FC<CopilotModalProps> = ({
   onClose,
   selectedIncidentId,
   onSelectIncident,
+  userLocation,
 }) => {
   const [query, setQuery] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -28,7 +30,7 @@ export const CopilotModal: React.FC<CopilotModalProps> = ({
   }>>([
     {
       role: "copilot",
-      text: "SHOONYA EOC Copilot active. Multilingual crisis intelligence and SITREP generation ready. Ask about any active incident, resource allocation, or district flood status.",
+      text: `SHOONYA EOC Copilot active. Monitoring location: ${userLocation || "Global"}. Multilingual crisis intelligence and SITREP generation ready. Ask about any active incident, resource allocation, or flood status.`,
     },
   ]);
 
@@ -50,6 +52,7 @@ export const CopilotModal: React.FC<CopilotModalProps> = ({
         body: JSON.stringify({
           query: textToSend,
           focus_incident_id: selectedIncidentId,
+          user_location: userLocation,
         }),
       });
 

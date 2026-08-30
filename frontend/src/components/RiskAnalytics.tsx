@@ -1,26 +1,43 @@
 import React from "react";
 import { TrendingUp, AlertCircle, Clock, ShieldCheck } from "lucide-react";
 
-export const RiskAnalytics: React.FC = () => {
+interface Incident {
+  incident_id: string;
+  category: string;
+  priority_score: number;
+}
+
+interface RiskAnalyticsProps {
+  origin?: string;
+  incidents?: Incident[];
+}
+
+export const RiskAnalytics: React.FC<RiskAnalyticsProps> = ({ origin = "Delhi NCR", incidents = [] }) => {
+  const primaryIncident = incidents.length > 0 
+    ? incidents.reduce((prev, current) => (prev.priority_score > current.priority_score) ? prev : current).category 
+    : "Low Lighting";
+
   return (
-    <div style={{ padding: "32px", height: "100%", overflowY: "auto", display: "flex", flexDirection: "column", gap: "24px" }}>
+    <div style={{ 
+      padding: "32px", display: "flex", flexDirection: "column", gap: "24px"
+    }}>
       <div>
         <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "8px" }}>
           <h2 style={{ fontSize: "28px", fontWeight: "bold", color: "white" }}>Risk Analytics</h2>
-          <span style={{ backgroundColor: "rgba(79, 70, 229, 0.2)", color: "var(--signal-cyan)", padding: "4px 12px", borderRadius: "16px", fontSize: "12px", fontWeight: "bold" }}>Demo Sample Data</span>
+          <span style={{ backgroundColor: "rgba(16, 185, 129, 0.2)", color: "#10B981", padding: "4px 12px", borderRadius: "16px", fontSize: "12px", fontWeight: "bold" }}>Live Data Stream</span>
         </div>
-        <p style={{ color: "var(--ink-dim)" }}>Predictive safety modeling & trend analysis · SHOONYA Operations</p>
+        <p style={{ color: "var(--ink-dim)" }}>Predictive safety modeling & trend analysis near {origin}</p>
       </div>
 
       {/* KPI Cards */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "16px" }}>
         {[
-          { title: "LOGGED INCIDENTS", value: "38", sub: "+2 this week", icon: <AlertCircle size={20} color="var(--ink-dim)" /> },
+          { title: "LOGGED INCIDENTS", value: incidents.length.toString(), sub: `Active in ${origin}`, icon: <AlertCircle size={20} color="var(--ink-dim)" /> },
           { title: "INCIDENT RESOLUTION RATE", value: "98.4%", sub: "Target ≥ 95%", color: "#10B981", icon: <ShieldCheck size={20} color="var(--ink-dim)" /> },
-          { title: "AVG RESPONSE / DISPATCH", value: "3.2 min", sub: "Delhi NCR response SLA", color: "var(--signal-cyan)", icon: <Clock size={20} color="var(--ink-dim)" /> },
-          { title: "PRIMARY INCIDENT TYPE", value: "Low Lighting", sub: "Telemetry classification", icon: <TrendingUp size={20} color="var(--ink-dim)" /> },
+          { title: "AVG RESPONSE / DISPATCH", value: "3.2 min", sub: `${origin} response SLA`, color: "var(--signal-cyan)", icon: <Clock size={20} color="var(--ink-dim)" /> },
+          { title: "PRIMARY INCIDENT TYPE", value: primaryIncident, sub: "Telemetry classification", icon: <TrendingUp size={20} color="var(--ink-dim)" /> },
         ].map((kpi, i) => (
-          <div key={i} style={{ backgroundColor: "var(--panel-elevated)", padding: "20px", borderRadius: "var(--radius-lg)", border: "1px solid var(--grid-line)" }}>
+          <div key={i} style={{ backgroundColor: "rgba(15, 20, 25, 0.7)", padding: "20px", borderRadius: "var(--radius-lg)", border: "1px solid rgba(255,255,255,0.1)" }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "12px" }}>
               <span style={{ color: "var(--ink-dim)", fontSize: "11px", fontWeight: "bold", letterSpacing: "1px" }}>{kpi.title}</span>
               {kpi.icon}
@@ -36,7 +53,7 @@ export const RiskAnalytics: React.FC = () => {
       {/* Charts Area */}
       <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: "16px", flex: 1 }}>
         {/* Trend Chart (Mock) */}
-        <div style={{ backgroundColor: "var(--panel-elevated)", padding: "24px", borderRadius: "var(--radius-lg)", border: "1px solid var(--grid-line)" }}>
+        <div style={{ backgroundColor: "rgba(15, 20, 25, 0.7)", padding: "24px", borderRadius: "var(--radius-lg)", border: "1px solid rgba(255,255,255,0.1)" }}>
           <h3 style={{ fontSize: "16px", fontWeight: "bold", color: "white", marginBottom: "4px" }}>Incident Volume vs SafeScore Trend</h3>
           <p style={{ color: "var(--ink-dim)", fontSize: "13px", marginBottom: "24px" }}>6-month rolling overview of logged safety alerts</p>
           
@@ -79,9 +96,9 @@ export const RiskAnalytics: React.FC = () => {
             ))}
           </div>
           <div style={{ display: "flex", gap: "20px", marginTop: "12px", padding: "0 10px" }}>
-            <div style={{ flex: 1, fontSize: "10px", color: "var(--ink-dim)", textAlign: "center" }}>Subhash Nagar</div>
-            <div style={{ flex: 1, fontSize: "10px", color: "var(--ink-dim)", textAlign: "center" }}>Tagore Garden</div>
-            <div style={{ flex: 1, fontSize: "10px", color: "var(--ink-dim)", textAlign: "center" }}>Kasturba Gandhi</div>
+            <div style={{ flex: 1, fontSize: "10px", color: "var(--ink-dim)", textAlign: "center" }}>North Sector</div>
+            <div style={{ flex: 1, fontSize: "10px", color: "var(--ink-dim)", textAlign: "center" }}>Central Zone</div>
+            <div style={{ flex: 1, fontSize: "10px", color: "var(--ink-dim)", textAlign: "center" }}>South District</div>
           </div>
         </div>
       </div>

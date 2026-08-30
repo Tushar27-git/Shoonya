@@ -1,5 +1,6 @@
 import React from "react";
 import type { SystemTelemetry } from "../types/domain";
+import { LocationSearch } from "./LocationSearch";
 
 import { Activity, ShieldAlert, Radio, Clock, Cpu } from "lucide-react";
 
@@ -8,6 +9,7 @@ interface HeaderProps {
   isLive: boolean;
   onToggleLive: () => void;
   onOpenCopilot: () => void;
+  onLocationFound?: (latLng: [number, number], locationName: string) => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -15,6 +17,7 @@ export const Header: React.FC<HeaderProps> = ({
   isLive,
   onToggleLive,
   onOpenCopilot,
+  onLocationFound,
 }) => {
   return (
     <header
@@ -40,50 +43,38 @@ export const Header: React.FC<HeaderProps> = ({
             // शून्य
           </span>
         </div>
-        <div
-          className="mono"
-          style={{
-            fontSize: "11px",
-            color: "var(--ink-dim)",
-            padding: "2px 8px",
-            backgroundColor: "var(--void)",
-            border: "1px solid var(--grid-line)",
-            borderRadius: "2px",
-          }}
-        >
-          SECTOR 4 // LUCKNOW COMMAND
-        </div>
+        <LocationSearch onLocationFound={onLocationFound} />
       </div>
 
       {/* Real-time Telemetry Readouts */}
       <div style={{ display: "flex", alignItems: "center", gap: "20px" }} className="mono">
         <div style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "11px" }}>
           <Radio size={13} color="var(--signal-cyan)" />
-          <span style={{ color: "var(--ink-dim)" }}>QUEUE:</span>
+          <span style={{ color: "var(--ink-dim)" }}>PENDING REPORTS:</span>
           <span style={{ color: "var(--ink)", fontWeight: 600 }}>{telemetry?.queue_depth ?? 0}</span>
         </div>
 
         <div style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "11px" }}>
           <Activity size={13} color="var(--critical-ember)" />
-          <span style={{ color: "var(--ink-dim)" }}>ACTIVE INCIDENTS:</span>
+          <span style={{ color: "var(--ink-dim)" }}>VERIFIED INCIDENTS:</span>
           <span style={{ color: "var(--critical-ember)", fontWeight: 700 }}>{telemetry?.active_incidents ?? 0}</span>
         </div>
 
         <div style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "11px" }}>
           <ShieldAlert size={13} color="var(--dispute-amber)" />
-          <span style={{ color: "var(--ink-dim)" }}>DISPUTES:</span>
+          <span style={{ color: "var(--ink-dim)" }}>CONFLICTS:</span>
           <span style={{ color: "var(--dispute-amber)", fontWeight: 600 }}>{telemetry?.disputed_incidents ?? 0}</span>
         </div>
 
         <div style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "11px" }}>
           <span style={{ width: "8px", height: "8px", borderRadius: "50%", backgroundColor: "var(--dark-zone-grey)" }} />
-          <span style={{ color: "var(--ink-dim)" }}>DARK ZONES:</span>
+          <span style={{ color: "var(--ink-dim)" }}>NO-SIGNAL ZONES:</span>
           <span style={{ color: "var(--ink)", fontWeight: 600 }}>{telemetry?.dark_zones ?? 0}</span>
         </div>
 
         <div style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "11px" }}>
           <Cpu size={13} color="var(--ink-dim)" />
-          <span style={{ color: "var(--ink-dim)" }}>ADVISORY SOLVER:</span>
+          <span style={{ color: "var(--ink-dim)" }}>SYSTEM STATUS:</span>
           <span style={{ color: "var(--signal-cyan)", fontWeight: 600 }}>{telemetry?.solver_status}</span>
         </div>
 

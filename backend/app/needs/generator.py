@@ -27,7 +27,7 @@ def generate_need_card(
         needed_items.extend(["insulin", "cold-chain"])
         
     # Rule 3: category == FLOOD + vulnerable=[children] -> infant nutrition
-    if incident.category == HazardType.FLOOD and "children" in incident.vulnerable_present:
+    if incident.category == HazardType.FLOOD and "children" in incident.vulnerability_tags:
         needed_items.append("infant nutrition")
         
     # Determine Status Label based on confidence
@@ -52,13 +52,16 @@ def generate_need_card(
     # Partner matching
     recommended = match_partners(needed_items, incident.location.centroid if hasattr(incident.location, 'centroid') else (incident.location.lat, incident.location.lng), route_segment_id, closed_road_segments)
     
+    description = ", ".join(needed_items) if needed_items else "General assessment needed"
+    priority = "HIGH" if incident.priority_score > 7.0 else "MEDIUM"
+    status = status_label if status_label in ["PENDING", "VERIFIED", "DISPUTED"] else "PENDING"
+    
     return NeedCard(
+        need_id=f"NEED-{incident.incident_id}",
         incident_id=incident.incident_id,
-        location=incident.location.centroid if hasattr(incident.location, 'centroid') else (incident.location.lat, incident.location.lng),
-        affected_population=affected_population,
-        needed_items=list(set(needed_items)), # unique
-        access_note=access_note,
-        last_verified=incident.updated_at,
-        status_label=status_label,
-        recommended_partners=recommended
+        category=incident.category.value if hasattr(incident.category, 'value') else str(incident.category),
+        description=f"{description}. {access_note}",
+        quantity_needed=affected_population,
+        priority=priority,
+        status=status
     )
