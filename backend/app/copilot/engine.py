@@ -145,7 +145,12 @@ class EOCCopilotEngine:
                 )
             )
 
-        # 6. General / Hindi / Hinglish Triage Summary Query
+        # 6. Basic greetings
+        elif "hello" in q_lower or "hi" in q_lower or "help" in q_lower:
+            content_lines.append("SHOONYA EOC COPILOT ONLINE. Awaiting tactical query.")
+            content_lines.append("I can provide situation reports on dark zones, venue surge capacity, incident clustering, or resource availability. Use quick prompts for standard inquiries.")
+
+        # 7. General / Hindi / Hinglish Triage Summary Query
         else:
             top_inc = sorted(incidents, key=lambda x: x.priority_score, reverse=True)[:3]
             content_lines.append("OPERATIONAL SITUATION BRIEFING // TOP PRIORITY INCIDENTS")

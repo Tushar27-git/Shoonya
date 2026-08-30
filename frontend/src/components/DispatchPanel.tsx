@@ -43,9 +43,9 @@ export const DispatchPanel: React.FC<DispatchPanelProps> = ({ incidents, resourc
       }));
 
       const resourcePayload = resources.map(r => ({
-        resource_id: r.resource_id,
-        type: r.type,
-        available: r.availability_status === "AVAILABLE",
+        resource_id: r.unit_id,
+        type: r.unit_type,
+        available: r.status === "AVAILABLE",
       }));
 
       const res = await fetch(`${API_BASE}/dispatch/plan`, {
@@ -144,7 +144,7 @@ export const DispatchPanel: React.FC<DispatchPanelProps> = ({ incidents, resourc
       <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "12px" }}>
         {[
           { label: "ACTIVE INCIDENTS", value: incidents.length.toString() },
-          { label: "AVAILABLE RESOURCES", value: resources.filter(r => r.availability_status === "AVAILABLE").length.toString() },
+          { label: "AVAILABLE RESOURCES", value: resources.filter(r => r.status === "AVAILABLE").length.toString() },
           { label: "ASSIGNMENTS READY", value: plan ? plan.assignments.length.toString() : "—" },
           { label: "PLAN QUALITY", value: plan ? plan.plan_quality.replace("PLAN QUALITY: ", "") : "NOT GENERATED", color: plan ? "#10B981" : "var(--ink-dim)" },
         ].map((s, i) => (

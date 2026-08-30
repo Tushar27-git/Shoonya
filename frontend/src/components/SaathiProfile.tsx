@@ -28,7 +28,7 @@ export const SaathiProfile: React.FC = () => {
   };
 
   return (
-    <div style={{ padding: "32px", height: "100%", overflowY: "auto", display: "flex", flexDirection: "column", gap: "24px", color: "var(--ink)" }}>
+    <div style={{ padding: "8px", display: "flex", flexDirection: "column", gap: "24px", color: "var(--ink)" }}>
       <div>
         <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "8px" }}>
           <Fingerprint size={28} color="var(--signal-cyan)" />
