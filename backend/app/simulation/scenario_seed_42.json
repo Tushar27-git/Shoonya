@@ -1,0 +1,138 @@
+[
+  {
+    "time_offset_seconds": 3,
+    "action": "ingest_vague",
+    "payload": {
+      "raw_text": "Minor rain recorded on telemetry sensor.",
+      "sender_id": "SENSOR-01",
+      "channel": "DRONE",
+      "landmark_hint": "WARD-01"
+    }
+  },
+  {
+    "time_offset_seconds": 7,
+    "action": "ingest_vague",
+    "payload": {
+      "raw_text": "Slight tremor felt near the river bank.",
+      "sender_id": "USER-01",
+      "channel": "SMS",
+      "landmark_hint": "WARD-01"
+    }
+  },
+  {
+    "time_offset_seconds": 12,
+    "action": "duplicate_burst",
+    "payload": {
+      "count": 50,
+      "ward": "WARD-01",
+      "base_text": "Severe waterlogging here!"
+    }
+  },
+  {
+    "time_offset_seconds": 18,
+    "action": "ingest_vague",
+    "payload": {
+      "raw_text": "We are stuck on the roof, water is rising fast! 4 children with us.",
+      "sender_id": "USER-ROOF-EN",
+      "channel": "SMS",
+      "landmark_hint": "WARD-02"
+    }
+  },
+  {
+    "time_offset_seconds": 18,
+    "action": "ingest_vague",
+    "payload": {
+      "raw_text": "Paani chhat tak aa gaya hai, bache sath hain, jaldi aao!",
+      "sender_id": "USER-ROOF-HI",
+      "channel": "SOCIAL",
+      "landmark_hint": "WARD-02"
+    }
+  },
+  {
+    "time_offset_seconds": 24,
+    "action": "telecom_outage",
+    "payload": {
+      "ward": "WARD-09"
+    }
+  },
+  {
+    "time_offset_seconds": 30,
+    "action": "ingest_vague",
+    "payload": {
+      "raw_text": "ROAD-MAIN-01 is fully OPEN.",
+      "sender_id": "DRIVER-1",
+      "channel": "SMS",
+      "landmark_hint": "ROAD-MAIN-01"
+    }
+  },
+  {
+    "time_offset_seconds": 30,
+    "action": "ingest_vague",
+    "payload": {
+      "raw_text": "ROAD-MAIN-01 is completely FLOODED.",
+      "sender_id": "USER-8",
+      "channel": "SOCIAL",
+      "landmark_hint": "ROAD-MAIN-01"
+    }
+  },
+  {
+    "time_offset_seconds": 30,
+    "action": "ingest_vague",
+    "payload": {
+      "raw_text": "ROAD-MAIN-01 is unsafe for heavy vehicles.",
+      "sender_id": "USER-9",
+      "channel": "WEB",
+      "landmark_hint": "ROAD-MAIN-01"
+    }
+  },
+  {
+    "time_offset_seconds": 36,
+    "action": "ingest_vague",
+    "payload": {
+      "raw_text": "SH-03 shelter update: 420 people here, water is dirty and unsafe, power is out. 12 have loose motion, 4 need insulin.",
+      "sender_id": "CAMP-ADMIN-1",
+      "channel": "RADIO",
+      "landmark_hint": "SH-03"
+    }
+  },
+  {
+    "time_offset_seconds": 44,
+    "action": "ingest_vague",
+    "payload": {
+      "raw_text": "Crack observed in the embankment.",
+      "sender_id": "ENG-1",
+      "channel": "SMS",
+      "landmark_hint": "WARD-04"
+    }
+  },
+  {
+    "time_offset_seconds": 44,
+    "action": "ingest_vague",
+    "payload": {
+      "raw_text": "Seepage from the wall near DY02.",
+      "sender_id": "ENG-2",
+      "channel": "SMS",
+      "landmark_hint": "WARD-04"
+    }
+  },
+  {
+    "time_offset_seconds": 44,
+    "action": "ingest_vague",
+    "payload": {
+      "raw_text": "Paani bahut tezi se badh raha hai (rapid water rise).",
+      "sender_id": "ENG-3",
+      "channel": "SMS",
+      "landmark_hint": "WARD-04"
+    }
+  },
+  {
+    "time_offset_seconds": 52,
+    "action": "trigger_dispatch",
+    "payload": {}
+  },
+  {
+    "time_offset_seconds": 56,
+    "action": "trigger_amplify",
+    "payload": {}
+  }
+]

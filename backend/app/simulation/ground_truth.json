@@ -1,0 +1,45 @@
+{
+  "ward_a_status": {
+    "ward_id": "LOC_000",
+    "name": "Ward A",
+    "flood_depth": "moderate",
+    "critical": false
+  },
+  "ward_b_status": {
+    "ward_id": "LOC_001",
+    "name": "Ward B",
+    "telecom_status": "dead",
+    "population": 7272
+  },
+  "rooftop_rescue": {
+    "ward_id": "LOC_004",
+    "coordinates": {
+      "lat": 28.61469,
+      "lon": 77.15024
+    },
+    "trapped_people": true,
+    "victims_estimate": 4,
+    "vulnerable_present": [
+      "children"
+    ]
+  },
+  "bridge": {
+    "segment_id": "RS_2_1",
+    "status": "CLOSED",
+    "damaged": true
+  },
+  "embankment": {
+    "ward_id": "LOC_003",
+    "coordinates": {
+      "lat": 28.61776,
+      "lon": 77.21748
+    },
+    "status": "WEAKENING",
+    "risk": "HIGH"
+  },
+  "shelter": {
+    "shelter_id": "SH_5_1",
+    "water_status": "CONTAMINATED",
+    "power_status": false
+  }
+}

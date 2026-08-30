@@ -154,6 +154,7 @@ class RawReport(BaseModel):
     cluster_id: Optional[str] = None
     source_id: Optional[str] = None
     trust_score: float = Field(default=0.5, ge=0.0, le=1.0)
+    reporter_role_level: Optional[int] = None
 
 class Incident(BaseModel):
     incident_id: str
@@ -509,4 +510,42 @@ class NotificationSummaryResponse(BaseModel):
     channels_breakdown: Dict[str, int]
     recent_broadcasts: List[NotificationRecord]
 
+from typing import Tuple
+
+class StatusClaim(BaseModel):
+    claim: RoadStatus
+    source: str
+    timestamp: datetime = Field(default_factory=utc_now)
+
+class ShelterUtilityStatus(BaseModel):
+    shelter_id: str
+    name: str
+    power_status: bool = True
+    water_status: str = "SAFE"
+    medicine_cold_chain_status: bool = True
+    affected_population: int = 0
+    linked_incident_id: Optional[str] = None
+
+class NGOPartner(BaseModel):
+    id: str
+    name: str
+    capabilities: List[str] = Field(default_factory=list)
+    location: Tuple[float, float]
+    stock_available: bool = True
+
+from enum import Enum
+class WaterStatus(str, Enum):
+    SAFE = "SAFE"
+    CONTAMINATED = "CONTAMINATED"
+    UNKNOWN = "UNKNOWN"
+
+class NeedCard(BaseModel):
+    incident_id: str
+    location: Tuple[float, float]
+    affected_population: int = 0
+    needed_items: List[str] = Field(default_factory=list)
+    access_note: str = ""
+    last_verified: datetime
+    status_label: str
+    recommended_partners: List[str] = Field(default_factory=list)
 

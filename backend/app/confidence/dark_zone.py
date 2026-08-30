@@ -1,6 +1,5 @@
 from typing import List, Dict, Any, Optional
 from datetime import datetime, timezone
-from ..models.enums import TelecomStatus
 from ..ingestion.processor import zone_tracker, KNOWN_DISTRICT_ZONES
 from ..config import settings
 

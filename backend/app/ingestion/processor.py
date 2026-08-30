@@ -1,8 +1,8 @@
 import re
 from typing import Optional, Dict, Tuple, List, Any
 from datetime import datetime, timezone
-from ..models.enums import LocationPrecision, SourceChannel, TelecomStatus
-from ..models.domain import LocationInfo, Coordinates, RawReport
+from ..models.enums import LocationPrecision, SourceChannel
+from ..models.domain import RawReport, LocationInfo
 from ..config import settings
 
 # Predefined district dictionary of wards and coarse boundaries
@@ -26,16 +26,16 @@ class ZoneActivityTracker:
     """
     def __init__(self):
         self._zone_latest_report: Dict[str, datetime] = {}
-        self._zone_telecom_status: Dict[str, TelecomStatus] = {
-            z_id: TelecomStatus.LIVE for z_id in KNOWN_DISTRICT_ZONES
+        self._zone_telecom_status: Dict[str, str] = {
+            z_id: "LIVE" for z_id in KNOWN_DISTRICT_ZONES
         }
 
     def record_activity(self, zone_id: str, timestamp: datetime):
         """Record activity in a zone and reset dark status."""
         self._zone_latest_report[zone_id] = timestamp
-        self._zone_telecom_status[zone_id] = TelecomStatus.LIVE
+        self._zone_telecom_status[zone_id] = "LIVE"
 
-    def set_telecom_status(self, zone_id: str, status: TelecomStatus):
+    def set_telecom_status(self, zone_id: str, status: str):
         """Manually or simulator-driven telecom outage trigger."""
         self._zone_telecom_status[zone_id] = status
 
@@ -47,7 +47,7 @@ class ZoneActivityTracker:
         now = current_time or datetime.now(timezone.utc)
         zone_info = KNOWN_DISTRICT_ZONES.get(zone_id, {"population": 1000, "name": zone_id})
         last_seen = self._zone_latest_report.get(zone_id)
-        telecom_state = self._zone_telecom_status.get(zone_id, TelecomStatus.LIVE)
+        telecom_state = self._zone_telecom_status.get(zone_id, "LIVE")
 
         silence_minutes = 0.0
         if last_seen:
@@ -56,7 +56,7 @@ class ZoneActivityTracker:
             silence_minutes = 120.0 # Initial baseline silence
 
         is_dark = (
-            telecom_state == TelecomStatus.DARK or
+            telecom_state == "DARK" or
             silence_minutes >= settings.DARK_ZONE_SILENCE_MINUTES
         )
 
@@ -64,7 +64,9 @@ class ZoneActivityTracker:
             "zone_id": zone_id,
             "zone_name": zone_info.get("name"),
             "population": zone_info.get("population", 1000),
-            "telecom_status": telecom_state.value,
+            "centroid": zone_info.get("centroid"),
+            "radius_km": zone_info.get("radius_km", 1.0),
+            "telecom_status": telecom_state,
             "last_report_at": last_seen.isoformat() if last_seen else None,
             "silence_duration_minutes": round(silence_minutes, 1),
             "is_dark": is_dark,
@@ -84,7 +86,7 @@ zone_tracker = ZoneActivityTracker()
 
 class LocationResolver:
     """
-    Resolves raw location strings and GPS coordinates into structured LocationInfo.
+    Resolves raw location strings and GPS coordinates into structured Location.
     Adheres strictly to the rule: Vague descriptions must not be turned into fake precise pins.
     """
     @staticmethod
@@ -95,7 +97,7 @@ class LocationResolver:
         lng: Optional[float] = None,
     ) -> Tuple[LocationInfo, str]:
         """
-        Returns (LocationInfo, zone_id).
+        Returns (Location, zone_id).
         """
         # Case 1: Exact GPS coordinates supplied directly
         if lat is not None and lng is not None:

@@ -1,0 +1,110 @@
+[
+  {
+    "id": "SAATHI-001",
+    "name": "Arjun Kumar",
+    "ward": "LOC_000",
+    "role_level": 1,
+    "completed_modules": ["Basic First Aid", "Flood Reporting"],
+    "permitted_actions": ["report_flooding", "report_road_closure"],
+    "not_permitted": ["medical_triage", "evacuation_coordination"]
+  },
+  {
+    "id": "SAATHI-002",
+    "name": "Priya Sharma",
+    "ward": "LOC_001",
+    "role_level": 2,
+    "completed_modules": ["Basic First Aid", "Community Mobilization", "Shelter Management"],
+    "permitted_actions": ["report_flooding", "report_shelter_status", "distribute_supplies"],
+    "not_permitted": ["medical_triage"]
+  },
+  {
+    "id": "SAATHI-003",
+    "name": "Rahul Singh",
+    "ward": "LOC_002",
+    "role_level": 3,
+    "completed_modules": ["Advanced First Aid", "Search and Rescue Basics", "Incident Command"],
+    "permitted_actions": ["report_all", "medical_triage", "evacuation_coordination"],
+    "not_permitted": ["structural_assessment"]
+  },
+  {
+    "id": "SAATHI-004",
+    "name": "Neha Gupta",
+    "ward": "LOC_003",
+    "role_level": 1,
+    "completed_modules": ["Basic First Aid"],
+    "permitted_actions": ["report_flooding"],
+    "not_permitted": ["medical_triage", "evacuation_coordination"]
+  },
+  {
+    "id": "SAATHI-005",
+    "name": "Vikram Patel",
+    "ward": "LOC_004",
+    "role_level": 4,
+    "completed_modules": ["All Modules", "Master Trainer Certification"],
+    "permitted_actions": ["all_actions", "certify_volunteers", "structural_assessment"],
+    "not_permitted": []
+  },
+  {
+    "id": "SAATHI-006",
+    "name": "Ananya Desai",
+    "ward": "LOC_005",
+    "role_level": 2,
+    "completed_modules": ["Basic First Aid", "Logistics"],
+    "permitted_actions": ["report_flooding", "distribute_supplies", "inventory_management"],
+    "not_permitted": ["medical_triage"]
+  },
+  {
+    "id": "SAATHI-007",
+    "name": "Sanjay Verma",
+    "ward": "LOC_000",
+    "role_level": 1,
+    "completed_modules": ["Flood Reporting"],
+    "permitted_actions": ["report_flooding"],
+    "not_permitted": ["medical_triage", "first_aid"]
+  },
+  {
+    "id": "SAATHI-008",
+    "name": "Kavita Reddy",
+    "ward": "LOC_001",
+    "role_level": 3,
+    "completed_modules": ["Advanced First Aid", "Crisis Communication"],
+    "permitted_actions": ["report_all", "medical_triage", "public_announcements"],
+    "not_permitted": ["evacuation_coordination"]
+  },
+  {
+    "id": "SAATHI-009",
+    "name": "Rohan Mishra",
+    "ward": "LOC_002",
+    "role_level": 1,
+    "completed_modules": ["Basic First Aid"],
+    "permitted_actions": ["report_flooding", "basic_first_aid"],
+    "not_permitted": ["medical_triage", "shelter_management"]
+  },
+  {
+    "id": "SAATHI-010",
+    "name": "Meera Joshi",
+    "ward": "LOC_003",
+    "role_level": 2,
+    "completed_modules": ["Basic First Aid", "Shelter Management"],
+    "permitted_actions": ["report_shelter_status", "manage_shelter_inventory"],
+    "not_permitted": ["search_and_rescue"]
+  },
+  {
+    "id": "SAATHI-011",
+    "name": "Amit Kapoor",
+    "ward": "LOC_004",
+    "role_level": 1,
+    "completed_modules": ["Flood Reporting"],
+    "permitted_actions": ["report_flooding"],
+    "not_permitted": ["all_other_actions"]
+  },
+  {
+    "id": "SAATHI-012",
+    "name": "Sonia Rao",
+    "ward": "LOC_005",
+    "role_level": 3,
+    "completed_modules": ["Search and Rescue Basics", "Advanced First Aid"],
+    "permitted_actions": ["report_all", "medical_triage", "assist_search_and_rescue"],
+    "not_permitted": ["lead_search_and_rescue"]
+  }
+]

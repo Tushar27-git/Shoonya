@@ -8,10 +8,10 @@ CHANNEL_WEIGHTS: Dict[SourceChannel, float] = {
     SourceChannel.RADIO: 1.0,
     SourceChannel.SATELLITE: 1.0,
     SourceChannel.DRONE: 0.9,
-    SourceChannel.VOICE: 0.8,
     SourceChannel.SMS: 0.8,
-    SourceChannel.WEB: 0.7,
+    SourceChannel.VOICE: 0.8,
     SourceChannel.SOCIAL: 0.5,
+    SourceChannel.WEB: 0.5,
 }
 
 class SeverityCalculator:
@@ -28,8 +28,7 @@ class SeverityCalculator:
         total_weight = 0.0
         for r in reports:
             base_w = CHANNEL_WEIGHTS.get(r.source_channel, 0.7)
-            # Modulate by source trust score if present
-            trust_factor = 0.5 + (0.5 * r.trust_score)
+            trust_factor = getattr(r, 'trust_score', 1.0)
             total_weight += (base_w * trust_factor)
 
         # Mandatory log10 dampening factor

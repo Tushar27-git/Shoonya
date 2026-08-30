@@ -14,7 +14,7 @@ export const ZeroGauge: React.FC<ZeroGaugeProps> = ({
   showLabel = true,
 }) => {
   const clampedScore = Math.max(0, Math.min(1, score));
-  const pct = Math.round(clampedScore * 100);
+  // pct removed
 
   // Determine active tier color
   let activeColor = "var(--dark-zone-grey)";
@@ -31,61 +31,71 @@ export const ZeroGauge: React.FC<ZeroGaugeProps> = ({
     tierLabel = "MODERATE";
   }
 
-  const heightMap = {
-    sm: "4px",
-    md: "6px",
-    lg: "10px",
-  };
+  const radiusMap = { sm: 12, md: 20, lg: 32 };
+  const strokeMap = { sm: 3, md: 4, lg: 5 };
+  
+  const r = radiusMap[size];
+  const strokeWidth = strokeMap[size];
+  const cx = r + strokeWidth;
+  const cy = r + strokeWidth;
+  const svgSize = (r + strokeWidth) * 2;
+  
+  const circumference = 2 * Math.PI * r;
+  const strokeDashoffset = circumference - (clampedScore * circumference);
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "3px", width: "100%" }}>
+    <div style={{ display: "flex", flexDirection: "column", gap: "6px", alignItems: "center" }} data-testid="zero-gauge">
+      <svg width={svgSize} height={svgSize} viewBox={`0 0 ${svgSize} ${svgSize}`} style={{ transform: "rotate(-90deg)" }}>
+        {/* Background Track */}
+        <circle
+          cx={cx}
+          cy={cy}
+          r={r}
+          fill="none"
+          stroke="var(--grid-line)"
+          strokeWidth={strokeWidth}
+        />
+        
+        {/* Fill Track */}
+        <circle
+          cx={cx}
+          cy={cy}
+          r={r}
+          fill="none"
+          stroke={activeColor}
+          strokeWidth={strokeWidth}
+          strokeDasharray={circumference}
+          strokeDashoffset={strokeDashoffset}
+          strokeLinecap="butt"
+          style={{ transition: "stroke-dashoffset 0.5s ease-in-out" }}
+          data-testid="gauge-fill"
+        />
+        
+        {/* Hatched pattern representation using a secondary SVG overlay for disputed state */}
+        {isDisputed && (
+           <circle
+             cx={cx}
+             cy={cy}
+             r={r}
+             fill="none"
+             stroke="var(--void)"
+             strokeWidth={strokeWidth}
+             strokeDasharray="2 4"
+             style={{ opacity: 0.5 }}
+           />
+        )}
+      </svg>
+      
       {showLabel && (
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: "10px" }} className="mono">
-          <span style={{ color: "var(--ink-dim)", letterSpacing: "0.5px" }}>
-            ZERO GAUGE // {tierLabel}
-          </span>
-          <span style={{ color: activeColor, fontWeight: 600 }}>
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", fontSize: "10px" }} className="mono">
+          <span style={{ color: activeColor, fontWeight: 600, fontSize: size === 'lg' ? '14px' : '11px' }} data-testid="gauge-score">
             {(clampedScore).toFixed(2)}
+          </span>
+          <span style={{ color: "var(--ink-dim)", letterSpacing: "0.5px" }}>
+            {tierLabel}
           </span>
         </div>
       )}
-      
-      <div
-        style={{
-          width: "100%",
-          height: heightMap[size],
-          backgroundColor: "var(--void)",
-          border: "1px solid var(--grid-line)",
-          borderRadius: "1px",
-          overflow: "hidden",
-          position: "relative",
-          display: "flex",
-        }}
-      >
-        <div
-          style={{
-            width: `${pct}%`,
-            height: "100%",
-            backgroundColor: activeColor,
-            transition: "width 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
-            boxShadow: clampedScore >= 0.75 ? "0 0 6px rgba(79, 216, 196, 0.4)" : "none",
-          }}
-        />
-        {/* Disputed hatched overlay */}
-        {isDisputed && (
-          <div
-            className="hatched-amber"
-            style={{
-              position: "absolute",
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              pointerEvents: "none",
-            }}
-          />
-        )}
-      </div>
     </div>
   );
 };

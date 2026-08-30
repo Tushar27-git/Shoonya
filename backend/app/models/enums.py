@@ -47,6 +47,7 @@ class HazardType(str, Enum):
     LANDSLIDE = "LANDSLIDE"
     ELECTRICAL_FAULT = "ELECTRICAL_FAULT"
     MEDICAL_EMERGENCY = "MEDICAL_EMERGENCY"
+    SHELTER_UTILITY_FAILURE = "SHELTER_UTILITY_FAILURE"
     OTHER = "OTHER"
 
 class VenueType(str, Enum):
@@ -133,7 +134,16 @@ class AuditActionType(str, Enum):
     REVERSE_SOS_SENT = "REVERSE_SOS_SENT"
     STATUS_CHANGED = "STATUS_CHANGED"
     VENUE_UPDATED = "VENUE_UPDATED"
+    TASK_ACCEPTED = "TASK_ACCEPTED"
+    TASK_COMPLETED = "TASK_COMPLETED"
+    AMPLIFY_APPROVED = "AMPLIFY_APPROVED"
 
+class SignalType(str, Enum):
+    SOS = "SOS"
+    NEED = "NEED"
+    UPDATE = "UPDATE"
+    VAGUE = "VAGUE"
+    RUMOUR = "RUMOUR"
 
 class TelecomStatus(str, Enum):
     LIVE = "LIVE"

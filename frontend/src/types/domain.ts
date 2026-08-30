@@ -226,4 +226,14 @@ export interface SitrepResponse {
   };
 }
 
-
+export interface NeedCard {
+  incident_id: string;
+  location: [number, number];
+  location_general?: string;
+  affected_population: number;
+  needed_items: string[];
+  access_note: string;
+  last_verified: string;
+  status_label: string;
+  recommended_partners: string[];
+}

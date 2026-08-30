@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { MessageSquare, Send, FileText, AlertTriangle, X } from "lucide-react";
 import type { CopilotMessageResponse, SitrepResponse } from "../types/domain";
 
+const API_BASE = "http://127.0.0.1:8000";
+
 interface CopilotModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -42,7 +44,7 @@ export const CopilotModal: React.FC<CopilotModalProps> = ({
     setIsLoading(true);
 
     try {
-      const res = await fetch("http://127.0.0.1:8001/copilot/query", {
+      const res = await fetch(`${API_BASE}/copilot/query`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -80,7 +82,7 @@ export const CopilotModal: React.FC<CopilotModalProps> = ({
   const handleFetchSitrep = async () => {
     setIsLoading(true);
     try {
-      const res = await fetch("http://127.0.0.1:8001/copilot/sitrep");
+      const res = await fetch(`${API_BASE}/copilot/sitrep`);
       if (!res.ok) throw new Error(`HTTP Error ${res.status}`);
       const data: SitrepResponse = await res.json();
       setMessages((prev) => [

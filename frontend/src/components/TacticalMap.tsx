@@ -6,15 +6,23 @@ import type { Incident, Resource } from "../types/domain";
 interface TacticalMapProps {
   incidents: Incident[];
   resources: Resource[];
+  darkZones?: any[];
+  roadDisputes?: any[];
+  shelters?: any[];
   selectedIncidentId: string | null;
   onSelectIncident: (id: string) => void;
+  mapCenter?: [number, number];
 }
 
 export const TacticalMap: React.FC<TacticalMapProps> = ({
   incidents,
   resources,
+  darkZones = [],
+  roadDisputes = [],
+  shelters = [],
   selectedIncidentId,
   onSelectIncident,
+  mapCenter,
 }) => {
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<L.Map | null>(null);
@@ -65,48 +73,43 @@ export const TacticalMap: React.FC<TacticalMapProps> = ({
     const layerGroup = layerGroupRef.current;
     layerGroup.clearLayers();
 
-    // 1. Render Dark Zone (Ward 09) hatched polygon with NO DATA overlay
-    const darkZonePolygon = L.polygon(
-      [
-        [26.860, 80.955],
-        [26.875, 80.958],
-        [26.872, 80.975],
-        [26.858, 80.970],
-      ],
-      {
-        color: "#5A6472",
-        weight: 1.5,
-        dashArray: "4, 4",
-        fillColor: "#1E232B",
-        fillOpacity: 0.8,
+    // 1. Render Dark Zones dynamically
+    darkZones.forEach(dz => {
+      if (dz.centroid && dz.centroid.length === 2) {
+        // Draw a circle for the dark zone instead of a hardcoded polygon
+        const circle = L.circle(dz.centroid, {
+          radius: (dz.radius_km || 1) * 1000,
+          color: "#5A6472",
+          weight: 1.5,
+          dashArray: "4, 4",
+          fillColor: "#1E232B",
+          fillOpacity: 0.8,
+        });
+        circle.bindTooltip(
+          `<div style='font-family:monospace;font-size:10px;background:#141920;color:#8A93A0;padding:4px;border:1px solid #5A6472;'><strong>${dz.zone_id} // SILENT ZONE</strong><br/><span style='color:#D6553C;'>NO DATA — UNKNOWN STATUS</span><br/>Telecom: ${dz.telecom_status} | Pop: ${dz.population}</div>`,
+          { permanent: true, direction: "center", className: "dark-zone-tooltip" }
+        );
+        layerGroup.addLayer(circle);
       }
-    );
-    darkZonePolygon.bindTooltip(
-      "<div style='font-family:monospace;font-size:10px;background:#141920;color:#8A93A0;padding:4px;border:1px solid #5A6472;'><strong>WARD 09 // SILENT ZONE</strong><br/><span style='color:#D6553C;'>NO DATA — UNKNOWN STATUS</span><br/>Telecom: DARK | Pop: 8,600</div>",
-      { permanent: true, direction: "center", className: "dark-zone-tooltip" }
-    );
-    layerGroup.addLayer(darkZonePolygon);
+    });
 
-    // 2. Render Road Segments
-    const openRoad = L.polyline(
-      [
-        [26.840, 80.930],
-        [26.851, 80.949],
-      ],
-      { color: "#4FD8C4", weight: 3, opacity: 0.7 }
-    );
-    openRoad.bindTooltip("Main Arterial Road // OPEN", { sticky: true });
-    layerGroup.addLayer(openRoad);
-
-    const floodedRoad = L.polyline(
-      [
-        [26.851, 80.949],
-        [26.865, 80.960],
-      ],
-      { color: "#D6553C", weight: 3.5, dashArray: "6, 6", opacity: 0.85 }
-    );
-    floodedRoad.bindTooltip("<span style='color:#D6553C;'>Station Approach Road // FLOODED / IMPASSABLE</span>", { sticky: true });
-    layerGroup.addLayer(floodedRoad);
+    // 2. Render Shelters
+    shelters.forEach(s => {
+      if (s.location?.lat && s.location?.lng) {
+        const smarker = L.circleMarker([s.location.lat, s.location.lng], {
+          radius: 10,
+          color: "#2B5876",
+          weight: 2,
+          fillColor: "#4E4376",
+          fillOpacity: 0.7,
+        });
+        smarker.bindTooltip(
+          `<div style='font-family:monospace;font-size:10px;background:#141920;color:#8A93A0;padding:4px;border:1px solid #2B5876;'><strong>${s.name}</strong><br/>Occupancy: ${s.current_occupancy}/${s.capacity}</div>`,
+          { sticky: true }
+        );
+        layerGroup.addLayer(smarker);
+      }
+    });
 
     // 3. Render Incidents
     incidents.forEach((inc) => {
@@ -180,7 +183,14 @@ export const TacticalMap: React.FC<TacticalMapProps> = ({
       );
       layerGroup.addLayer(resMarker);
     });
-  }, [incidents, resources, selectedIncidentId, onSelectIncident]);
+  }, [incidents, resources, darkZones, roadDisputes, shelters, selectedIncidentId, onSelectIncident]);
+
+  // Update map center dynamically
+  useEffect(() => {
+    if (mapInstanceRef.current && mapCenter) {
+      mapInstanceRef.current.flyTo(mapCenter, 14, { duration: 1.5 });
+    }
+  }, [mapCenter]);
 
   return (
     <div style={{ position: "relative", width: "100%", height: "100%", overflow: "hidden" }}>

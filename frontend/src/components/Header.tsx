@@ -51,7 +51,7 @@ export const Header: React.FC<HeaderProps> = ({
             borderRadius: "2px",
           }}
         >
-          SECTOR 4 // RAIPUR EAST COMMAND
+          SECTOR 4 // LUCKNOW COMMAND
         </div>
       </div>
 
@@ -60,37 +60,37 @@ export const Header: React.FC<HeaderProps> = ({
         <div style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "11px" }}>
           <Radio size={13} color="var(--signal-cyan)" />
           <span style={{ color: "var(--ink-dim)" }}>QUEUE:</span>
-          <span style={{ color: "var(--ink)", fontWeight: 600 }}>{telemetry.queue_depth}</span>
+          <span style={{ color: "var(--ink)", fontWeight: 600 }}>{telemetry?.queue_depth ?? 0}</span>
         </div>
 
         <div style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "11px" }}>
           <Activity size={13} color="var(--critical-ember)" />
           <span style={{ color: "var(--ink-dim)" }}>ACTIVE INCIDENTS:</span>
-          <span style={{ color: "var(--critical-ember)", fontWeight: 700 }}>{telemetry.active_incidents}</span>
+          <span style={{ color: "var(--critical-ember)", fontWeight: 700 }}>{telemetry?.active_incidents ?? 0}</span>
         </div>
 
         <div style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "11px" }}>
           <ShieldAlert size={13} color="var(--dispute-amber)" />
           <span style={{ color: "var(--ink-dim)" }}>DISPUTES:</span>
-          <span style={{ color: "var(--dispute-amber)", fontWeight: 600 }}>{telemetry.disputed_incidents}</span>
+          <span style={{ color: "var(--dispute-amber)", fontWeight: 600 }}>{telemetry?.disputed_incidents ?? 0}</span>
         </div>
 
         <div style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "11px" }}>
           <span style={{ width: "8px", height: "8px", borderRadius: "50%", backgroundColor: "var(--dark-zone-grey)" }} />
           <span style={{ color: "var(--ink-dim)" }}>DARK ZONES:</span>
-          <span style={{ color: "var(--ink)", fontWeight: 600 }}>{telemetry.dark_zones}</span>
+          <span style={{ color: "var(--ink)", fontWeight: 600 }}>{telemetry?.dark_zones ?? 0}</span>
         </div>
 
         <div style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "11px" }}>
           <Cpu size={13} color="var(--ink-dim)" />
-          <span style={{ color: "var(--ink-dim)" }}>SOLVER:</span>
-          <span style={{ color: "var(--signal-cyan)", fontWeight: 600 }}>{telemetry.solver_status}</span>
+          <span style={{ color: "var(--ink-dim)" }}>ADVISORY SOLVER:</span>
+          <span style={{ color: "var(--signal-cyan)", fontWeight: 600 }}>{telemetry?.solver_status}</span>
         </div>
 
-        <div style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "11px" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
           <Clock size={13} color="var(--ink-dim)" />
           <span style={{ color: "var(--ink-dim)" }}>LATENCY:</span>
-          <span style={{ color: "var(--ink)", fontWeight: 600 }}>{telemetry.ingestion_to_map_latency_sec.toFixed(2)}s</span>
+          <span style={{ color: "var(--signal-cyan)", fontWeight: 600 }}>{telemetry?.ingestion_to_map_latency_sec?.toFixed(2) ?? "0.00"}s</span>
         </div>
       </div>
 
@@ -122,7 +122,7 @@ export const Header: React.FC<HeaderProps> = ({
               boxShadow: "0 0 6px var(--signal-cyan)",
             }}
           />
-          COPILOT AI // शून्य
+          AI ADVISORY / HUMAN CONTROL
         </button>
 
         <button
@@ -151,7 +151,7 @@ export const Header: React.FC<HeaderProps> = ({
               boxShadow: isLive ? "0 0 6px var(--signal-cyan)" : "none",
             }}
           />
-          {isLive ? "LIVE TELEMETRY" : "REPLAY PAUSED"}
+          {isLive ? "SIMULATION STREAM" : "REPLAY PAUSED"}
         </button>
       </div>
     </header>

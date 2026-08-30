@@ -197,7 +197,11 @@ class ClusteringEngine:
         self._incidents[incident.incident_id] = incident
         return incident
 
+    def reset(self):
+        """Clears all in-memory incidents and reports for simulation reset."""
+        self._incidents.clear()
+        self._report_to_incident.clear()
+        self._raw_reports.clear()
+
 clustering_engine = ClusteringEngine()
 cluster_engine = clustering_engine
-
-

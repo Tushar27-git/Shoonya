@@ -98,7 +98,7 @@ export const OperationalConsole: React.FC<OperationalConsoleProps> = ({
           };
 
       const endpoint = selectedIncident ? "/notifications/reverse-sos" : "/notifications/broadcast";
-      const res = await fetch(`http://127.0.0.1:8001${endpoint}`, {
+      const res = await fetch(`http://127.0.0.1:8000${endpoint}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),

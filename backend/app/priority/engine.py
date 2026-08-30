@@ -1,169 +1,116 @@
 import math
-from typing import List, Optional, Dict, Any
-from datetime import datetime, timezone
-from ..models.domain import Incident, PriorityFactors
-from ..models.enums import VulnerabilityTag, MicroEnvironmentTag, HazardType
-from ..config import settings
+from typing import Dict, Any
 
 class PriorityEngine:
-    """
-    Implements the load-bearing SHOONYA Priority System:
-    1. Base Urgency: U_i = w1*S_i + w2*V_i + w3*log(1+N_i) + w4*R_i + w5*A_i
-    2. Confidence Modifier: M(c_i) = c_min + (1 - c_min)*c_i (with c_min = 0.4)
-    3. Final Priority: P_i = U_i * M(c_i)
-    """
-    @staticmethod
-    def compute_severity_term(incident: Incident) -> float:
-        """S_i: Severity factor [0.0, 1.0]."""
-        score = 0.4
+    def __init__(
+        self,
+        w_severity: float = 0.35,
+        w_vulnerability: float = 0.25,
+        w_victims: float = 0.20,
+        w_recency: float = 0.10,
+        w_accessibility: float = 0.10,
+        c_min: float = 0.40
+    ):
+        self.w1 = w_severity
+        self.w2 = w_vulnerability
+        self.w3 = w_victims
+        self.w4 = w_recency
+        self.w5 = w_accessibility
+        self.c_min = c_min
 
-        if incident.category == HazardType.BUILDING_COLLAPSE:
-            score += 0.35
-        elif incident.category == HazardType.BRIDGE_FAILURE:
-            score += 0.30
-        elif incident.category == HazardType.FLOOD:
-            score += 0.20
-
-        if incident.micro_environment == MicroEnvironmentTag.CRUSH_INJURY:
-            score += 0.35
-        elif incident.micro_environment == MicroEnvironmentTag.DROWNING_RISK:
-            score += 0.30
-        elif incident.micro_environment == MicroEnvironmentTag.ROOFTOP_STRANDED:
-            score += 0.20
-        elif incident.micro_environment == MicroEnvironmentTag.DEBRIS_TRAPPED:
-            score += 0.25
-
-        return min(1.0, score)
-
-    @staticmethod
-    def compute_vulnerability_term(incident: Incident) -> float:
-        """V_i: Vulnerability factor [0.0, 1.0]."""
-        if not incident.vulnerability_tags:
-            return 0.0
-
-        score = 0.0
-        for tag in incident.vulnerability_tags:
-            if tag in [VulnerabilityTag.CHILDREN, VulnerabilityTag.PREGNANT]:
-                score += 0.40
-            elif tag in [VulnerabilityTag.INJURED, VulnerabilityTag.DISABLED]:
-                score += 0.35
-            elif tag == VulnerabilityTag.ELDERLY:
-                score += 0.25
-
-        return min(1.0, score)
-
-    @staticmethod
-    def compute_victim_count_term(incident: Incident) -> float:
-        """log(1 + N_i) victim count term."""
-        n_i = incident.victim_estimate.best_guess or incident.victim_estimate.max_victims or 0
-        return math.log(1.0 + float(n_i))
-
-    @staticmethod
-    def compute_recency_term(incident: Incident, current_time: Optional[datetime] = None) -> float:
-        """R_i: Recency factor [0.0, 1.0]."""
-        now = current_time or datetime.now(timezone.utc)
-        age_minutes = max(0.0, (now - incident.updated_at).total_seconds() / 60.0)
-
-        if age_minutes <= 15.0:
-            return 1.0
-        elif age_minutes <= 60.0:
-            return 0.75
-        elif age_minutes <= 180.0:
-            return 0.45
-        else:
-            return 0.20
-
-    @staticmethod
-    def compute_accessibility_risk_term(incident: Incident) -> float:
-        """A_i: Accessibility risk factor [0.0, 1.0]."""
-        if incident.micro_environment == MicroEnvironmentTag.CUT_OFF_ACCESS:
-            return 0.90
-        elif incident.micro_environment == MicroEnvironmentTag.ROOFTOP_STRANDED:
-            return 0.75
-        else:
-            return 0.40
-
-    @staticmethod
-    def compute_confidence_modifier(confidence_score: float, c_min: Optional[float] = None) -> float:
-        """
-        M(c_i) = c_min + (1 - c_min) * c_i
-        Invariant: At c_i = 0, M(0) = c_min = 0.4.
-        """
-        c_floor = c_min if c_min is not None else settings.CONFIDENCE_MIN_FLOOR
-        clamped_c = max(0.0, min(1.0, confidence_score))
-        modifier = c_floor + ((1.0 - c_floor) * clamped_c)
-        return round(modifier, 4)
-
-    @staticmethod
-    def evaluate_incident_priority(
-        incident: Incident,
-        override_weights: Optional[Dict[str, float]] = None,
-        current_time: Optional[datetime] = None
-    ) -> Incident:
-        now = current_time or datetime.now(timezone.utc)
-        weights = override_weights or {}
-
-        w1 = weights.get("w1", settings.WEIGHT_SEVERITY)
-        w2 = weights.get("w2", settings.WEIGHT_VULNERABILITY)
-        w3 = weights.get("w3", settings.WEIGHT_VICTIM_COUNT)
-        w4 = weights.get("w4", settings.WEIGHT_RECENCY)
-        w5 = weights.get("w5", settings.WEIGHT_ACCESSIBILITY)
-
-        s_i = PriorityEngine.compute_severity_term(incident)
-        v_i = PriorityEngine.compute_vulnerability_term(incident)
-        n_term = PriorityEngine.compute_victim_count_term(incident)
-        r_i = PriorityEngine.compute_recency_term(incident, now)
-        a_i = PriorityEngine.compute_accessibility_risk_term(incident)
-
-        # Base Urgency: U_i = w1*S_i + w2*V_i + w3*log(1+N_i) + w4*R_i + w5*A_i
-        base_urgency = (w1 * s_i) + (w2 * v_i) + (w3 * n_term) + (w4 * r_i) + (w5 * a_i)
-
-        # Confidence Modifier: M(c_i) = c_min + (1 - c_min)*c_i
-        m_c = PriorityEngine.compute_confidence_modifier(incident.confidence_score)
-
-        # Final Priority: P_i = U_i * M(c_i)
-        final_priority = base_urgency * m_c
-
-        incident.urgency_score = round(base_urgency, 4)
-        incident.priority_score = round(final_priority, 4)
-        incident.confidence_floor = settings.CONFIDENCE_MIN_FLOOR
-        incident.priority_factors = PriorityFactors(
-            severity_score=round(s_i, 3),
-            vulnerability_score=round(v_i, 3),
-            victim_count_term=round(n_term, 3),
-            recency_score=round(r_i, 3),
-            accessibility_risk_score=round(a_i, 3),
-            base_urgency=round(base_urgency, 4),
-            confidence_modifier=round(m_c, 4),
-            final_priority=round(final_priority, 4)
+    def compute_base_urgency(
+        self,
+        severity: float,
+        vulnerability: float,
+        victim_count: int,
+        recency: float,
+        accessibility_risk: float
+    ) -> float:
+        v_log = math.log10(victim_count + 1)
+        return (
+            (self.w1 * severity)
+            + (self.w2 * vulnerability)
+            + (self.w3 * v_log)
+            + (self.w4 * recency)
+            + (self.w5 * accessibility_risk)
         )
-        incident.updated_at = now
-        return incident
 
-    @staticmethod
-    def rank_incidents(
-        incidents: List[Incident],
-        override_weights: Optional[Dict[str, float]] = None,
-        current_time: Optional[datetime] = None
-    ) -> List[Incident]:
-        """Evaluates and ranks all incidents in descending order of final priority."""
-        evaluated = [
-            PriorityEngine.evaluate_incident_priority(inc, override_weights, current_time)
-            for inc in incidents
-        ]
-        return sorted(evaluated, key=lambda x: x.priority_score, reverse=True)
+    def confidence_modifier(self, confidence: float) -> float:
+        return self.c_min + (1.0 - self.c_min) * confidence
 
-    @staticmethod
+    def compute_priority(
+        self,
+        severity: float,
+        vulnerability: float,
+        victim_count: int,
+        recency: float,
+        accessibility_risk: float,
+        confidence: float
+    ) -> float:
+        u_i = self.compute_base_urgency(severity, vulnerability, victim_count, recency, accessibility_risk)
+        m_ci = self.confidence_modifier(confidence)
+        return round(u_i * m_ci, 4)
 
-    def compute_base_urgency(s_i: float, v_i: float, n_victims: int, r_i: float, a_i: float) -> float:
-        w1 = settings.WEIGHT_SEVERITY
-        w2 = settings.WEIGHT_VULNERABILITY
-        w3 = settings.WEIGHT_VICTIM_COUNT
-        w4 = settings.WEIGHT_RECENCY
-        w5 = settings.WEIGHT_ACCESSIBILITY
-        n_term = math.log(1.0 + float(n_victims))
-        return (w1 * s_i) + (w2 * v_i) + (w3 * n_term) + (w4 * r_i) + (w5 * a_i)
+    def explain_priority(
+        self,
+        severity: float,
+        victim_count: int,
+        vulnerability: float,
+        accessibility_risk: float,
+        independent_source_count: int,
+        confidence: float,
+        priority: float
+    ) -> str:
+        return (
+            f"Assigned priority {priority} because: "
+            f"Severity evaluated at {severity}, with {victim_count} potential victims "
+            f"and vulnerability factor {vulnerability}. Road/Accessibility risk is {accessibility_risk}. "
+            f"Confirmed by {independent_source_count} independent sources (raw confidence {confidence} floored to {self.c_min})."
+        )
+
+    def rank_incidents(self, incidents: list, override_weights: dict = None) -> list:
+        # Use override weights if provided
+        old_w1, old_w2, old_w3, old_w4, old_w5 = self.w1, self.w2, self.w3, self.w4, self.w5
+        if override_weights:
+            self.w1 = override_weights.get("w1", self.w1)
+            self.w2 = override_weights.get("w2", self.w2)
+            self.w3 = override_weights.get("w3", self.w3)
+            self.w4 = override_weights.get("w4", self.w4)
+            self.w5 = override_weights.get("w5", self.w5)
+
+        for inc in incidents:
+            # We assume incident is a dict or object. Let's handle dict for simplicity in ranking tests
+            if isinstance(inc, dict):
+                sev = inc.get("severity", 0.0)
+                vuln = inc.get("vulnerability", 0.0)
+                vic = inc.get("victim_count", 0)
+                rec = inc.get("recency", 0.0)
+                acc = inc.get("accessibility_risk", 0.0)
+                conf = inc.get("confidence", 0.0)
+                indep_sources = inc.get("independent_source_count", 1)
+                
+                pri = self.compute_priority(sev, vuln, vic, rec, acc, conf)
+                inc["priority_score"] = pri
+                inc["priority_reason"] = self.explain_priority(sev, vic, vuln, acc, indep_sources, conf, pri)
+            else:
+                # Handle Incident object
+                sev = inc.severity
+                vuln = inc.vulnerability
+                vic = inc.victim_estimate.value if getattr(inc, "victim_estimate", None) else 0
+                rec = inc.recency
+                acc = inc.accessibility_risk
+                conf = inc.confidence_score
+                indep_sources = len(inc.evidence)
+                
+                pri = self.compute_priority(sev, vuln, vic, rec, acc, conf)
+                inc.priority_score = pri
+                inc.priority_reason = self.explain_priority(sev, vic, vuln, acc, indep_sources, conf, pri)
+
+        # Restore old weights
+        self.w1, self.w2, self.w3, self.w4, self.w5 = old_w1, old_w2, old_w3, old_w4, old_w5
+
+        if incidents and isinstance(incidents[0], dict):
+            return sorted(incidents, key=lambda x: x["priority_score"], reverse=True)
+        return sorted(incidents, key=lambda x: x.priority_score, reverse=True)
 
 priority_engine = PriorityEngine()
-PriorityCalculator = PriorityEngine
-

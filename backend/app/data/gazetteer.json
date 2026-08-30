@@ -1,0 +1,562 @@
+[
+  {
+    "id": "LOC_000",
+    "name": "Ward A",
+    "coordinates": {
+      "lat": 28.55608,
+      "lon": 77.28013
+    },
+    "population_density": 9154,
+    "road_segments": [
+      "RS_0_1",
+      "RS_0_2"
+    ],
+    "shelters": [
+      "SH_0_1"
+    ]
+  },
+  {
+    "id": "LOC_001",
+    "name": "Ward B",
+    "coordinates": {
+      "lat": 28.60489,
+      "lon": 77.3068
+    },
+    "population_density": 7272,
+    "road_segments": [
+      "RS_1_1",
+      "RS_1_2"
+    ],
+    "shelters": [
+      "SH_1_1"
+    ]
+  },
+  {
+    "id": "LOC_002",
+    "name": "Ward C",
+    "coordinates": {
+      "lat": 28.66423,
+      "lon": 77.18351
+    },
+    "population_density": 900,
+    "road_segments": [
+      "RS_2_1",
+      "RS_2_2"
+    ],
+    "shelters": [
+      "SH_2_1"
+    ]
+  },
+  {
+    "id": "LOC_003",
+    "name": "Ward D",
+    "coordinates": {
+      "lat": 28.61776,
+      "lon": 77.21748
+    },
+    "population_density": 5570,
+    "road_segments": [
+      "RS_3_1",
+      "RS_3_2"
+    ],
+    "shelters": [
+      "SH_3_1"
+    ]
+  },
+  {
+    "id": "LOC_004",
+    "name": "Ward E",
+    "coordinates": {
+      "lat": 28.61469,
+      "lon": 77.15024
+    },
+    "population_density": 5293,
+    "road_segments": [
+      "RS_4_1",
+      "RS_4_2"
+    ],
+    "shelters": [
+      "SH_4_1"
+    ]
+  },
+  {
+    "id": "LOC_005",
+    "name": "Village 1",
+    "coordinates": {
+      "lat": 28.64545,
+      "lon": 77.11319
+    },
+    "population_density": 8546,
+    "road_segments": [
+      "RS_5_1",
+      "RS_5_2"
+    ],
+    "shelters": [
+      "SH_5_1"
+    ]
+  },
+  {
+    "id": "LOC_006",
+    "name": "Village 2",
+    "coordinates": {
+      "lat": 28.57114,
+      "lon": 77.10912
+    },
+    "population_density": 7381,
+    "road_segments": [
+      "RS_6_1",
+      "RS_6_2"
+    ],
+    "shelters": [
+      "SH_6_1"
+    ]
+  },
+  {
+    "id": "LOC_007",
+    "name": "Village 3",
+    "coordinates": {
+      "lat": 28.70462,
+      "lon": 77.1401
+    },
+    "population_density": 223,
+    "road_segments": [
+      "RS_7_1",
+      "RS_7_2"
+    ],
+    "shelters": [
+      "SH_7_1"
+    ]
+  },
+  {
+    "id": "LOC_008",
+    "name": "Village 4",
+    "coordinates": {
+      "lat": 28.67718,
+      "lon": 77.25589
+    },
+    "population_density": 7486,
+    "road_segments": [
+      "RS_8_1",
+      "RS_8_2"
+    ],
+    "shelters": [
+      "SH_8_1"
+    ]
+  },
+  {
+    "id": "LOC_009",
+    "name": "Village 5",
+    "coordinates": {
+      "lat": 28.69393,
+      "lon": 77.19684
+    },
+    "population_density": 6356,
+    "road_segments": [
+      "RS_9_1",
+      "RS_9_2"
+    ],
+    "shelters": [
+      "SH_9_1"
+    ]
+  },
+  {
+    "id": "LOC_010",
+    "name": "Landmark Alpha",
+    "coordinates": {
+      "lat": 28.70157,
+      "lon": 77.22665
+    },
+    "population_density": 3822,
+    "road_segments": [
+      "RS_10_1",
+      "RS_10_2"
+    ],
+    "shelters": [
+      "SH_10_1"
+    ]
+  },
+  {
+    "id": "LOC_011",
+    "name": "Landmark Beta",
+    "coordinates": {
+      "lat": 28.60529,
+      "lon": 77.25764
+    },
+    "population_density": 1089,
+    "road_segments": [
+      "RS_11_1",
+      "RS_11_2"
+    ],
+    "shelters": [
+      "SH_11_1"
+    ]
+  },
+  {
+    "id": "LOC_012",
+    "name": "Landmark Gamma",
+    "coordinates": {
+      "lat": 28.5356,
+      "lon": 77.21101
+    },
+    "population_density": 6070,
+    "road_segments": [
+      "RS_12_1",
+      "RS_12_2"
+    ],
+    "shelters": [
+      "SH_12_1"
+    ]
+  },
+  {
+    "id": "LOC_013",
+    "name": "Landmark Delta",
+    "coordinates": {
+      "lat": 28.57872,
+      "lon": 77.14742
+    },
+    "population_density": 3698,
+    "road_segments": [
+      "RS_13_1",
+      "RS_13_2"
+    ],
+    "shelters": [
+      "SH_13_1"
+    ]
+  },
+  {
+    "id": "LOC_014",
+    "name": "Landmark Epsilon",
+    "coordinates": {
+      "lat": 28.54016,
+      "lon": 77.14224
+    },
+    "population_density": 4169,
+    "road_segments": [
+      "RS_14_1",
+      "RS_14_2"
+    ],
+    "shelters": [
+      "SH_14_1"
+    ]
+  },
+  {
+    "id": "LOC_015",
+    "name": "North District",
+    "coordinates": {
+      "lat": 28.56067,
+      "lon": 77.30498
+    },
+    "population_density": 5706,
+    "road_segments": [
+      "RS_15_1",
+      "RS_15_2"
+    ],
+    "shelters": [
+      "SH_15_1"
+    ]
+  },
+  {
+    "id": "LOC_016",
+    "name": "South District",
+    "coordinates": {
+      "lat": 28.56566,
+      "lon": 77.15225
+    },
+    "population_density": 3324,
+    "road_segments": [
+      "RS_16_1",
+      "RS_16_2"
+    ],
+    "shelters": [
+      "SH_16_1"
+    ]
+  },
+  {
+    "id": "LOC_017",
+    "name": "East District",
+    "coordinates": {
+      "lat": 28.59359,
+      "lon": 77.28243
+    },
+    "population_density": 307,
+    "road_segments": [
+      "RS_17_1",
+      "RS_17_2"
+    ],
+    "shelters": [
+      "SH_17_1"
+    ]
+  },
+  {
+    "id": "LOC_018",
+    "name": "West District",
+    "coordinates": {
+      "lat": 28.65275,
+      "lon": 77.18056
+    },
+    "population_density": 5167,
+    "road_segments": [
+      "RS_18_1",
+      "RS_18_2"
+    ],
+    "shelters": [
+      "SH_18_1"
+    ]
+  },
+  {
+    "id": "LOC_019",
+    "name": "Central District",
+    "coordinates": {
+      "lat": 28.6786,
+      "lon": 77.30656
+    },
+    "population_density": 9381,
+    "road_segments": [
+      "RS_19_1",
+      "RS_19_2"
+    ],
+    "shelters": [
+      "SH_19_1"
+    ]
+  },
+  {
+    "id": "LOC_020",
+    "name": "Hilltop Settlement",
+    "coordinates": {
+      "lat": 28.63536,
+      "lon": 77.24019
+    },
+    "population_density": 1426,
+    "road_segments": [
+      "RS_20_1",
+      "RS_20_2"
+    ],
+    "shelters": [
+      "SH_20_1"
+    ]
+  },
+  {
+    "id": "LOC_021",
+    "name": "Riverbed Area",
+    "coordinates": {
+      "lat": 28.60613,
+      "lon": 77.26856
+    },
+    "population_density": 5043,
+    "road_segments": [
+      "RS_21_1",
+      "RS_21_2"
+    ],
+    "shelters": [
+      "SH_21_1"
+    ]
+  },
+  {
+    "id": "LOC_022",
+    "name": "Downtown Hub",
+    "coordinates": {
+      "lat": 28.70513,
+      "lon": 77.29432
+    },
+    "population_density": 2746,
+    "road_segments": [
+      "RS_22_1",
+      "RS_22_2"
+    ],
+    "shelters": [
+      "SH_22_1"
+    ]
+  },
+  {
+    "id": "LOC_023",
+    "name": "Industrial Zone",
+    "coordinates": {
+      "lat": 28.65761,
+      "lon": 77.25419
+    },
+    "population_density": 4728,
+    "road_segments": [
+      "RS_23_1",
+      "RS_23_2"
+    ],
+    "shelters": [
+      "SH_23_1"
+    ]
+  },
+  {
+    "id": "LOC_024",
+    "name": "Suburban Sprawl",
+    "coordinates": {
+      "lat": 28.55819,
+      "lon": 77.16373
+    },
+    "population_density": 1932,
+    "road_segments": [
+      "RS_24_1",
+      "RS_24_2"
+    ],
+    "shelters": [
+      "SH_24_1"
+    ]
+  },
+  {
+    "id": "LOC_025",
+    "name": "Old Town",
+    "coordinates": {
+      "lat": 28.64631,
+      "lon": 77.22357
+    },
+    "population_density": 2615,
+    "road_segments": [
+      "RS_25_1",
+      "RS_25_2"
+    ],
+    "shelters": [
+      "SH_25_1"
+    ]
+  },
+  {
+    "id": "LOC_026",
+    "name": "New Town",
+    "coordinates": {
+      "lat": 28.6381,
+      "lon": 77.18179
+    },
+    "population_density": 6631,
+    "road_segments": [
+      "RS_26_1",
+      "RS_26_2"
+    ],
+    "shelters": [
+      "SH_26_1"
+    ]
+  },
+  {
+    "id": "LOC_027",
+    "name": "Coastal Ward",
+    "coordinates": {
+      "lat": 28.69248,
+      "lon": 77.16558
+    },
+    "population_density": 8047,
+    "road_segments": [
+      "RS_27_1",
+      "RS_27_2"
+    ],
+    "shelters": [
+      "SH_27_1"
+    ]
+  },
+  {
+    "id": "LOC_028",
+    "name": "Highland Village",
+    "coordinates": {
+      "lat": 28.52655,
+      "lon": 77.28218
+    },
+    "population_density": 6573,
+    "road_segments": [
+      "RS_28_1",
+      "RS_28_2"
+    ],
+    "shelters": [
+      "SH_28_1"
+    ]
+  },
+  {
+    "id": "LOC_029",
+    "name": "Valley Settlement",
+    "coordinates": {
+      "lat": 28.55127,
+      "lon": 77.23895
+    },
+    "population_density": 9262,
+    "road_segments": [
+      "RS_29_1",
+      "RS_29_2"
+    ],
+    "shelters": [
+      "SH_29_1"
+    ]
+  },
+  {
+    "id": "LOC_030",
+    "name": "Market Square",
+    "coordinates": {
+      "lat": 28.51834,
+      "lon": 77.28456
+    },
+    "population_density": 3431,
+    "road_segments": [
+      "RS_30_1",
+      "RS_30_2"
+    ],
+    "shelters": [
+      "SH_30_1"
+    ]
+  },
+  {
+    "id": "LOC_031",
+    "name": "Transport Hub",
+    "coordinates": {
+      "lat": 28.67784,
+      "lon": 77.27758
+    },
+    "population_density": 4452,
+    "road_segments": [
+      "RS_31_1",
+      "RS_31_2"
+    ],
+    "shelters": [
+      "SH_31_1"
+    ]
+  },
+  {
+    "id": "LOC_032",
+    "name": "University Campus",
+    "coordinates": {
+      "lat": 28.57029,
+      "lon": 77.1163
+    },
+    "population_density": 8611,
+    "road_segments": [
+      "RS_32_1",
+      "RS_32_2"
+    ],
+    "shelters": [
+      "SH_32_1"
+    ]
+  },
+  {
+    "id": "LOC_033",
+    "name": "Hospital Zone",
+    "coordinates": {
+      "lat": 28.71233,
+      "lon": 77.19219
+    },
+    "population_density": 9463,
+    "road_segments": [
+      "RS_33_1",
+      "RS_33_2"
+    ],
+    "shelters": [
+      "SH_33_1"
+    ]
+  },
+  {
+    "id": "LOC_034",
+    "name": "Residential Blocks",
+    "coordinates": {
+      "lat": 28.70683,
+      "lon": 77.19754
+    },
+    "population_density": 9010,
+    "road_segments": [
+      "RS_34_1",
+      "RS_34_2"
+    ],
+    "shelters": [
+      "SH_34_1"
+    ]
+  }
+]
