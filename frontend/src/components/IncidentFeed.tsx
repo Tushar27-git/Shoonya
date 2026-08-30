@@ -1,8 +1,7 @@
 import React, { useState } from "react";
 import type { Incident } from "../types/domain";
 import { ZeroGauge } from "./ZeroGauge";
-import { Users, ShieldAlert } from "lucide-react";
-
+import { Users, ShieldAlert, AlertCircle, Filter, Search } from "lucide-react";
 
 interface IncidentFeedProps {
   incidents: Incident[];
@@ -45,37 +44,56 @@ export const IncidentFeed: React.FC<IncidentFeedProps> = ({
       }}
     >
       {/* Header & Search */}
-      <div style={{ padding: "12px", borderBottom: "1px solid var(--grid-line)" }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "8px" }}>
-          <span style={{ fontSize: "11px", fontWeight: 700, color: "var(--ink-dim)", letterSpacing: "1px" }}>
-            INCIDENT TRIAGE QUEUE // {filteredIncidents.length}
-          </span>
-          <span className="mono" style={{ fontSize: "10px", color: "var(--signal-cyan)" }}>
+      <div style={{ padding: "14px 12px", borderBottom: "1px solid var(--grid-line)" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "10px" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+            <Filter size={13} color="var(--signal-cyan)" />
+            <span style={{ fontSize: "11px", fontWeight: 800, color: "var(--ink-bright)", letterSpacing: "0.5px" }} className="mono">
+              TRIAGE QUEUE
+            </span>
+            <span
+              className="mono"
+              style={{
+                fontSize: "10px",
+                padding: "1px 6px",
+                backgroundColor: "var(--void)",
+                border: "1px solid var(--grid-line)",
+                borderRadius: "10px",
+                color: "var(--signal-cyan)",
+                fontWeight: 700,
+              }}
+            >
+              {filteredIncidents.length}
+            </span>
+          </div>
+          <span className="mono" style={{ fontSize: "10px", color: "var(--ink-dim)" }}>
             ORDER: PRIORITY (P_i) ↓
           </span>
         </div>
 
-        <input
-          type="text"
-          placeholder="Filter ward, ID, or hazard..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className="mono"
-          style={{
-            width: "100%",
-            padding: "6px 8px",
-            backgroundColor: "var(--void)",
-            border: "1px solid var(--grid-line)",
-            color: "var(--ink)",
-            fontSize: "11px",
-            borderRadius: "2px",
-            outline: "none",
-            marginBottom: "8px",
-          }}
-        />
+        <div style={{ position: "relative", marginBottom: "10px" }}>
+          <Search size={12} color="var(--ink-muted)" style={{ position: "absolute", left: "9px", top: "8px" }} />
+          <input
+            type="text"
+            placeholder="Search ward, hazard, or ID..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="mono"
+            style={{
+              width: "100%",
+              padding: "6px 8px 6px 28px",
+              backgroundColor: "var(--void)",
+              border: "1px solid var(--grid-line)",
+              color: "var(--ink)",
+              fontSize: "11px",
+              borderRadius: "4px",
+              outline: "none",
+            }}
+          />
+        </div>
 
         {/* Filter Pills */}
-        <div style={{ display: "flex", gap: "4px" }}>
+        <div style={{ display: "flex", gap: "5px" }}>
           {[
             { id: "ALL", label: "ALL" },
             { id: "CRITICAL", label: "P > 1.0" },
@@ -88,14 +106,15 @@ export const IncidentFeed: React.FC<IncidentFeedProps> = ({
               className="mono"
               style={{
                 flex: 1,
-                padding: "3px 0",
+                padding: "4px 0",
                 fontSize: "10px",
-                fontWeight: 600,
-                backgroundColor: filter === tab.id ? "var(--grid-line-bright)" : "var(--void)",
-                color: filter === tab.id ? "var(--ink)" : "var(--ink-dim)",
-                border: "1px solid var(--grid-line)",
-                borderRadius: "2px",
+                fontWeight: filter === tab.id ? 700 : 600,
+                backgroundColor: filter === tab.id ? "var(--signal-cyan-glow)" : "var(--void)",
+                color: filter === tab.id ? "var(--signal-cyan)" : "var(--ink-dim)",
+                border: `1px solid ${filter === tab.id ? "var(--signal-cyan-border)" : "var(--grid-line)"}`,
+                borderRadius: "4px",
                 cursor: "pointer",
+                transition: "all 0.15s ease",
               }}
             >
               {tab.label}
@@ -105,9 +124,10 @@ export const IncidentFeed: React.FC<IncidentFeedProps> = ({
       </div>
 
       {/* Incident List */}
-      <div style={{ flex: 1, overflowY: "auto", padding: "8px", display: "flex", flexDirection: "column", gap: "6px" }}>
+      <div style={{ flex: 1, overflowY: "auto", padding: "10px", display: "flex", flexDirection: "column", gap: "8px" }}>
         {filteredIncidents.length === 0 ? (
-          <div style={{ textAlign: "center", padding: "30px 10px", color: "var(--ink-muted)" }} className="mono">
+          <div style={{ textAlign: "center", padding: "40px 10px", color: "var(--ink-muted)" }} className="mono">
+            <AlertCircle size={20} style={{ margin: "0 auto 8px", opacity: 0.5 }} />
             NO INCIDENTS MATCHING CRITERIA
           </div>
         ) : (
@@ -124,32 +144,33 @@ export const IncidentFeed: React.FC<IncidentFeedProps> = ({
                   border: isSelected
                     ? "1px solid var(--signal-cyan)"
                     : isCritical
-                    ? "1px solid rgba(214, 85, 60, 0.4)"
+                    ? "1px solid var(--critical-ember-border)"
                     : "1px solid var(--grid-line)",
-                  borderRadius: "2px",
-                  padding: "10px",
+                  borderRadius: "5px",
+                  padding: "11px",
                   cursor: "pointer",
                   display: "flex",
                   flexDirection: "column",
-                  gap: "6px",
+                  gap: "7px",
                   position: "relative",
-                  transition: "background-color 0.15s ease",
+                  boxShadow: isSelected ? "0 0 12px var(--signal-cyan-glow)" : "none",
+                  transition: "all 0.15s ease",
                 }}
               >
                 {/* Header row: ID, Ward, Priority Score */}
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
                   <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                    <span className="mono" style={{ fontSize: "11px", fontWeight: 700, color: "var(--ink)" }}>
+                    <span className="mono" style={{ fontSize: "11px", fontWeight: 800, color: "var(--ink-bright)" }}>
                       {inc.incident_id}
                     </span>
                     <span
                       className="mono"
                       style={{
                         fontSize: "9px",
-                        padding: "1px 4px",
+                        padding: "1px 5px",
                         backgroundColor: "var(--panel)",
                         border: "1px solid var(--grid-line)",
-                        borderRadius: "2px",
+                        borderRadius: "3px",
                         color: "var(--ink-dim)",
                       }}
                     >
@@ -163,8 +184,8 @@ export const IncidentFeed: React.FC<IncidentFeedProps> = ({
                     <span
                       style={{
                         fontSize: "12px",
-                        fontWeight: 700,
-                        color: isCritical ? "var(--critical-ember)" : "var(--ink)",
+                        fontWeight: 800,
+                        color: isCritical ? "var(--critical-ember)" : "var(--signal-cyan)",
                       }}
                     >
                       {inc.priority_score.toFixed(2)}
@@ -183,15 +204,15 @@ export const IncidentFeed: React.FC<IncidentFeedProps> = ({
                     className="mono"
                     style={{
                       fontSize: "9px",
-                      padding: "2px 5px",
-                      backgroundColor: "rgba(214, 85, 60, 0.15)",
+                      padding: "2px 6px",
+                      backgroundColor: "var(--critical-ember-glow)",
                       color: "var(--critical-ember)",
-                      border: "1px solid rgba(214, 85, 60, 0.3)",
-                      borderRadius: "2px",
-                      fontWeight: 600,
+                      border: "1px solid var(--critical-ember-border)",
+                      borderRadius: "3px",
+                      fontWeight: 700,
                     }}
                   >
-                    {inc.category}
+                    {inc.category.replace(/_/g, " ")}
                   </span>
 
                   {inc.micro_environment !== "NONE" && (
@@ -199,15 +220,15 @@ export const IncidentFeed: React.FC<IncidentFeedProps> = ({
                       className="mono"
                       style={{
                         fontSize: "9px",
-                        padding: "2px 5px",
-                        backgroundColor: "rgba(79, 216, 196, 0.12)",
+                        padding: "2px 6px",
+                        backgroundColor: "var(--signal-cyan-glow)",
                         color: "var(--signal-cyan)",
-                        border: "1px solid rgba(79, 216, 196, 0.3)",
-                        borderRadius: "2px",
-                        fontWeight: 600,
+                        border: "1px solid var(--signal-cyan-border)",
+                        borderRadius: "3px",
+                        fontWeight: 700,
                       }}
                     >
-                      {inc.micro_environment}
+                      {inc.micro_environment.replace(/_/g, " ")}
                     </span>
                   )}
 
@@ -216,9 +237,9 @@ export const IncidentFeed: React.FC<IncidentFeedProps> = ({
                       className="mono hatched-amber"
                       style={{
                         fontSize: "9px",
-                        padding: "2px 5px",
+                        padding: "2px 6px",
                         color: "var(--dispute-amber)",
-                        borderRadius: "2px",
+                        borderRadius: "3px",
                         fontWeight: 700,
                         display: "flex",
                         alignItems: "center",
@@ -236,7 +257,7 @@ export const IncidentFeed: React.FC<IncidentFeedProps> = ({
                     <Users size={11} color="var(--ink-dim)" />
                     <span>
                       VICTIMS:{" "}
-                      <strong style={{ color: "var(--ink)" }}>
+                      <strong style={{ color: "var(--ink-bright)" }}>
                         {inc.victim_estimate.min_victims === inc.victim_estimate.max_victims
                           ? inc.victim_estimate.best_guess
                           : `[${inc.victim_estimate.min_victims}..${inc.victim_estimate.max_victims}]`}
@@ -245,7 +266,7 @@ export const IncidentFeed: React.FC<IncidentFeedProps> = ({
                   </div>
 
                   {inc.vulnerability_tags.length > 0 && (
-                    <span style={{ color: "var(--critical-ember)" }}>
+                    <span style={{ color: "var(--critical-ember)", fontWeight: 600 }}>
                       +{inc.vulnerability_tags.length} VULN
                     </span>
                   )}

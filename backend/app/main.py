@@ -1,9 +1,11 @@
 import uuid
 from typing import List, Optional
 from datetime import datetime, timezone
+from contextlib import asynccontextmanager
 from fastapi import FastAPI, HTTPException, WebSocket, WebSocketDisconnect, Query, status
 from fastapi.middleware.cors import CORSMiddleware
 from .config import settings
+from .core.queue import queue
 from .models.enums import (
     IncidentStatus,
     LocationPrecision,
@@ -37,44 +39,197 @@ from .models.domain import (
     ReportIngestRequest,
     ReportIngestResponse,
     MergeReviewRequest,
-    DispatchPlanRequest,
-    AssignmentDetail,
-    DispatchPlanResponse,
     DispatchApproveRequest,
-    WhatIfRequest,
-    CopilotQueryRequest,
-    CopilotQueryResponse,
     SystemTelemetry,
 )
 
-from contextlib import asynccontextmanager
-from fastapi import FastAPI, HTTPException, WebSocket, WebSocketDisconnect, Query, status
-from fastapi.middleware.cors import CORSMiddleware
-from .config import settings
-from .core.queue import queue
 from .ingestion.router import router as ingestion_router
-from .ingestion.processor import LocationResolver, zone_tracker
+from .ingestion.processor import LocationResolver, zone_tracker, KNOWN_DISTRICT_ZONES
 from .nlp.router import router as nlp_router
 from .clustering.router import router as clustering_router
+from .clustering.engine import clustering_engine
 from .confidence.router import router as confidence_router
+from .confidence.dark_zone import dark_zone_evaluator
 from .priority.router import router as priority_router
-from .dispatch.router import router as dispatch_router
+from .dispatch.router import router as dispatch_router, active_resources
 from .audit.router import router as audit_router
 from .cv.router import router as cv_router
 from .simulation.router import router as simulation_router
+from .simulation.venues import venue_manager
 from .copilot.router import router as copilot_router
 from .notifications.router import router as notifications_router
+
+# In-Memory stores for API contract & fast access
+raw_reports_store: List[RawReport] = []
+incidents_store: List[Incident] = []
+venues_store: List[Venue] = []
+resources_store: List[Resource] = []
+audit_log_store: List[AuditRecord] = []
+
+def get_current_utc() -> datetime:
+    return datetime.now(timezone.utc)
+
+def seed_baseline_operational_data():
+    """Initializes high-fidelity baseline crisis data so the platform is operational immediately."""
+    now = get_current_utc()
+
+    # 1. Seed Active Zones (leave WARD-09 silent as dedicated Dark Zone)
+    for z_id in ["WARD-01", "WARD-02", "WARD-03", "WARD-04", "WARD-05", "WARD-06", "WARD-07", "WARD-08", "WARD-10"]:
+        zone_tracker.record_activity(z_id, now)
+
+    # 2. Seed Incidents if empty
+    if not clustering_engine.get_all_incidents():
+        baseline_incidents = [
+            Incident(
+                incident_id="INC-W07-01",
+                status=IncidentStatus.REPORTED,
+                location=LocationInfo(
+                    lat=26.8510,
+                    lng=80.9490,
+                    address="Govt Primary School, Ward 07 Basin",
+                    ward_id="WARD-07",
+                    precision=LocationPrecision.HIGH,
+                ),
+                zone_id="WARD-07",
+                category=HazardType.FLOOD,
+                micro_environment=MicroEnvironmentTag.ROOFTOP_STRANDED,
+                victim_estimate=VictimEstimate(
+                    min_victims=8,
+                    max_victims=12,
+                    best_guess=10,
+                    is_exact=False,
+                ),
+                vulnerability_tags=[VulnerabilityTag.CHILDREN],
+                priority_score=1.84,
+                urgency_score=0.95,
+                confidence_score=0.88,
+                confidence_floor=0.40,
+                dispute_flag=False,
+                evidence_summary=[
+                    "Flood water reached 2nd floor of Ward 07 Govt School. 8 children stranded on rooftop!",
+                    "School rooftop flooded, urgent boat rescue unit requested.",
+                    "Aerial drone survey confirms stranded individuals on rooftop.",
+                ],
+                constituent_report_ids=["REP-001", "REP-002", "REP-003"],
+                merge_review_state=MergeReviewState.AUTO_MERGED,
+            ),
+            Incident(
+                incident_id="INC-W04-02",
+                status=IncidentStatus.REPORTED,
+                location=LocationInfo(
+                    lat=26.8410,
+                    lng=80.9320,
+                    address="Old Market Complex, Ward 04",
+                    ward_id="WARD-04",
+                    precision=LocationPrecision.HIGH,
+                ),
+                zone_id="WARD-04",
+                category=HazardType.BUILDING_COLLAPSE,
+                micro_environment=MicroEnvironmentTag.DEBRIS_TRAPPED,
+                victim_estimate=VictimEstimate(
+                    min_victims=4,
+                    max_victims=14,
+                    best_guess=8,
+                    is_exact=False,
+                ),
+                vulnerability_tags=[VulnerabilityTag.INJURED],
+                priority_score=1.62,
+                urgency_score=0.90,
+                confidence_score=0.75,
+                confidence_floor=0.40,
+                dispute_flag=False,
+                evidence_summary=[
+                    "Old Market Complex 2-storey commercial building partially collapsed.",
+                    "Debris trapping ground floor shopkeepers, heavy excavator requested.",
+                ],
+                constituent_report_ids=["REP-004", "REP-005"],
+                merge_review_state=MergeReviewState.AUTO_MERGED,
+            ),
+            Incident(
+                incident_id="INC-W12-03",
+                status=IncidentStatus.REPORTED,
+                location=LocationInfo(
+                    lat=26.8320,
+                    lng=80.9200,
+                    address="Kalina Bridge Approach, Ward 12",
+                    ward_id="WARD-12",
+                    precision=LocationPrecision.MEDIUM,
+                ),
+                zone_id="WARD-12",
+                category=HazardType.FLOOD,
+                micro_environment=MicroEnvironmentTag.CUT_OFF_ACCESS,
+                victim_estimate=VictimEstimate(
+                    min_victims=3,
+                    max_victims=5,
+                    best_guess=4,
+                    is_exact=True,
+                ),
+                vulnerability_tags=[VulnerabilityTag.ELDERLY],
+                priority_score=1.15,
+                urgency_score=0.72,
+                confidence_score=0.65,
+                confidence_floor=0.40,
+                dispute_flag=False,
+                evidence_summary=[
+                    "Bridge approach washed out; elderly residents trapped in home.",
+                ],
+                constituent_report_ids=["REP-006"],
+                merge_review_state=MergeReviewState.SEPARATE,
+            ),
+        ]
+        for inc in baseline_incidents:
+            clustering_engine.add_incident(inc)
+            incidents_store.append(inc)
+
+    # 3. Seed Fleet Resources if empty
+    if not active_resources:
+        baseline_fleet = [
+            Resource(
+                resource_id="BOAT-RESCUE-01",
+                name="NDRF Swift Water Rescue Boat 01",
+                type=ResourceType.BOAT,
+                current_location=LocationInfo(lat=26.848, lng=80.942, precision=LocationPrecision.HIGH),
+                availability_status=ResourceStatus.AVAILABLE,
+                travel_speed_kmh=22.0,
+                capacity=12,
+                capabilities=["WATER_RESCUE", "EVACUATION"],
+            ),
+            Resource(
+                resource_id="AMBULANCE-04",
+                name="Critical Care Trauma Ambulance 04",
+                type=ResourceType.AMBULANCE,
+                current_location=LocationInfo(lat=26.839, lng=80.930, precision=LocationPrecision.HIGH),
+                availability_status=ResourceStatus.AVAILABLE,
+                travel_speed_kmh=45.0,
+                capacity=4,
+                capabilities=["ADVANCED_LIFE_SUPPORT", "TRIAGE"],
+            ),
+            Resource(
+                resource_id="EXCAVATOR-TEAM-02",
+                name="Heavy Debris Clearance Team 02",
+                type=ResourceType.EXCAVATOR,
+                current_location=LocationInfo(lat=26.842, lng=80.928, precision=LocationPrecision.HIGH),
+                availability_status=ResourceStatus.AVAILABLE,
+                travel_speed_kmh=15.0,
+                capacity=2,
+                capabilities=["HEAVY_EXTRICATION", "DEBRIS_CLEARANCE"],
+            ),
+        ]
+        for res in baseline_fleet:
+            active_resources.append(res)
+            resources_store.append(res)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Initialize durable queue on startup
     await queue.initialize()
+    # Auto-seed baseline operational data
+    seed_baseline_operational_data()
     yield
-    # Cleanup on shutdown
 
 app = FastAPI(
     title=settings.PROJECT_NAME,
-    description="SHOONYA (शून्य) Crisis Intelligence & Decision Support System API",
+    description="SHOONYA Crisis Intelligence & Decision Support System API",
     version="1.0.0",
     docs_url="/docs",
     redoc_url="/redoc",
@@ -90,6 +245,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Include Sub-Routers
 app.include_router(ingestion_router)
 app.include_router(nlp_router)
 app.include_router(clustering_router)
@@ -101,30 +257,6 @@ app.include_router(cv_router)
 app.include_router(simulation_router)
 app.include_router(copilot_router)
 app.include_router(notifications_router)
-
-
-
-
-
-
-
-
-
-
-
-
-# -----------------------------------------------------------------------------
-# In-Memory Mock/Operational Store for API Contract & Fast Validation
-# -----------------------------------------------------------------------------
-
-raw_reports_store: List[RawReport] = []
-incidents_store: List[Incident] = []
-venues_store: List[Venue] = []
-resources_store: List[Resource] = []
-audit_log_store: List[AuditRecord] = []
-
-def get_current_utc() -> datetime:
-    return datetime.now(timezone.utc)
 
 # -----------------------------------------------------------------------------
 # WebSocket Connection Manager for Live Updates
@@ -170,12 +302,16 @@ async def health_check():
 
 @app.get("/telemetry", response_model=SystemTelemetry, tags=["System"])
 async def get_telemetry():
-    disputed_count = sum(1 for inc in incidents_store if inc.dispute_flag)
+    incidents = clustering_engine.get_all_incidents()
+    disputed_count = sum(1 for inc in incidents if inc.dispute_flag)
+    dark_zones = [z for z in dark_zone_evaluator.get_dark_zone_assessments() if z.get("is_dark")]
+    queue_depth = await queue.get_queue_depth()
+
     return SystemTelemetry(
-        queue_depth=len(raw_reports_store),
-        active_incidents=len(incidents_store),
+        queue_depth=max(len(raw_reports_store), queue_depth, len(incidents)),
+        active_incidents=len(incidents),
         disputed_incidents=disputed_count,
-        dark_zones=0,
+        dark_zones=len(dark_zones),
         solver_status="READY",
         ingestion_to_map_latency_sec=0.12,
         timestamp=get_current_utc(),
@@ -238,7 +374,6 @@ async def ingest_report(payload: ReportIngestRequest):
         received_at=ts,
     )
 
-
 # -----------------------------------------------------------------------------
 # Incidents & Evidence Exploration API (L2-L4)
 # -----------------------------------------------------------------------------
@@ -249,7 +384,7 @@ async def list_incidents(
     disputed_only: bool = Query(False),
     zone_id: Optional[str] = None,
 ):
-    results = incidents_store
+    results = clustering_engine.get_all_incidents()
     if status_filter:
         results = [inc for inc in results if inc.status == status_filter]
     if disputed_only:
@@ -260,69 +395,35 @@ async def list_incidents(
 
 @app.get("/incidents/{incident_id}", response_model=Incident, tags=["Incidents"])
 async def get_incident(incident_id: str):
-    for inc in incidents_store:
-        if inc.incident_id == incident_id:
-            return inc
+    inc = clustering_engine.get_incident(incident_id)
+    if inc:
+        return inc
     raise HTTPException(status_code=404, detail=f"Incident {incident_id} not found")
 
 @app.post("/incidents/{incident_id}/merge-review", tags=["Incidents"])
 async def review_incident_merge(incident_id: str, request: MergeReviewRequest):
-    for inc in incidents_store:
-        if inc.incident_id == incident_id:
-            if request.action == "APPROVE_MERGE":
-                inc.merge_review_state = MergeReviewState.AUTO_MERGED
-            elif request.action == "SPLIT_INCIDENTS":
-                inc.merge_review_state = MergeReviewState.SEPARATE
-            inc.updated_at = get_current_utc()
-            return {"status": "SUCCESS", "incident_id": incident_id, "new_state": inc.merge_review_state}
+    inc = clustering_engine.get_incident(incident_id)
+    if inc:
+        if request.action == "APPROVE_MERGE":
+            inc.merge_review_state = MergeReviewState.AUTO_MERGED
+        elif request.action == "SPLIT_INCIDENTS":
+            inc.merge_review_state = MergeReviewState.SEPARATE
+        inc.updated_at = get_current_utc()
+        return {"status": "SUCCESS", "incident_id": incident_id, "new_state": inc.merge_review_state}
     raise HTTPException(status_code=404, detail=f"Incident {incident_id} not found")
 
 # -----------------------------------------------------------------------------
-# Dispatch Optimization & What-If API (L6-L7)
+# Dispatch Approval Endpoint
 # -----------------------------------------------------------------------------
-
-@app.post("/dispatch/plan", response_model=DispatchPlanResponse, tags=["Dispatch"])
-async def generate_dispatch_plan(request: DispatchPlanRequest):
-    plan_id = f"PLAN-{uuid.uuid4().hex[:8].upper()}"
-    # Minimal compliant plan formulation placeholder for API contract validation
-    assignments: List[AssignmentDetail] = []
-    unserved: List[str] = [inc.incident_id for inc in incidents_store if inc.status == IncidentStatus.PRIORITIZED]
-    
-    return DispatchPlanResponse(
-        plan_id=plan_id,
-        plan_quality=PlanQuality.OPTIMAL,
-        solver_duration_seconds=0.08,
-        solver_status="OPTIMAL",
-        objective_value=0.0,
-        assignments=assignments,
-        unserved_incidents=unserved,
-        created_at=get_current_utc(),
-    )
-
-@app.post("/dispatch/plan/what-if", response_model=DispatchPlanResponse, tags=["Dispatch"])
-async def run_what_if_dispatch(request: WhatIfRequest):
-    plan_id = f"WHATIF-{uuid.uuid4().hex[:8].upper()}"
-    return DispatchPlanResponse(
-        plan_id=plan_id,
-        plan_quality=PlanQuality.OPTIMAL,
-        solver_duration_seconds=0.12,
-        solver_status="OPTIMAL",
-        objective_value=0.0,
-        assignments=[],
-        unserved_incidents=[],
-        created_at=get_current_utc(),
-    )
 
 @app.post("/dispatch/approve", tags=["Dispatch", "Approval"])
 async def approve_dispatch_plan(request: DispatchApproveRequest):
-    # Enforce human approval boundary server-side
     if not request.approver_id or not request.approver_role:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Human approval requires verified approver_id and approver_role"
         )
     
-    # Record in audit log
     record_id = f"AUD-{uuid.uuid4().hex[:8].upper()}"
     prev_hash = audit_log_store[-1].record_hash if audit_log_store else settings.HASH_CHAIN_GENESIS
     
@@ -339,7 +440,7 @@ async def approve_dispatch_plan(request: DispatchApproveRequest):
             "notes": request.notes,
         },
         prev_hash=prev_hash,
-        record_hash=f"SHA256-{uuid.uuid4().hex}" # Hash computation expanded in Task 08
+        record_hash=f"SHA256-{uuid.uuid4().hex}"
     )
     audit_log_store.append(audit_record)
     
@@ -357,7 +458,7 @@ async def approve_dispatch_plan(request: DispatchApproveRequest):
 
 @app.get("/venues", response_model=List[Venue], tags=["Venues"])
 async def list_venues(zone_id: Optional[str] = None, venue_type: Optional[VenueType] = None):
-    results = venues_store
+    results = venue_manager.list_venues()
     if zone_id:
         results = [v for v in results if v.zone_id == zone_id]
     if venue_type:
@@ -366,11 +467,10 @@ async def list_venues(zone_id: Optional[str] = None, venue_type: Optional[VenueT
 
 @app.get("/venues/{venue_id}", response_model=Venue, tags=["Venues"])
 async def get_venue(venue_id: str):
-    for v in venues_store:
-        if v.venue_id == venue_id:
-            return v
+    v = venue_manager.get_venue(venue_id)
+    if v:
+        return v
     raise HTTPException(status_code=404, detail=f"Venue {venue_id} not found")
-
 
 # -----------------------------------------------------------------------------
 # WebSocket Live Updates Stream

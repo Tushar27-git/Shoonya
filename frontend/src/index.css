@@ -1,30 +1,51 @@
 @import "leaflet/dist/leaflet.css";
 
 :root {
-  --void: #0B0E11;
-  --panel: #141920;
-  --panel-elevated: #1C232D;
-  --grid-line: #232B33;
-  --grid-line-bright: #323E4A;
+  /* Dark Void & Surface Hierarchy */
+  --void: #090C10;
+  --void-deep: #050709;
+  --panel: #0F151F;
+  --panel-elevated: #151D2A;
+  --panel-hover: #1C2738;
+  --panel-glass: rgba(15, 21, 31, 0.88);
   
-  --signal-cyan: #4FD8C4;
-  --signal-cyan-glow: rgba(79, 216, 196, 0.15);
-  
-  --dispute-amber: #E8A33D;
-  --dispute-amber-glow: rgba(232, 163, 61, 0.15);
-  
-  --critical-ember: #D6553C;
-  --critical-ember-glow: rgba(214, 85, 60, 0.2);
-  
-  --dark-zone-grey: #5A6472;
-  --dark-zone-dark: #1E232B;
-  
-  --ink: #E4E8EC;
-  --ink-dim: #8A93A0;
-  --ink-muted: #535C68;
-  
+  /* Borders & Grids */
+  --grid-line: #1E293B;
+  --grid-line-bright: #2D3D54;
+  --grid-line-subtle: rgba(255, 255, 255, 0.06);
+
+  /* 3 Curated Subtle Accent Colors */
+  /* 1. Primary Signal (Cyan/Sky) */
+  --signal-cyan: #38BDF8;
+  --signal-cyan-dim: #0284C7;
+  --signal-cyan-glow: rgba(56, 189, 248, 0.16);
+  --signal-cyan-border: rgba(56, 189, 248, 0.35);
+
+  /* 2. Caution / Dispute (Warm Amber) */
+  --dispute-amber: #F59E0B;
+  --dispute-amber-dim: #D97706;
+  --dispute-amber-glow: rgba(245, 158, 11, 0.16);
+  --dispute-amber-border: rgba(245, 158, 11, 0.35);
+
+  /* 3. Critical / Urgent Alert (Coral Ember) */
+  --critical-ember: #EF4444;
+  --critical-ember-dim: #DC2626;
+  --critical-ember-glow: rgba(239, 68, 68, 0.18);
+  --critical-ember-border: rgba(239, 68, 68, 0.4);
+
+  /* Secondary Neutral Accents */
+  --dark-zone-grey: #64748B;
+  --dark-zone-dark: #141B26;
+
+  /* Typography Colors */
+  --ink: #F1F5F9;
+  --ink-bright: #FFFFFF;
+  --ink-dim: #94A3B8;
+  --ink-muted: #64748B;
+
+  /* Fonts */
   --font-mono: "JetBrains Mono", "SF Mono", "Fira Code", monospace;
-  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+  --font-sans: "Outfit", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
 
 * {
@@ -38,7 +59,7 @@ body {
   color: var(--ink);
   font-family: var(--font-sans);
   font-size: 13px;
-  line-height: 1.4;
+  line-height: 1.45;
   overflow: hidden;
   height: 100vh;
   width: 100vw;
@@ -55,10 +76,10 @@ body {
 }
 ::-webkit-scrollbar-thumb {
   background: var(--grid-line);
-  border-radius: 2px;
+  border-radius: 3px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--ink-muted);
+  background: var(--grid-line-bright);
 }
 
 /* Monospace Utilities */
@@ -71,60 +92,99 @@ body {
 .hatched-amber {
   background: repeating-linear-gradient(
     45deg,
-    rgba(232, 163, 61, 0.1),
-    rgba(232, 163, 61, 0.1) 6px,
-    rgba(232, 163, 61, 0.2) 6px,
-    rgba(232, 163, 61, 0.2) 12px
+    rgba(245, 158, 11, 0.08),
+    rgba(245, 158, 11, 0.08) 6px,
+    rgba(245, 158, 11, 0.16) 6px,
+    rgba(245, 158, 11, 0.16) 12px
   );
-  border: 1px solid var(--dispute-amber);
+  border: 1px solid var(--dispute-amber-border);
 }
 
 .hatched-dark-zone {
   background: repeating-linear-gradient(
     -45deg,
-    rgba(90, 100, 114, 0.15),
-    rgba(90, 100, 114, 0.15) 8px,
-    rgba(30, 35, 43, 0.8) 8px,
-    rgba(30, 35, 43, 0.8) 16px
+    rgba(100, 116, 139, 0.12),
+    rgba(100, 116, 139, 0.12) 8px,
+    rgba(20, 27, 38, 0.85) 8px,
+    rgba(20, 27, 38, 0.85) 16px
   );
   border: 1px dashed var(--dark-zone-grey);
 }
 
 /* Leaflet Dark Tactical Map Customization */
 .leaflet-container {
-  background-color: #0b0e11 !important;
+  background-color: #090c10 !important;
+  font-family: var(--font-sans) !important;
 }
+
 .leaflet-tile-pane {
-  filter: brightness(0.65) contrast(1.35) saturate(0.3) !important;
+  filter: brightness(0.65) contrast(1.3) saturate(0.25) !important;
 }
+
 .leaflet-control-zoom {
   border: 1px solid var(--grid-line) !important;
   background: var(--panel) !important;
+  border-radius: 4px !important;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5) !important;
 }
-
-
 
 .leaflet-control-zoom a {
   background: var(--panel) !important;
   color: var(--ink) !important;
   border-bottom: 1px solid var(--grid-line) !important;
+  transition: background 0.15s ease, color 0.15s ease;
 }
 
-/* Keyframes */
+.leaflet-control-zoom a:hover {
+  background: var(--panel-hover) !important;
+  color: var(--signal-cyan) !important;
+}
+
+.leaflet-popup-content-wrapper {
+  background: var(--panel-glass) !important;
+  backdrop-filter: blur(12px) !important;
+  border: 1px solid var(--grid-line-bright) !important;
+  color: var(--ink) !important;
+  border-radius: 6px !important;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.7) !important;
+  padding: 0 !important;
+}
+
+.leaflet-popup-content {
+  margin: 0 !important;
+  line-height: 1.4 !important;
+}
+
+.leaflet-popup-tip {
+  background: var(--panel) !important;
+}
+
+/* Keyframes & Pulse Effects */
 @keyframes pulse-critical {
-  0% { box-shadow: 0 0 0 0 rgba(214, 85, 60, 0.6); }
-  70% { box-shadow: 0 0 0 8px rgba(214, 85, 60, 0); }
-  100% { box-shadow: 0 0 0 0 rgba(214, 85, 60, 0); }
+  0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.6); }
+  70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+}
+
+@keyframes pulse-cyan {
+  0% { box-shadow: 0 0 0 0 rgba(56, 189, 248, 0.6); }
+  70% { box-shadow: 0 0 0 8px rgba(56, 189, 248, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(56, 189, 248, 0); }
 }
 
 @keyframes pulse-amber {
-  0% { box-shadow: 0 0 0 0 rgba(232, 163, 61, 0.6); }
-  70% { box-shadow: 0 0 0 8px rgba(232, 163, 61, 0); }
-  100% { box-shadow: 0 0 0 0 rgba(232, 163, 61, 0); }
+  0% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.6); }
+  70% { box-shadow: 0 0 0 8px rgba(245, 158, 11, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); }
 }
 
 .pulsing-critical {
   animation: pulse-critical 2s infinite;
+}
+
+.pulsing-cyan {
+  animation: pulse-cyan 2.5s infinite;
 }
 
 .pulsing-amber {

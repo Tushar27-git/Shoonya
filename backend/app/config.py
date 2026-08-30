@@ -2,7 +2,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 from pydantic import Field
 
 class Settings(BaseSettings):
-    PROJECT_NAME: str = "SHOONYA (शून्य)"
+    PROJECT_NAME: str = "SHOONYA"
     API_V1_PREFIX: str = "/api/v1"
     DEBUG: bool = False
     

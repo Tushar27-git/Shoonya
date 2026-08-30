@@ -206,10 +206,13 @@ export interface CopilotMessageResponse {
 
 export interface SitrepResponse {
   sitrep_id: string;
-  generated_at: string;
-  reporting_officer: string;
-  district_name: string;
+  timestamp?: string;
+  generated_at?: string;
+  reporting_officer?: string;
+  district_name?: string;
+  executive_summary?: string;
   total_active_incidents: number;
+  critical_incidents_count?: number;
   disputed_incidents_count: number;
   casualty_bounds: {
     min: number;
@@ -217,8 +220,11 @@ export interface SitrepResponse {
     best_guess: number;
   };
   dark_zones_count: number;
-  critical_venues_at_risk: any[];
-  fleet_status: {
+  critical_incident_ids?: string[];
+  critical_venues_at_risk?: any[];
+  venue_surge_alerts?: string[];
+  operational_recommendations?: string[];
+  fleet_status?: {
     total_resources: number;
     assigned_resources: number;
     available_resources: number;

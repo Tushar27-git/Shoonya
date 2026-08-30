@@ -25,7 +25,7 @@ def api_get(endpoint):
         return json.loads(resp.read().decode("utf-8"))
 
 print("=" * 75)
-print("  SHOONYA (शून्य) CRISIS PLATFORM — FULL END-TO-END SERVICE & SCENARIO LOADER")
+print("  SHOONYA CRISIS PLATFORM — FULL END-TO-END SERVICE & SCENARIO LOADER")
 print("=" * 75)
 
 # 1. Health & Telemetry Check

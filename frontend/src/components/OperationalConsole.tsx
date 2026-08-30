@@ -157,6 +157,8 @@ export const OperationalConsole: React.FC<OperationalConsoleProps> = ({
           display: "flex",
           borderBottom: "1px solid var(--grid-line)",
           backgroundColor: "var(--void)",
+          padding: "4px 6px 0 6px",
+          gap: "2px",
         }}
       >
         {[
@@ -172,14 +174,18 @@ export const OperationalConsole: React.FC<OperationalConsoleProps> = ({
             className="mono"
             style={{
               flex: 1,
-              padding: "10px 4px",
+              padding: "9px 4px",
               fontSize: "10px",
-              fontWeight: 700,
+              fontWeight: activeTab === t.id ? 800 : 600,
               backgroundColor: activeTab === t.id ? "var(--panel)" : "transparent",
               color: activeTab === t.id ? "var(--signal-cyan)" : "var(--ink-dim)",
-              border: "none",
+              border: "1px solid",
+              borderColor: activeTab === t.id ? "var(--grid-line-bright) var(--grid-line-bright) transparent var(--grid-line-bright)" : "transparent",
+              borderTopLeftRadius: "4px",
+              borderTopRightRadius: "4px",
               borderBottom: activeTab === t.id ? "2px solid var(--signal-cyan)" : "none",
               cursor: "pointer",
+              transition: "all 0.15s ease",
             }}
           >
             {t.label}

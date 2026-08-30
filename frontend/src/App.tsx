@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
+import { LandingPage } from "./components/LandingPage";
 import { Header } from "./components/Header";
 import { IncidentFeed } from "./components/IncidentFeed";
 import { TacticalMap } from "./components/TacticalMap";
@@ -16,7 +17,10 @@ import type {
 const API_BASE = "http://127.0.0.1:8001";
 
 export const App: React.FC = () => {
-  // State management
+  // Top-level navigation state: Landing Page vs Operational Dashboard
+  const [viewMode, setViewMode] = useState<"LANDING" | "DASHBOARD">("LANDING");
+
+  // Operational State management
   const [incidents, setIncidents] = useState<Incident[]>([]);
   const [resources, setResources] = useState<Resource[]>([]);
   const [dispatchPlan, setDispatchPlan] = useState<DispatchPlanResponse | null>(null);
@@ -34,8 +38,8 @@ export const App: React.FC = () => {
 
   // Telemetry strip state
   const [telemetry, setTelemetry] = useState<SystemTelemetry>({
-    queue_depth: 0,
-    active_incidents: 0,
+    queue_depth: 3,
+    active_incidents: 3,
     disputed_incidents: 0,
     dark_zones: 1,
     solver_status: "READY",
@@ -79,7 +83,7 @@ export const App: React.FC = () => {
         setAuditRecords(audData);
       }
     } catch (e) {
-      console.warn("Backend poll warning:", e);
+      console.warn("Backend poll notice:", e);
     }
   }, [selectedIncidentId]);
 
@@ -90,7 +94,7 @@ export const App: React.FC = () => {
       if (isLive) {
         fetchLiveData();
       }
-    }, 4000);
+    }, 3500);
     return () => clearInterval(interval);
   }, [fetchLiveData, isLive]);
 
@@ -191,7 +195,6 @@ export const App: React.FC = () => {
       alert(`✗ What-If calculation error: ${e.message}`);
     }
   };
-
 
   const handleVerifyAuditChain = async () => {
     try {
@@ -296,8 +299,34 @@ export const App: React.FC = () => {
     }
   };
 
-  const selectedIncident = incidents.find((i) => i.incident_id === selectedIncidentId) || (incidents.length > 0 ? incidents[0] : null);
+  // Copilot Action Execution dispatcher
+  const handleExecuteCopilotAction = (actionType: string, targetId: string, params?: Record<string, any>) => {
+    if (actionType === "REQUEST_INFO") {
+      const lat = params?.lat || 26.865;
+      const lng = params?.lng || 80.962;
+      handleTaskDrone(targetId, lat, lng, `Copilot requested aerial recon survey on ${targetId}`);
+    } else if (actionType === "DISPATCH_RESOURCE") {
+      handleGeneratePlan();
+    } else if (actionType === "ESCALATE_ALERT") {
+      alert(`⚠ Escalation Alert: Casualty transfer alert broadcast for ${targetId}.`);
+    }
+  };
 
+  const selectedIncident =
+    incidents.find((i) => i.incident_id === selectedIncidentId) ||
+    (incidents.length > 0 ? incidents[0] : null);
+
+  // If in Landing mode, render clean dedicated Landing Page
+  if (viewMode === "LANDING") {
+    return (
+      <LandingPage
+        telemetry={telemetry}
+        onEnterDashboard={() => setViewMode("DASHBOARD")}
+      />
+    );
+  }
+
+  // Operational Command Dashboard
   return (
     <div style={{ display: "flex", flexDirection: "column", height: "100vh", width: "100vw" }}>
       {/* Top Header Strip */}
@@ -309,6 +338,7 @@ export const App: React.FC = () => {
           if (!isLive) setReplayMinutesAgo(0);
         }}
         onOpenCopilot={() => setIsCopilotOpen(true)}
+        onNavigateToLanding={() => setViewMode("LANDING")}
       />
 
       {/* Main 3-Column Tactical Command Grid */}
@@ -327,6 +357,7 @@ export const App: React.FC = () => {
             resources={resources}
             selectedIncidentId={selectedIncident?.incident_id || null}
             onSelectIncident={setSelectedIncidentId}
+            onTaskDrone={handleTaskDrone}
           />
 
           {/* Bottom Timeline Replay Slider */}
@@ -376,6 +407,7 @@ export const App: React.FC = () => {
           setSelectedIncidentId(id);
           setIsCopilotOpen(false);
         }}
+        onExecuteAction={handleExecuteCopilotAction}
       />
     </div>
   );
