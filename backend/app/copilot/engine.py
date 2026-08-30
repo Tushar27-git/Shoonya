@@ -145,9 +145,9 @@ class EOCCopilotEngine:
 
         # 1.6 Fleet / Resources Inventory
         is_fleet_query = any(k in q_lower for k in [
-            "boat", "ambulance", "excavator", "fleet", "resource", "vehicle", "vehicles",
+            "boat", "ambulance", "excavator", "fleet", "resource", "resources", "vehicle", "vehicles",
             "nau", "नाव", "gadi", "गाड़ी", "sadhan", "how many boats", "available boats",
-            "available units", "fleet status", "rescue units"
+            "available units", "fleet status", "rescue units", "free resources"
         ])
 
         # 1.7 Casualty & Victims
@@ -166,7 +166,7 @@ class EOCCopilotEngine:
         # 1.9 Hospitals & Shelters Surge
         is_hospital_query = any(k in q_lower for k in [
             "hospital", "hospitals", "bed", "beds", "icu", "shelter", "camp", "trauma",
-            "doctor", "asptal", "aspatal", "अस्पताल", "rahat shibir", "relief camp"
+            "doctor", "asptal", "aspatal", "अस्पताल", "rahat shibir", "relief camp", "capacity"
         ])
 
         # 1.10 Disputes & Verification
@@ -185,6 +185,12 @@ class EOCCopilotEngine:
         is_sop_query = any(k in q_lower for k in [
             "sop", "protocol", "what to do", "procedure", "how to rescue", "steps",
             "kya karein", "guideline", "guidelines", "nirdesh", "प्रक्रिया"
+        ])
+
+        # 1.13 Strategy & Recommendations
+        is_strategy_query = any(k in q_lower for k in [
+            "strategy", "recommend", "recommendation", "what should we do", "what to do now",
+            "action plan", "next steps", "priority plan", "kya karna chahiye"
         ])
 
         # ---------------------------------------------------------------------
@@ -621,7 +627,36 @@ class EOCCopilotEngine:
                     "4. Telecom Blackouts: Initiate automated drone surveillance sweep to verify uncorroborated levee breach.",
                 ])
 
-        # BRANCH 12: General Situational Briefing & Ranked Priorities
+        # BRANCH 12: Strategy & High-Level Recommendations
+        elif is_strategy_query:
+            if is_hindi:
+                content_lines.extend([
+                    "रणनीतिक कार्ययोजना // कमांडर निर्णय-समर्थन",
+                    "",
+                    "1. तात्कालिक प्राथमिक कदम:",
+                    "   • वार्ड 07 स्कूल (10 बच्चे) के लिए नाव [BOAT-RESCUE-01] की ट्रैकिंग सुनिश्चित करें।",
+                    "   • वार्ड 04 मार्केट संकुल में मलबे में फंसे 8 लोगों हेतु जेसीबी [EXCAVATOR-TEAM-02] तैनात करें।",
+                    "   • मौन डार्क ज़ोन (वार्ड 09) में स्थिति का पता लगाने हेतु टोही ड्रोन भेजें।",
+                    "",
+                    "2. नागरिक चेतावनी एवं अस्पताल तैयारी:",
+                    "   • जिला अस्पताल में 84% बेड भरे हैं, गंभीर मरीजों को बैकअप सेंटर में रिडायरेक्ट करें।",
+                    "   • दूषित जल से बचाव हेतु प्रभावित क्षेत्रों में रिवर्स एसओएस चेतावनी जारी करें।"
+                ])
+            else:
+                content_lines.extend([
+                    "OPERATIONAL STRATEGY // COMMANDER DECISION MATRIX",
+                    "",
+                    "1. IMMEDIATE LIFE-SAFETY ACTIONS:",
+                    "   • Maintain active boat extraction for 10 rooftop children at Ward 07 School ([INC-W07-01]).",
+                    "   • Authorize heavy excavator deployment to Ward 04 Market debris collapse ([INC-W04-02]).",
+                    "   • Task autonomous drone reconnaissance sweep across silent dark zone (Ward 09).",
+                    "",
+                    "2. LOGISTICS & CASUALTY DIVERSION:",
+                    "   • District General Hospital is at 84% occupancy — divert non-critical patients to Sector 4 Relief Camp.",
+                    "   • Broadcast localized Reverse SOS boil-water advisories to downstream basin residents.",
+                ])
+
+        # BRANCH 13: General Situational Briefing & Ranked Priorities
         else:
             top_inc = sorted(incidents, key=lambda x: x.priority_score, reverse=True)[:3]
             if is_hindi:
